@@ -12,6 +12,7 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "antd": "^5.1.6",
+    "axios": "^1.2.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.0",
@@ -25,7 +26,8 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject",
-    "prettier": "prettier --write  ."
+    "prettier": "prettier --write  .",
+    "generate-swagger": "swagger-typescript-api --path http://ycrpark.iptime.org:8080/api-docs --output ./src/apis --axios --unwrap-response-data"
   },
   "eslintConfig": {
     "extends": [
@@ -54,6 +56,7 @@
     "eslint-plugin-react": "^7.32.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^2.8.3",
+    "swagger-typescript-api": "^12.0.2",
     "tailwindcss": "^3.2.4"
   }
 }
