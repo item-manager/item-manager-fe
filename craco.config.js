@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path')
 
-const endpoint = '라즈베리파이주소?'
+const endpoint = 'http://ycrpark.iptime.org:8080/'
 
 module.exports = {
   webpack: {
@@ -11,7 +11,10 @@ module.exports = {
   },
   devServer: {
     proxy: {
-      '/api': endpoint,
+      '/api': {
+        target: endpoint,
+        pathRewrite: { '^/api': '' }
+      }
     },
   },
 }
