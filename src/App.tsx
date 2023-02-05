@@ -1,6 +1,7 @@
-import { Button, ConfigProvider } from 'antd'
+import { ConfigProvider } from 'antd'
 import { StyleProvider } from '@ant-design/cssinjs'
 import { RecoilRoot } from 'recoil'
+import Router from './routes'
 
 import 'antd/dist/reset.css'
 import './index.css'
@@ -11,7 +12,7 @@ function App() {
       <ConfigProvider>
         <StyleProvider hashPriority='high'>
           <div className='App'>
-            <Button type='primary'>Button</Button>
+            <Router />
           </div>
         </StyleProvider>
       </ConfigProvider>
