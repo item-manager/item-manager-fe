@@ -3,7 +3,8 @@ import { httpClient, CreateUserRQ } from '@/apis'
 export const NavigationUtil = {
   login: '/login',
   register: '/register',
-}
+  locations: '/locations',
+} as const
 
 export const Schema = async ({ id, username, password, passwordConfirm }: CreateUserRQ) => {
   if (!/^[A-Za-z][A-Za-z0-9_]{2,10}$/.test(id)) {
