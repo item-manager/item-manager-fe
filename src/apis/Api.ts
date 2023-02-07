@@ -370,12 +370,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @summary '보관장소(방)'의 '위치' 목록 조회
      * @request GET:/locations/places
      */
-    getPlacesByRoomNo: (
-      query: {
-        placesRQ: PlacesRQ
-      },
-      params: RequestParams = {}
-    ) =>
+    getPlacesByRoomNo: (query: PlacesRQ, params: RequestParams = {}) =>
       this.request<any, ErrorResult>({
         path: `/locations/places`,
         method: 'GET',

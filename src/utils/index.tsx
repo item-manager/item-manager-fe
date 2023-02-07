@@ -8,7 +8,8 @@ interface CreateUser {
 export const NavigationUtil = {
   login: '/login',
   register: '/register',
-}
+  locations: '/locations',
+} as const
 
 export const schema = ({ id, username, password, passwordConfirm }: CreateUser) => {
   if (!/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test(username)) {
