@@ -4,10 +4,12 @@ import { ChangeEvent, useState } from 'react'
 import { httpClient } from '@/apis'
 import { useNavigate } from 'react-router'
 import { NavigationUtil } from '@/utils'
+import { useRecoilState } from 'recoil'
+import { showPassword } from '@/store/atom'
 
 const LoginPage = () => {
   const navigate = useNavigate()
-  const [isShow, setIsShow] = useState<boolean>(false)
+  const [isShow, setIsShow] = useRecoilState(showPassword)
   const [inputs, setInputs] = useState({
     id: '',
     password: '',
@@ -49,7 +51,7 @@ const LoginPage = () => {
         </h3>
         <div>
           <input
-            placeholder='Username'
+            placeholder='ID'
             className='w-72 h-10 pl-3 outline-none border-b-2 bg-white'
             name='id'
             onChange={onChangeInputs}

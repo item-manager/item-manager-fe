@@ -1,14 +1,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEyeSlash, faUser, faEye, faEnvelope } from '@fortawesome/free-solid-svg-icons'
+import { faEyeSlash, faUser, faEye, faIdCard } from '@fortawesome/free-solid-svg-icons'
 import { ChangeEvent, useState } from 'react'
-import { httpClient } from '@/apis'
-import { schema, NavigationUtil } from '@/utils'
-import { useNavigate } from 'react-router'
+import { Schema } from '@/utils'
+import { useRecoilState } from 'recoil'
+import { showPassword, showPasswordConfirm } from '@/store/atom'
 
 const Register = () => {
-  const navigate = useNavigate()
-  const [isShow, setIsShow] = useState<boolean>(false)
-  const [isShowPass, setIsShowPass] = useState<boolean>(false)
+  const [isShow, setIsShow] = useRecoilState(showPassword)
+  const [isShowPass, setIsShowPass] = useRecoilState(showPasswordConfirm)
   const [inputs, setInputs] = useState({
     id: '',
     username: '',
@@ -31,16 +30,8 @@ const Register = () => {
     setIsShowPass((prev) => !prev)
   }
 
-  const onClickRegister = async () => {
-    schema({ ...inputs })
-
-    try {
-      await httpClient.users.createUser({ ...inputs })
-    } catch (error) {
-      if (error instanceof Error) console.log('register error:', error.message)
-    }
-
-    navigate(NavigationUtil.login)
+  const onClickRegister = () => {
+    Schema({ ...inputs })
   }
 
   return (
@@ -51,18 +42,18 @@ const Register = () => {
         </h1>
         <div>
           <input
-            placeholder='Email'
+            placeholder='ID'
             className='w-72 h-10 pl-3 outline-none border-b-2 bg-white'
-            name='username'
+            name='id'
             onChange={onChangeInputs}
           />
-          <FontAwesomeIcon icon={faEnvelope} className='relative right-6' />
+          <FontAwesomeIcon icon={faIdCard} className='relative right-6' />
         </div>
         <div>
           <input
             placeholder='Username'
             className='w-72 h-10 pl-3 outline-none border-b-2 bg-white'
-            name='id'
+            name='username'
             onChange={onChangeInputs}
           />
           <FontAwesomeIcon icon={faUser} className='relative right-6' />

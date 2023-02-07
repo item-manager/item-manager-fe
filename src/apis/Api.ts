@@ -19,6 +19,7 @@ export interface CreateUserRQ {
   id: string
   password: string
   username: string
+  passwordConfirm: string;
 }
 
 export interface CreateUserRS {
