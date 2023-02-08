@@ -1,6 +1,8 @@
 # Multi-stage build
 FROM node:18-alpine3.15 AS builder
 
+ENV NODE_ENV production
+
 # working directory 설정
 WORKDIR /app
 

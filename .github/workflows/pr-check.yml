@@ -1,0 +1,22 @@
+name: PR Build Check
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Build the Docker image
+      uses: actions/checkout@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        platforms: linux/arm/v7
+        push: false
+        tags: youngjins/item-manager-fe:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
