@@ -1,6 +1,10 @@
 # Multi-stage build
 FROM node:18-alpine3.15 AS builder
 
+ENV NODE_ENV production
+ENV DISABLE_ESLINT_PLUGIN=true
+ENV GENERATE_SOURCEMAP=false
+
 # working directory 설정
 WORKDIR /app
 
@@ -8,7 +12,7 @@ COPY package*.json ./
 COPY yarn.lock  ./
 
 # 인스톨
-RUN yarn --frozen-lockfile
+RUN yarn --frozen-lockfile --network-timeout 1000000
 
 # working directory로 소스 복사
 COPY . .
