@@ -19,7 +19,7 @@ export interface CreateUserRQ {
   id: string
   password: string
   username: string
-  passwordConfirm: string;
+  passwordConfirm: string
 }
 
 export interface CreateUserRS {
@@ -56,6 +56,34 @@ export interface CreatePlaceRQ {
   name: string
 }
 
+export interface CreatePlaceRS {
+  /** @format int64 */
+  placeNo?: number
+}
+
+export interface ResultCreatePlaceRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: CreatePlaceRS
+}
+
+export interface CreateLabelRQ {
+  name?: string
+}
+
+export interface CreateLabelRS {
+  /** @format int64 */
+  labelNo: number
+}
+
+export interface ResultCreateLabelRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: CreateLabelRS
+}
+
 export interface CreateItemRQ {
   name: string
   type: 'CONSUMABLE' | 'EQUIPMENT'
@@ -66,6 +94,39 @@ export interface CreateItemRQ {
   photo?: File
   /** @format int32 */
   priority?: number
+}
+
+export interface CreateItemRS {
+  /** @format int64 */
+  itemNo?: number
+}
+
+export interface ResultCreateItemRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: CreateItemRS
+}
+
+export interface AttachLabelToItemRQ {
+  /** @format int64 */
+  itemNo?: number
+  /** @format int64 */
+  labelNo?: number
+}
+
+export interface ItemLabelRS {
+  /** @format int64 */
+  itemNo?: number
+  /** @format int64 */
+  labelNo?: number
+}
+
+export interface ResultItemLabelRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: ItemLabelRS
 }
 
 export interface LoginUserRQ {
@@ -84,6 +145,17 @@ export interface ResultLoginUserRS {
   code?: number
   message?: string
   data?: LoginUserRS
+}
+
+export interface UpdateLabelRQ {
+  name?: string
+}
+
+export interface ResultVoid {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: object
 }
 
 export interface ResultSessionUser {
@@ -117,16 +189,66 @@ export interface PlacesRQ {
   roomNo?: number
 }
 
-export interface ItemRQ {
+export interface PlacesRS {
   /** @format int64 */
-  itemNo?: number
+  placeNo?: number
+  name?: string
 }
 
-export interface ResultVoid {
+export interface ResultListPlacesRS {
   /** @format int32 */
   code?: number
   message?: string
-  data?: object
+  data?: PlacesRS[]
+}
+
+export interface LabelRS {
+  /** @format int64 */
+  labelNo?: number
+  name?: string
+}
+
+export interface ResultListLabelRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: LabelRS[]
+}
+
+export interface ItemRS {
+  /** @format int64 */
+  itemNo?: number
+  name?: string
+  type?: 'CONSUMABLE' | 'EQUIPMENT'
+  room?: string
+  place?: string
+  locationMemo?: string
+  /** @format int32 */
+  quantity?: number
+  /** @format int32 */
+  priority?: number
+  labels?: LabelRS[]
+}
+
+export interface ResultListItemRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: ItemRS[]
+}
+
+export interface ResultItemRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: ItemRS
+}
+
+export interface DetachLabelFromItemRQ {
+  /** @format int64 */
+  itemNo?: number
+  /** @format int64 */
+  labelNo?: number
 }
 
 import axios, { AxiosInstance, AxiosRequestConfig, HeadersDefaults, ResponseType } from 'axios'
@@ -372,7 +494,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/locations/places
      */
     getPlacesByRoomNo: (query: PlacesRQ, params: RequestParams = {}) =>
-      this.request<any, ErrorResult>({
+      this.request<ResultListPlacesRS, ErrorResult>({
         path: `/locations/places`,
         method: 'GET',
         query: query,
@@ -388,9 +510,74 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/locations/places
      */
     createPlace: (data: CreatePlaceRQ, params: RequestParams = {}) =>
-      this.request<any, ErrorResult>({
+      this.request<ResultCreatePlaceRS, ErrorResult>({
         path: `/locations/places`,
         method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+  }
+  labels = {
+    /**
+     * No description
+     *
+     * @tags label-controller
+     * @name GetLabels
+     * @summary 라벨 목록 조회
+     * @request GET:/labels
+     */
+    getLabels: (params: RequestParams = {}) =>
+      this.request<ResultListLabelRS, ErrorResult>({
+        path: `/labels`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags label-controller
+     * @name CreateLabel
+     * @summary 라벨 생성
+     * @request POST:/labels
+     */
+    createLabel: (data: CreateLabelRQ, params: RequestParams = {}) =>
+      this.request<ResultCreateLabelRS, ErrorResult>({
+        path: `/labels`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags label-controller
+     * @name DeleteLabel
+     * @summary 라벨 제거
+     * @request DELETE:/labels/{labelNo}
+     */
+    deleteLabel: (labelNo: number, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/labels/${labelNo}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags label-controller
+     * @name PatchLabel
+     * @summary 라벨 수정
+     * @request PATCH:/labels/{labelNo}
+     */
+    patchLabel: (labelNo: number, data: UpdateLabelRQ, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/labels/${labelNo}`,
+        method: 'PATCH',
         body: data,
         type: ContentType.Json,
         ...params,
@@ -401,20 +588,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags item-controller
-     * @name GetItem
-     * @summary 물품 pk로 조회
+     * @name GetItems
+     * @summary 물품 목록 조회
      * @request GET:/items
      */
-    getItem: (
-      query: {
-        itemRQ: ItemRQ
-      },
-      params: RequestParams = {}
-    ) =>
-      this.request<any, ErrorResult>({
+    getItems: (params: RequestParams = {}) =>
+      this.request<ResultListItemRS, ErrorResult>({
         path: `/items`,
         method: 'GET',
-        query: query,
         ...params,
       }),
 
@@ -427,11 +608,75 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/items
      */
     createItem: (data: CreateItemRQ, params: RequestParams = {}) =>
-      this.request<any, ErrorResult>({
+      this.request<ResultCreateItemRS, ErrorResult>({
         path: `/items`,
         method: 'POST',
         body: data,
         type: ContentType.FormData,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name AttachLabelToItemRq
+     * @summary 물품에 라벨링
+     * @request POST:/items/labels
+     */
+    attachLabelToItemRq: (data: AttachLabelToItemRQ, params: RequestParams = {}) =>
+      this.request<ResultItemLabelRS, ErrorResult>({
+        path: `/items/labels`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name DetachLabelFromItem
+     * @summary 물품에서 라벨 제거
+     * @request DELETE:/items/labels
+     */
+    detachLabelFromItem: (data: DetachLabelFromItemRQ, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/items/labels`,
+        method: 'DELETE',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name GetItem
+     * @summary 물품 pk로 조회
+     * @request GET:/items/{itemNo}
+     */
+    getItem: (itemNo: number, params: RequestParams = {}) =>
+      this.request<ResultItemRS, ErrorResult>({
+        path: `/items/${itemNo}`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name LoadPhoto
+     * @summary 물품 사진 조회
+     * @request GET:/items/{itemNo}/photo
+     */
+    loadPhoto: (itemNo: number, params: RequestParams = {}) =>
+      this.request<File, ErrorResult>({
+        path: `/items/${itemNo}/photo`,
+        method: 'GET',
         ...params,
       }),
   }
