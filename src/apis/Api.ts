@@ -144,7 +144,7 @@ export interface ResultLoginUserRS {
   /** @format int32 */
   code?: number
   message?: string
-  data?: LoginUserRS
+  data: LoginUserRS
 }
 
 export interface UpdateLabelRQ {

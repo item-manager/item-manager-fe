@@ -5,7 +5,6 @@ import koKR from 'antd/locale/ko_KR'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RecoilRoot } from 'recoil'
 import Router from './routes'
-import Layout from './styles/layouts'
 
 import 'antd/dist/reset.css'
 import './index.css'
@@ -25,13 +24,11 @@ function App() {
             },
           }}
         >
-          <Layout>
-            <StyleProvider hashPriority='high'>
-              <div className='App'>
-                <Router />
-              </div>
-            </StyleProvider>
-          </Layout>
+          <StyleProvider hashPriority='high'>
+            <div className='App'>
+              <Router />
+            </div>
+          </StyleProvider>
         </ConfigProvider>
       </QueryClientProvider>
     </RecoilRoot>

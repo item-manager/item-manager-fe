@@ -1,19 +1,33 @@
-import { NavigationUtil } from '@/utils'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import LoginPage from '@/pages/login'
-import Register from '@/pages/register'
-import LocationsPage from '@/pages/locations'
-import ItemsPage from '@/pages/items'
+import { httpClient } from '@/apis'
+import { MainSpin } from '@/components/spin'
+import { isLoggedInState, userState } from '@/store'
+import { useEffect, useState } from 'react'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import PrivateRoutes from './PrivateRoutes'
+import PublicRoutes from './PublicRoutes'
 
 const Router = () => {
-  return (
-    <Routes>
-      <Route path='/' element={<Navigate replace to='/login' />} />
-      <Route path={NavigationUtil.login} element={<LoginPage />} />
-      <Route path={NavigationUtil.register} element={<Register />} />
-      <Route path={NavigationUtil.locations} element={<LocationsPage />} />
-      <Route path={NavigationUtil.items} element={<ItemsPage />} />
-    </Routes>
-  )
+  const [_user, setUser] = useRecoilState(userState)
+  const isLoggedIn = useRecoilValue(isLoggedInState)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    getUser()
+  }, [])
+
+  const getUser = async () => {
+    try {
+      const result = await httpClient.users.getUser()
+      if (result.data) {
+        setUser(result.data)
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return <>{isLoading ? <MainSpin /> : isLoggedIn ? <PrivateRoutes /> : <PublicRoutes />}</>
 }
 export default Router
