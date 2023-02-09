@@ -21,6 +21,7 @@ function App() {
           theme={{
             token: {
               colorPrimary: '#2E8B57',
+              fontFamily: 'Inter',
             },
           }}
         >
