@@ -204,8 +204,8 @@ export interface ResultListPlacesRS {
 
 export interface LabelRS {
   /** @format int64 */
-  labelNo?: number
-  name?: string
+  labelNo: number
+  name: string
 }
 
 export interface ResultListLabelRS {
