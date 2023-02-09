@@ -2,7 +2,7 @@ import { httpClient } from '@/apis'
 import { NavigationUtil } from '@/utils'
 import { useNavigate } from 'react-router'
 
-const Header = () => {
+export const Header = () => {
   const navigate = useNavigate()
 
   const onClickRouteLogin = () => {
@@ -16,7 +16,7 @@ const Header = () => {
   }
 
   return (
-    <div className='w-screen h-16 bg-main flex items-center'>
+    <div className='flex items-center w-screen h-16 bg-main'>
       <div className='flex items-center w-4/5 h-full'>
         <h1 className='pl-10 text-2xl hover:cursor-pointer'>물품관리</h1>
       </div>
@@ -34,4 +34,3 @@ const Header = () => {
     </div>
   )
 }
-export default Header
