@@ -4,6 +4,7 @@ export const NavigationUtil = {
   login: '/login',
   register: '/register',
   locations: '/locations',
+  items: '/items',
 } as const
 
 export const Schema = async ({ id, username, password, passwordConfirm }: CreateUserRQ) => {
