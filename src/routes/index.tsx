@@ -1,10 +1,33 @@
+import { httpClient } from '@/apis'
+import { MainSpin } from '@/components/spin'
+import { isLoggedInState, userState } from '@/store'
+import { useEffect, useState } from 'react'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import PrivateRoutes from './PrivateRoutes'
 import PublicRoutes from './PublicRoutes'
 
 const Router = () => {
-  // TODO 로그인 여부 관리 필요
-  const isLoggedIn = false
+  const [_user, setUser] = useRecoilState(userState)
+  const isLoggedIn = useRecoilValue(isLoggedInState)
+  const [isLoading, setIsLoading] = useState(true)
 
-  return <>{isLoggedIn ? <PrivateRoutes /> : <PublicRoutes />}</>
+  useEffect(() => {
+    getUser()
+  }, [])
+
+  const getUser = async () => {
+    try {
+      const result = await httpClient.users.getUser()
+      if (result.data) {
+        setUser(result.data)
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return <>{isLoading ? <MainSpin /> : isLoggedIn ? <PrivateRoutes /> : <PublicRoutes />}</>
 }
 export default Router

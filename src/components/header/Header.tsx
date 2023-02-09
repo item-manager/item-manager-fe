@@ -1,18 +1,26 @@
 import { httpClient } from '@/apis'
+import { userState } from '@/store'
 import { NavigationUtil } from '@/utils'
 import { useNavigate } from 'react-router'
+import { useRecoilState } from 'recoil'
 
 export const Header = () => {
+  const [_user, setUser] = useRecoilState(userState)
   const navigate = useNavigate()
 
   const onClickRouteLogin = () => {
     navigate(NavigationUtil.login)
   }
 
-  const onClickLogout = () => {
-    httpClient.auth.logout()
-    alert('로그아웃 되셨습니다.')
-    navigate(NavigationUtil.login)
+  const onClickLogout = async () => {
+    try {
+      await httpClient.auth.logout()
+      setUser(null)
+      alert('로그아웃 되셨습니다.')
+      navigate(NavigationUtil.login)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   return (
