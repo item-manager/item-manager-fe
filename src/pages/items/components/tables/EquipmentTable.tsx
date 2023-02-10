@@ -2,18 +2,33 @@ import { httpClient, ItemRS } from '@/apis'
 import BasicTable from '@/components/tables/BasicTable'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnsType } from 'antd/es/table'
+import { SearchAreaForm } from '../SearchArea'
 
 // TODO
 const TYPE = 'EQUIPMENT'
 
-const EquipmentTable = () => {
+const EquipmentTable = ({ name, temp1 }: SearchAreaForm) => {
   const query = useQuery({
     queryKey: ['items'],
     queryFn: () => httpClient.items.getItems(),
     select(data) {
       // TODO
       // @ts-ignore
-      return data.data.map((item) => ({ ...item, temp1: '거실' }))
+      return data.data
+        .map((item) => ({ ...item, temp1: '거실' }))
+        .filter((item) => {
+          let result = true
+
+          if (name?.trim()) {
+            result = result && !!item.name?.includes(name.trim())
+          }
+
+          if (temp1) {
+            result = result && !!item.temp1?.includes(temp1)
+          }
+
+          return result
+        })
     },
   })
 
@@ -27,7 +42,7 @@ const EquipmentTable = () => {
     },
     {
       title: '물품명',
-      dataIndex: '',
+      dataIndex: 'name',
       key: 'name',
       align: 'center',
       width: 200,

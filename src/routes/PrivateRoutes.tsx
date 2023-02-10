@@ -17,7 +17,7 @@ const Main = () => {
 const PrivateRoutes = () => {
   return (
     <Routes>
-      <Route path='/' element={<Main />}>
+      <Route element={<Main />}>
         <Route path={NavigationUtil.items} element={<ItemsPage />} />
         <Route path={NavigationUtil.locations} element={<LocationsPage />} />
         <Route path='*' element={<Navigate replace to={NavigationUtil.items} />} />

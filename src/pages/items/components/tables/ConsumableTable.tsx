@@ -4,23 +4,38 @@ import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
 import { Button, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
+import { SearchAreaForm } from '../SearchArea'
 
 // TODO
 const TYPE = 'CONSUMABLE'
 
-const ConsumableTable = () => {
+const ConsumableTable = ({ name, temp1 }: SearchAreaForm) => {
   const query = useQuery({
     queryKey: ['items'],
     queryFn: () => httpClient.items.getItems(),
     select(data) {
       // TODO
       // @ts-ignore
-      return data.data.map((item) => ({
-        ...item,
-        temp1: '거실',
-        temp2: '2022.10.01',
-        temp3: '2022.10.01',
-      }))
+      return data.data
+        .map((item) => ({
+          ...item,
+          temp1: '거실',
+          temp2: '2022.10.01',
+          temp3: '2022.10.01',
+        }))
+        .filter((item) => {
+          let result = true
+
+          if (name?.trim()) {
+            result = result && !!item.name?.includes(name.trim())
+          }
+
+          if (temp1) {
+            result = result && !!item.temp1?.includes(temp1)
+          }
+
+          return result
+        })
     },
   })
 
@@ -77,11 +92,15 @@ const ConsumableTable = () => {
       key: 'labels',
       align: 'center',
       render(_value, record, _index) {
-        return record.labels?.map((item) => (
-          <Tag key={item.labelNo} color='default'>
-            {item.name}
-          </Tag>
-        ))
+        return (
+          <div className='inline-flex flex-wrap gap-y-2'>
+            {record.labels?.map((item) => (
+              <Tag key={item.labelNo} color='default'>
+                {item.name}
+              </Tag>
+            ))}
+          </div>
+        )
       },
       width: 200,
     },

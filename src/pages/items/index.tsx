@@ -1,13 +1,18 @@
+import { userState } from '@/store'
 import { UserOutlined } from '@ant-design/icons'
 import { Avatar, Space, Tabs, TabsProps, Typography } from 'antd'
+import { useRecoilValue } from 'recoil'
 import ConsumableTab from './components/tabs/ConsumableTab'
 import EquipmentTab from './components/tabs/EquipmentTab'
 
 const Intro = () => {
+  const user = useRecoilValue(userState)!
   return (
     <Space wrap size={16} className='mb-2'>
       <Avatar size={64} icon={<UserOutlined />} />
-      <Typography.Title level={2}>안잉님 좋은 아침 입니다.</Typography.Title>
+      <Typography.Title level={2} className='m-0'>
+        {user.username}님 좋은 아침 입니다.
+      </Typography.Title>
     </Space>
   )
 }
