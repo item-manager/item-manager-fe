@@ -9,7 +9,7 @@ import { SearchAreaForm } from '../SearchArea'
 // TODO
 const TYPE = 'CONSUMABLE'
 
-const ConsumableTable = ({ name, temp1 }: SearchAreaForm) => {
+const ConsumableTable = ({ name, labels }: SearchAreaForm) => {
   const query = useQuery({
     queryKey: ['items'],
     queryFn: () => httpClient.items.getItems(),
@@ -19,7 +19,6 @@ const ConsumableTable = ({ name, temp1 }: SearchAreaForm) => {
       return data.data
         .map((item) => ({
           ...item,
-          temp1: '거실',
           temp2: '2022.10.01',
           temp3: '2022.10.01',
         }))
@@ -30,8 +29,10 @@ const ConsumableTable = ({ name, temp1 }: SearchAreaForm) => {
             result = result && !!item.name?.includes(name.trim())
           }
 
-          if (temp1) {
-            result = result && !!item.temp1?.includes(temp1)
+          if (labels?.length) {
+            result =
+              result &&
+              labels.every((labelNo) => item.labels?.map((item) => item.labelNo).includes(+labelNo))
           }
 
           return result
@@ -47,17 +48,28 @@ const ConsumableTable = ({ name, temp1 }: SearchAreaForm) => {
     //   align: 'center',
     // },
     {
-      title: '사용처',
-      dataIndex: 'temp1',
-      key: 'temp1',
-      align: 'center',
-      width: 100,
-    },
-    {
       title: '물품명',
       dataIndex: 'name',
       key: 'name',
       align: 'center',
+      width: 200,
+    },
+    {
+      title: '라벨',
+      dataIndex: 'labels',
+      key: 'labels',
+      align: 'center',
+      render(_value, record, _index) {
+        return (
+          <div className='inline-flex flex-wrap gap-y-2'>
+            {record.labels?.map((item) => (
+              <Tag key={item.labelNo} color='default'>
+                {item.name}
+              </Tag>
+            ))}
+          </div>
+        )
+      },
       width: 200,
     },
     // TODO 최근 구매일
@@ -86,24 +98,7 @@ const ConsumableTable = ({ name, temp1 }: SearchAreaForm) => {
         return `${record.quantity?.toLocaleString() || 0}개`
       },
     },
-    {
-      title: '라벨',
-      dataIndex: 'labels',
-      key: 'labels',
-      align: 'center',
-      render(_value, record, _index) {
-        return (
-          <div className='inline-flex flex-wrap gap-y-2'>
-            {record.labels?.map((item) => (
-              <Tag key={item.labelNo} color='default'>
-                {item.name}
-              </Tag>
-            ))}
-          </div>
-        )
-      },
-      width: 200,
-    },
+
     {
       title: '사용하기',
       key: '사용하기',
@@ -132,14 +127,13 @@ const ConsumableTable = ({ name, temp1 }: SearchAreaForm) => {
             <Button
               type='text'
               shape='circle'
-              size='large'
               icon={<DeleteFilled className='text-stone-500' />}
-              className='flex items-center justify-center mx-auto'
+              className='flex items-center justify-center py-0 mx-auto'
             />
           </Tooltip>
         )
       },
-      width: 100,
+      width: 70,
     },
   ]
 
@@ -152,6 +146,7 @@ const ConsumableTable = ({ name, temp1 }: SearchAreaForm) => {
       loading={query.isLoading}
       tableLayout='fixed'
       scroll={{ x: 250 }}
+      size='large'
     />
   )
 }
