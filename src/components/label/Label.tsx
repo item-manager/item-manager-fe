@@ -47,8 +47,12 @@ const PopoverContent = ({
   return (
     <div
       className='w-56 block-overlay'
-      onClick={(e) => {
+      onClick={async (e) => {
         e.stopPropagation()
+
+        if (item.label !== label) {
+          await patchLabel(item.value, label)
+        }
         close()
       }}
       onKeyUp={(e) => e.stopPropagation()}
@@ -75,12 +79,6 @@ const PopoverContent = ({
               case 'Escape':
                 close()
                 break
-            }
-          }}
-          onBlur={(e) => {
-            e.stopPropagation()
-            if (item.label !== label) {
-              patchLabel(item.value, label)
             }
           }}
           className='mb-3'
@@ -287,7 +285,7 @@ export const Label = (props: Parameters<typeof Select<string[]>>[0]) => {
     setFetching(true)
     try {
       const result = await httpClient.labels.patchLabel(+labelNo, { name: name.trim() })
-      if (!result.data) {
+      if (result.code !== 200) {
         // TODO Error 핸들링
         throw new Error('TODO')
       }

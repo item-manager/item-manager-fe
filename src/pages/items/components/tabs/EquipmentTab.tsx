@@ -7,12 +7,12 @@ const EquipmentTab = () => {
   const [form] = useForm<SearchAreaForm>()
 
   const name = Form.useWatch('name', form)
-  const temp1 = Form.useWatch('temp1', form)
+  const labels = Form.useWatch('labels', form)
 
   return (
     <>
-      <SearchArea form={form} />
-      <EquipmentTable name={name} temp1={temp1} />
+      <SearchArea form={form} type={'EQUIPMENT'} />
+      <EquipmentTable name={name} labels={labels} />
     </>
   )
 }

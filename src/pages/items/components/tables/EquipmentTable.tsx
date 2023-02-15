@@ -1,44 +1,56 @@
 import { httpClient, ItemRS } from '@/apis'
+import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
 import { useQuery } from '@tanstack/react-query'
+import { Tag } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { SearchAreaForm } from '../SearchArea'
 
 // TODO
 const TYPE = 'EQUIPMENT'
 
-const EquipmentTable = ({ name, temp1 }: SearchAreaForm) => {
+const EquipmentTable = ({ name, labels }: SearchAreaForm) => {
   const query = useQuery({
     queryKey: ['items'],
     queryFn: () => httpClient.items.getItems(),
     select(data) {
       // TODO
       // @ts-ignore
-      return data.data
-        .map((item) => ({ ...item, temp1: '거실' }))
-        .filter((item) => {
-          let result = true
+      return data.data.filter((item) => {
+        let result = true
 
-          if (name?.trim()) {
-            result = result && !!item.name?.includes(name.trim())
-          }
+        // TODO
+        result = result && item.type === 'EQUIPMENT'
 
-          if (temp1) {
-            result = result && !!item.temp1?.includes(temp1)
-          }
+        if (name?.trim()) {
+          result = result && !!item.name?.includes(name.trim())
+        }
 
-          return result
-        })
+        if (labels?.length) {
+          result =
+            result &&
+            labels.every((labelNo) => item.labels?.map((item) => item.labelNo).includes(+labelNo))
+        }
+
+        return result
+      })
     },
   })
 
   const columns: ColumnsType<ItemRS> = [
     {
-      title: '사용처',
-      dataIndex: 'temp1',
-      key: 'temp1',
+      title: '중요도',
+      dataIndex: 'priority',
+      key: 'priority',
       align: 'center',
-      width: 100,
+      render: (priority) => {
+        return (
+          <div className='w-5 mx-auto'>
+            <PriorityProgressBar priority={priority} />
+          </div>
+        )
+      },
+      width: 80,
     },
     {
       title: '물품명',
@@ -48,7 +60,25 @@ const EquipmentTable = ({ name, temp1 }: SearchAreaForm) => {
       width: 200,
     },
     {
-      title: '보관장소',
+      title: '라벨',
+      dataIndex: 'labels',
+      key: 'labels',
+      align: 'center',
+      render(_value, record, _index) {
+        return (
+          <div className='inline-flex flex-wrap gap-y-2'>
+            {record.labels?.map((item) => (
+              <Tag key={item.labelNo} color='default'>
+                {item.name}
+              </Tag>
+            ))}
+          </div>
+        )
+      },
+      width: 200,
+    },
+    {
+      title: '보관 장소',
       dataIndex: 'room',
       key: 'room',
       align: 'center',
@@ -79,6 +109,7 @@ const EquipmentTable = ({ name, temp1 }: SearchAreaForm) => {
       loading={query.isLoading}
       tableLayout='fixed'
       scroll={{ x: 250 }}
+      size='large'
     />
   )
 }
