@@ -1,4 +1,5 @@
 import { httpClient, ItemRS } from '@/apis'
+import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
@@ -25,6 +26,9 @@ const ConsumableTable = ({ name, labels }: SearchAreaForm) => {
         .filter((item) => {
           let result = true
 
+          // TODO
+          result = result && item.type === 'CONSUMABLE'
+
           if (name?.trim()) {
             result = result && !!item.name?.includes(name.trim())
           }
@@ -41,12 +45,20 @@ const ConsumableTable = ({ name, labels }: SearchAreaForm) => {
   })
 
   const columns: ColumnsType<ItemRS> = [
-    // {
-    //   title: '중요도',
-    //   dataIndex: 'priority',
-    //   key: 'priority',
-    //   align: 'center',
-    // },
+    {
+      title: '중요도',
+      dataIndex: 'priority',
+      key: 'priority',
+      align: 'center',
+      render: (priority) => {
+        return (
+          <div className='w-5 mx-auto'>
+            <PriorityProgressBar priority={priority} />
+          </div>
+        )
+      },
+      width: 80,
+    },
     {
       title: '물품명',
       dataIndex: 'name',
