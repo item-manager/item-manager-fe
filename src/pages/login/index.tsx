@@ -7,14 +7,19 @@ import { NavigationUtil } from '@/utils'
 import { useRecoilState } from 'recoil'
 import { showPassword } from '@/store/atom'
 import { userState } from '@/store/user'
+import { useMutation } from '@tanstack/react-query'
 
 const LoginPage = () => {
   const navigate = useNavigate()
+
   const [isShow, setIsShow] = useRecoilState(showPassword)
+
   const [inputs, setInputs] = useState({
     id: '',
     password: '',
   })
+
+  const { mutate } = useMutation(httpClient.auth.login)
 
   const [_user, setUser] = useRecoilState(userState)
 
@@ -32,15 +37,21 @@ const LoginPage = () => {
   const onClickLogin = async () => {
     const { id, password } = inputs
     if (!id || !password) return alert('정보를 입력해 주세요')
-    try {
-      const result = await httpClient.auth.login({ ...inputs })
-      setUser(result.data)
-    } catch (error) {
-      if (error instanceof Error) console.log(error.message)
-    }
+    mutate(
+      { ...inputs },
+      {
+        onSuccess: (response) => {
+          setUser(response.data)
+          NavigationUtil.items
+        },
+        onError: (error) => {
+          if (error instanceof Error) console.log('error login:', error.message)
+        },
+      }
+    )
   }
 
-  const onClickMoveToRegister = () => {
+  const onClickMoveToRegister = (): void => {
     navigate(NavigationUtil.register)
   }
 
