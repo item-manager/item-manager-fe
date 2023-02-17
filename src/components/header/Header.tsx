@@ -6,6 +6,7 @@ import { useRecoilState } from 'recoil'
 
 export const Header = () => {
   const [_user, setUser] = useRecoilState(userState)
+
   const navigate = useNavigate()
 
   const onClickRouteLogin = () => {
@@ -18,8 +19,8 @@ export const Header = () => {
       setUser(null)
       alert('로그아웃 되셨습니다.')
       navigate(NavigationUtil.login)
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      if (error instanceof Error) console.log('error logout:', error.message)
     }
   }
 
