@@ -8,30 +8,33 @@ import Router from './routes'
 
 import 'antd/dist/reset.css'
 import './index.css'
+import { RecoilURLSyncJSON } from 'recoil-sync'
 
 function App() {
   const queryClient = new QueryClient()
 
   return (
     <RecoilRoot>
-      <QueryClientProvider client={queryClient}>
-        <ConfigProvider
-          locale={koKR}
-          theme={{
-            token: {
-              colorPrimary: '#2E8B57',
-              fontFamily: 'Inter',
-              colorBgContainer: '#FBFBFB',
-            },
-          }}
-        >
-          <StyleProvider hashPriority='high'>
-            <div className='App'>
-              <Router />
-            </div>
-          </StyleProvider>
-        </ConfigProvider>
-      </QueryClientProvider>
+      <RecoilURLSyncJSON location={{ part: 'queryParams' }}>
+        <QueryClientProvider client={queryClient}>
+          <ConfigProvider
+            locale={koKR}
+            theme={{
+              token: {
+                colorPrimary: '#2E8B57',
+                fontFamily: 'Inter',
+                colorBgContainer: '#FBFBFB',
+              },
+            }}
+          >
+            <StyleProvider hashPriority='high'>
+              <div className='App'>
+                <Router />
+              </div>
+            </StyleProvider>
+          </ConfigProvider>
+        </QueryClientProvider>
+      </RecoilURLSyncJSON>
     </RecoilRoot>
   )
 }

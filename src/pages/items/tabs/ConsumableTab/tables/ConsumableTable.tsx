@@ -1,50 +1,32 @@
-import { httpClient, ItemRS } from '@/apis'
+import { ConsumableItemRS, ConsumableItemsRQ, httpClient } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
-import { Button, Tag, Tooltip } from 'antd'
+import { Button, PaginationProps, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
-import { SearchAreaForm } from '../SearchArea'
+import dayjs from 'dayjs'
+import { useRecoilState } from 'recoil'
+import { consumableSearchState } from '../store'
 
-// TODO
-const TYPE = 'CONSUMABLE'
+const ConsumableTable = () => {
+  const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
 
-const ConsumableTable = ({ name, labels }: SearchAreaForm) => {
+  const criteria: ConsumableItemsRQ = {
+    name: consumableSearch.name,
+    labelNos: consumableSearch.labels?.map((item) => +item) || [],
+    orderBy: consumableSearch.orderBy,
+    sort: consumableSearch.sort,
+    page: consumableSearch.page,
+    size: consumableSearch.size,
+  }
+
   const query = useQuery({
-    queryKey: ['items'],
-    queryFn: () => httpClient.items.getItems(),
-    select(data) {
-      // TODO
-      // @ts-ignore
-      return data.data
-        .map((item) => ({
-          ...item,
-          temp2: '2022.10.01',
-          temp3: '2022.10.01',
-        }))
-        .filter((item) => {
-          let result = true
-
-          // TODO
-          result = result && item.type === 'CONSUMABLE'
-
-          if (name?.trim()) {
-            result = result && !!item.name?.includes(name.trim())
-          }
-
-          if (labels?.length) {
-            result =
-              result &&
-              labels.every((labelNo) => item.labels?.map((item) => item.labelNo).includes(+labelNo))
-          }
-
-          return result
-        })
-    },
+    queryKey: ['items', criteria],
+    queryFn: () => httpClient.items.getConsumableItems(criteria),
   })
 
-  const columns: ColumnsType<ItemRS> = [
+  const columns: ColumnsType<ConsumableItemRS> = [
     {
       title: '중요도',
       dataIndex: 'priority',
@@ -84,21 +66,21 @@ const ConsumableTable = ({ name, labels }: SearchAreaForm) => {
       },
       width: 200,
     },
-    // TODO 최근 구매일
     {
       title: '최근 구매일',
-      dataIndex: 'temp2',
-      key: 'temp2',
+      dataIndex: 'latestPurchaseDate',
+      key: 'latestPurchaseDate',
       align: 'center',
       width: 120,
+      render: (value) => value && dayjs(value).format('YYYY.MM.DD'),
     },
-    // TODO 최근 사용일
     {
       title: '최근 사용일',
-      dataIndex: 'temp3',
-      key: 'temp3',
+      dataIndex: 'latestConsumeDate',
+      key: 'latestConsumeDate',
       align: 'center',
       width: 120,
+      render: (value) => value && dayjs(value).format('YYYY.MM.DD'),
     },
     {
       title: '남은 수량',
@@ -149,16 +131,27 @@ const ConsumableTable = ({ name, labels }: SearchAreaForm) => {
     },
   ]
 
+  const handlePageChange: PaginationProps['onChange'] = (page, _pageSize) => {
+    setConsumableSearch((value) => ({ ...value, page }))
+  }
+
   return (
-    <BasicTable<ItemRS>
+    <BasicTable<ConsumableItemRS>
       columns={columns}
       rowKey='itemNo'
       // @ts-ignore
-      dataSource={query.data}
+      dataSource={query.data?.data}
       loading={query.isLoading}
       tableLayout='fixed'
       scroll={{ x: 250 }}
       size='large'
+      pagination={{
+        current: consumableSearch.page,
+        pageSize: consumableSearch.size,
+        total: query.data?.page?.totalDataCnt,
+        onChange: handlePageChange,
+        // showSizeChanger: true,
+      }}
     />
   )
 }

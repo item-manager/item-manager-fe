@@ -2,8 +2,8 @@ import { userState } from '@/store'
 import { UserOutlined } from '@ant-design/icons'
 import { Avatar, Space, Tabs, TabsProps, Typography } from 'antd'
 import { useRecoilValue } from 'recoil'
-import ConsumableTab from './components/tabs/ConsumableTab'
-import EquipmentTab from './components/tabs/EquipmentTab'
+import ConsumableTab from './tabs/ConsumableTab'
+import EquipmentTab from './tabs/EquipmentTab'
 
 const Intro = () => {
   const user = useRecoilValue(userState)!
