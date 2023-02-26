@@ -169,8 +169,8 @@ export interface ResultListRoomsRS {
 
 export interface RoomsRS {
   /** @format int64 */
-  roomNo?: number
-  name?: string
+  roomNo: number
+  name: string
 }
 
 export interface PlacesRQ {
@@ -180,8 +180,8 @@ export interface PlacesRQ {
 
 export interface PlacesRS {
   /** @format int64 */
-  placeNo?: number
-  name?: string
+  placeNo: number
+  name: string
 }
 
 export interface ResultListPlacesRS {

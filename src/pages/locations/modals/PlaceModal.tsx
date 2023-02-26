@@ -1,17 +1,20 @@
-import { CreateRoomRQ, httpClient } from '@/apis'
+import { CreateRoomRQ, httpClient, PlacesRS, UpdatePlaceRQ } from '@/apis'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, Form, Input, InputRef, Modal, Select } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 
 type Props = {
+  record?: PlacesRS
   roomNo: number
   hideModal: () => void
 }
-const PlaceModal = ({ roomNo, hideModal }: Props) => {
+const PlaceModal = ({ record, roomNo, hideModal }: Props) => {
+  const isUpdateModal = !!record
+
   const inputRef = useRef<InputRef | null>(null)
   const [confirmLoading, setConfirmLoading] = useState(false)
   const queryClient = useQueryClient()
-  const [form] = Form.useForm<CreateRoomRQ>()
+  const [form] = Form.useForm<CreateRoomRQ & UpdatePlaceRQ>()
 
   const query = useQuery({
     queryKey: ['rooms'],
@@ -20,18 +23,29 @@ const PlaceModal = ({ roomNo, hideModal }: Props) => {
 
   useEffect(() => {
     inputRef.current?.focus()
+    inputRef.current?.select()
   }, [])
 
   const handleOk = () => {
     form.submit()
   }
 
-  const onFinish = async (values: CreateRoomRQ) => {
+  const onFinish = async (values: CreateRoomRQ & UpdatePlaceRQ) => {
     setConfirmLoading(true)
 
     try {
       const name = values.name.trim()
-      await httpClient.locations.createPlace({ roomNo, name })
+      if (isUpdateModal) {
+        // 수정
+        await httpClient.locations.patchPlace(record.placeNo, {
+          roomNo: values.roomNo,
+          name,
+        })
+        // console.log({ result })
+      } else {
+        // 신규 추가
+        await httpClient.locations.createPlace({ roomNo, name })
+      }
       hideModal()
       queryClient.invalidateQueries({ queryKey: ['rooms', roomNo] })
     } catch (e) {
@@ -43,13 +57,13 @@ const PlaceModal = ({ roomNo, hideModal }: Props) => {
 
   return (
     <Modal
-      title='위치 추가'
+      title={isUpdateModal ? '위치 수정' : '위치 추가'}
       open={true}
       onOk={handleOk}
       confirmLoading={confirmLoading}
       onCancel={hideModal}
       width={300}
-      okText={'추가'}
+      okText={'저장'}
       cancelText={'닫기'}
       closable={false}
     >
@@ -64,6 +78,7 @@ const PlaceModal = ({ roomNo, hideModal }: Props) => {
         autoComplete='off'
         initialValues={{
           roomNo,
+          ...record,
         }}
       >
         <Form.Item
@@ -71,7 +86,7 @@ const PlaceModal = ({ roomNo, hideModal }: Props) => {
           name='roomNo'
           rules={[{ required: true, message: '${label}을 입력해 주세요.' }]}
         >
-          <Select value={roomNo} disabled>
+          <Select value={roomNo} disabled={!isUpdateModal}>
             {query.data?.data?.map((item) => {
               const { roomNo, name } = item
 

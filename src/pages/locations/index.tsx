@@ -4,7 +4,7 @@ import PlaceTable from './tables/PlaceTable'
 import RoomTable from './tables/RoomTable'
 
 const LocationsPage = () => {
-  const [roomNo, setRoomNo] = useState<number | undefined>(undefined)
+  const [roomNo, setRoomNo] = useState<number | undefined>()
 
   return (
     <Row gutter={20}>
