@@ -10,3 +10,18 @@ export const showPasswordConfirm = atom({
   key: `isShowPass/${uuidv4()}`,
   default: false,
 })
+
+export const ascendYear = atom({
+  key: `isAcendYear/${uuidv4()}`,
+  default: false,
+})
+
+export const ascendMonth = atom({
+  key: `isAcendMonth/${uuidv4()}`,
+  default: false,
+})
+
+export const ascendAmount = atom({
+  key: `isAcendAmount/${uuidv4()}`,
+  default: false,
+})

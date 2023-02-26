@@ -5,12 +5,14 @@ import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
 import { Button, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
+import { useNavigate } from 'react-router'
 import { SearchAreaForm } from '../SearchArea'
 
 // TODO
 const TYPE = 'CONSUMABLE'
 
 const ConsumableTable = ({ name, labels }: SearchAreaForm) => {
+  const navigate = useNavigate()
   const query = useQuery({
     queryKey: ['items'],
     queryFn: () => httpClient.items.getItems(),
@@ -159,6 +161,11 @@ const ConsumableTable = ({ name, labels }: SearchAreaForm) => {
       tableLayout='fixed'
       scroll={{ x: 250 }}
       size='large'
+      onRow={(data) => {
+        return {
+          onClick: () => navigate(`/items/${data?.itemNo}`),
+        }
+      }}
     />
   )
 }
