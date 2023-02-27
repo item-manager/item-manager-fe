@@ -1,8 +1,9 @@
 import { userState } from '@/store'
 import { UserOutlined } from '@ant-design/icons'
 import { Avatar, Space, Tabs, TabsProps, Typography } from 'antd'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import ConsumableTab from './tabs/ConsumableTab'
+import { consumableSearchState } from './tabs/ConsumableTab/store'
 import EquipmentTab from './tabs/EquipmentTab'
 
 const Intro = () => {
@@ -18,14 +19,16 @@ const Intro = () => {
 }
 
 const ItemsPage = () => {
+  const [{ currentTabKey }, setConsumableSearch] = useRecoilState(consumableSearchState)
+
   const items: TabsProps['items'] = [
     {
-      key: '1',
+      key: '0',
       label: `소모품 관리`,
       children: <ConsumableTab />,
     },
     {
-      key: '2',
+      key: '1',
       label: `비품 관리`,
       children: <EquipmentTab />,
     },
@@ -34,7 +37,11 @@ const ItemsPage = () => {
   return (
     <>
       <Intro />
-      <Tabs defaultActiveKey='1' items={items} />
+      <Tabs
+        activeKey={currentTabKey}
+        items={items}
+        onChange={(key) => setConsumableSearch((item) => ({ ...item, currentTabKey: key }))}
+      />
     </>
   )
 }

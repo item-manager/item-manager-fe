@@ -6,13 +6,21 @@ import { useQuery } from '@tanstack/react-query'
 import { Button, PaginationProps, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useResetRecoilState } from 'recoil'
 import { consumableSearchState } from '../store'
 
 const ConsumableTable = () => {
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
+  const resetConsumableSearchState = useResetRecoilState(consumableSearchState)
+
   const navigate = useNavigate()
+  useEffect(() => {
+    return function cleanup() {
+      resetConsumableSearchState()
+    }
+  }, [resetConsumableSearchState])
 
   const criteria: ConsumableItemsRQ = {
     name: consumableSearch.name,
