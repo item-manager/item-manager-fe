@@ -5,7 +5,7 @@ import { Button, Form, FormProps, Input, Select } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
 import { useRecoilState } from 'recoil'
 import { consumableSearchState, ConsumableSearchType } from './store'
-import { debounce } from 'lodash'
+
 const SearchArea = () => {
   const [form] = useForm<ConsumableSearchType>()
 
@@ -21,21 +21,24 @@ const SearchArea = () => {
     },
   })
 
-  const setLazyConsumableSearch = debounce((values) => {
-    setConsumableSearch(values)
-  }, 300)
-
   const handleValuesChange: FormProps['onValuesChange'] = (changedValues) => {
-    if (changedValues.name) {
-      setLazyConsumableSearch(form.getFieldsValue())
-    } else {
+    if (!changedValues.name) {
       setConsumableSearch(form.getFieldsValue())
     }
   }
 
+  const handleSubmit: FormProps['onFinish'] = () => {
+    setConsumableSearch(form.getFieldsValue())
+  }
+
   return (
     <div className='flex flex-wrap justify-between mb-4'>
-      <Form form={form} onValuesChange={handleValuesChange} initialValues={consumableSearch}>
+      <Form
+        form={form}
+        onValuesChange={handleValuesChange}
+        initialValues={consumableSearch}
+        onFinish={handleSubmit}
+      >
         <div className='flex flex-wrap gap-x-3'>
           <Form.Item name='name'>
             <Input
@@ -66,6 +69,7 @@ const SearchArea = () => {
             </Select>
           </Form.Item>
         </div>
+        <button type='submit' className='hidden'></button>
       </Form>
       <Button type='primary' className='ml-auto'>
         물품 추가
