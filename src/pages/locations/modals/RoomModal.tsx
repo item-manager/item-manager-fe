@@ -1,36 +1,49 @@
-import { CreateRoomRQ, httpClient } from '@/apis'
+import { CreateRoomRQ, httpClient, RoomsRS, UpdateRoomRQ } from '@/apis'
 import { useQueryClient } from '@tanstack/react-query'
-import { Button, Form, Input, InputRef, Modal } from 'antd'
+import { Button, Form, Input, InputRef, message, Modal } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 
 type Props = {
+  record?: RoomsRS
   hideModal: () => void
   setRoomNo: (roomNo: number) => void
 }
-const RoomModal = ({ hideModal, setRoomNo }: Props) => {
+const RoomModal = ({ record, hideModal, setRoomNo }: Props) => {
+  const isUpdateModal = !!record
+
   const inputRef = useRef<InputRef | null>(null)
   const [confirmLoading, setConfirmLoading] = useState(false)
   const queryClient = useQueryClient()
-  const [form] = Form.useForm<CreateRoomRQ>()
+  const [form] = Form.useForm<CreateRoomRQ & UpdateRoomRQ>()
 
   useEffect(() => {
     inputRef.current?.focus()
+    inputRef.current?.select()
   }, [])
 
   const handleOk = () => {
     form.submit()
   }
 
-  const onFinish = async (values: CreateRoomRQ) => {
+  const onFinish = async (values: CreateRoomRQ & UpdateRoomRQ) => {
     setConfirmLoading(true)
 
     try {
       const name = values.name.trim()
-      const result = await httpClient.locations.createRoom({ name })
-      if (result.data?.roomNo) {
-        setRoomNo(result.data?.roomNo)
+
+      if (isUpdateModal) {
+        // 수정
+        await httpClient.locations.patchRoom(record.roomNo, { name })
+      } else {
+        // 신규 추가
+        const result = await httpClient.locations.createRoom({ name })
+        if (result.data?.roomNo) {
+          setRoomNo(result.data?.roomNo)
+        }
       }
+
       hideModal()
+      message.success('저장되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['rooms'], exact: true })
     } catch (e) {
       console.error(e)
@@ -41,13 +54,13 @@ const RoomModal = ({ hideModal, setRoomNo }: Props) => {
 
   return (
     <Modal
-      title='방 추가'
+      title={isUpdateModal ? '방 수정' : '방 추가'}
       open={true}
       onOk={handleOk}
       confirmLoading={confirmLoading}
       onCancel={hideModal}
       width={300}
-      okText={'추가'}
+      okText={'저장'}
       cancelText={'닫기'}
       closable={false}
     >
@@ -55,11 +68,14 @@ const RoomModal = ({ hideModal, setRoomNo }: Props) => {
         form={form}
         name='basic'
         className='mt-3'
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
         style={{ maxWidth: 300 }}
         onFinish={onFinish}
         autoComplete='off'
+        initialValues={{
+          ...record,
+        }}
       >
         <Form.Item
           label='방 이름'
