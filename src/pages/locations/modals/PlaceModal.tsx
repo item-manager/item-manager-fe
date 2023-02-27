@@ -1,6 +1,6 @@
 import { CreateRoomRQ, httpClient, PlacesRS, UpdatePlaceRQ } from '@/apis'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button, Form, Input, InputRef, Modal, Select } from 'antd'
+import { Button, Form, Input, InputRef, message, Modal, Select } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 
 type Props = {
@@ -47,6 +47,7 @@ const PlaceModal = ({ record, roomNo, hideModal }: Props) => {
         await httpClient.locations.createPlace({ roomNo, name })
       }
       hideModal()
+      message.success('저장되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['rooms', roomNo] })
     } catch (e) {
       console.error(e)

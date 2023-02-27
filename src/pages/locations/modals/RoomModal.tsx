@@ -1,6 +1,6 @@
 import { CreateRoomRQ, httpClient, RoomsRS, UpdateRoomRQ } from '@/apis'
 import { useQueryClient } from '@tanstack/react-query'
-import { Button, Form, Input, InputRef, Modal } from 'antd'
+import { Button, Form, Input, InputRef, message, Modal } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 
 type Props = {
@@ -43,6 +43,7 @@ const RoomModal = ({ record, hideModal, setRoomNo }: Props) => {
       }
 
       hideModal()
+      message.success('저장되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['rooms'], exact: true })
     } catch (e) {
       console.error(e)
