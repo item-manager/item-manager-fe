@@ -108,27 +108,6 @@ export interface ResultCreateItemRS {
   data?: CreateItemRS
 }
 
-export interface AttachLabelToItemRQ {
-  /** @format int64 */
-  itemNo?: number
-  /** @format int64 */
-  labelNo?: number
-}
-
-export interface ItemLabelRS {
-  /** @format int64 */
-  itemNo?: number
-  /** @format int64 */
-  labelNo?: number
-}
-
-export interface ResultItemLabelRS {
-  /** @format int32 */
-  code?: number
-  message?: string
-  data?: ItemLabelRS
-}
-
 export interface LoginUserRQ {
   id: string
   password: string
@@ -147,8 +126,8 @@ export interface ResultLoginUserRS {
   data: LoginUserRS
 }
 
-export interface UpdateLabelRQ {
-  name?: string
+export interface UpdateRoomRQ {
+  name: string
 }
 
 export interface ResultVoid {
@@ -156,6 +135,16 @@ export interface ResultVoid {
   code?: number
   message?: string
   data?: object
+}
+
+export interface UpdatePlaceRQ {
+  /** @format int64 */
+  roomNo: number
+  name: string
+}
+
+export interface UpdateLabelRQ {
+  name?: string
 }
 
 export interface ResultSessionUser {
@@ -244,11 +233,58 @@ export interface ResultItemRS {
   data?: ItemRS
 }
 
-export interface DetachLabelFromItemRQ {
+export interface ConsumableItemsRQ {
+  name?: string
+  labelNos?: number[]
+  /** priority(중요도), quantity(수량), latest_purchase_date(최근 구매일), latest_consume_date(최근 사용일), null(생성순) */
+  orderBy?: 'PRIORITY' | 'QUANTITY' | 'LATEST_PURCHASE_DATE' | 'LATEST_CONSUME_DATE'
+  /**
+   * +(오름차순), -(내림차순)
+   * @default "+"
+   * @pattern ^[+-]?$
+   */
+  sort?: string
+  /**
+   * @format int32
+   * @default 1
+   */
+  page?: number
+  /**
+   * @format int32
+   * @default 10
+   */
+  size?: number
+}
+
+export interface ConsumableItemRS {
   /** @format int64 */
   itemNo?: number
-  /** @format int64 */
-  labelNo?: number
+  /** @format int32 */
+  priority?: number
+  name?: string
+  /** @format date-time */
+  latestConsumeDate?: string
+  /** @format date-time */
+  latestPurchaseDate?: string
+  /** @format int32 */
+  quantity?: number
+  labels?: LabelRS[]
+}
+
+export interface Page {
+  /** @format int32 */
+  totalDataCnt: number
+  /** @format int32 */
+  totalPages: number
+  /** @format int32 */
+  requestPage: number
+  /** @format int32 */
+  requestSize: number
+}
+
+export interface ResultListConsumableItemRS {
+  page?: Page
+  data?: ConsumableItemRS[]
 }
 
 import axios, { AxiosInstance, AxiosRequestConfig, HeadersDefaults, ResponseType } from 'axios'
@@ -517,6 +553,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         type: ContentType.Json,
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags location-controller
+     * @name PatchRoom
+     * @summary 보관장소(방) 정보 수정
+     * @request PATCH:/locations/rooms/{roomNo}
+     */
+    patchRoom: (roomNo: number, data: UpdateRoomRQ, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/locations/rooms/${roomNo}`,
+        method: 'PATCH',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags location-controller
+     * @name PatchPlace
+     * @summary 위치 정보 수정
+     * @request PATCH:/locations/places/{placeNo}
+     */
+    patchPlace: (placeNo: number, data: UpdatePlaceRQ, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/locations/places/${placeNo}`,
+        method: 'PATCH',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
   }
   labels = {
     /**
@@ -620,40 +690,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags item-controller
-     * @name AttachLabelToItemRq
-     * @summary 물품에 라벨링
-     * @request POST:/items/labels
-     */
-    attachLabelToItemRq: (data: AttachLabelToItemRQ, params: RequestParams = {}) =>
-      this.request<ResultItemLabelRS, ErrorResult>({
-        path: `/items/labels`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags item-controller
-     * @name DetachLabelFromItem
-     * @summary 물품에서 라벨 제거
-     * @request DELETE:/items/labels
-     */
-    detachLabelFromItem: (data: DetachLabelFromItemRQ, params: RequestParams = {}) =>
-      this.request<ResultVoid, ErrorResult>({
-        path: `/items/labels`,
-        method: 'DELETE',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags item-controller
      * @name GetItem
      * @summary 물품 pk로 조회
      * @request GET:/items/{itemNo}
@@ -669,14 +705,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags item-controller
-     * @name LoadPhoto
-     * @summary 물품 사진 조회
-     * @request GET:/items/{itemNo}/photo
+     * @name GetConsumableItems
+     * @summary 소모품 목록 조회
+     * @request GET:/items/consumables
      */
-    loadPhoto: (itemNo: number, params: RequestParams = {}) =>
-      this.request<File, ErrorResult>({
-        path: `/items/${itemNo}/photo`,
+    getConsumableItems: (query: ConsumableItemsRQ, params: RequestParams = {}) =>
+      this.request<ResultListConsumableItemRS, ErrorResult>({
+        path: `/items/consumables`,
         method: 'GET',
+        query: query,
         ...params,
       }),
   }
@@ -709,6 +746,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     logout: (params: RequestParams = {}) =>
       this.request<ResultVoid, ErrorResult>({
         path: `/auth/logout`,
+        method: 'GET',
+        ...params,
+      }),
+  }
+  photo = {
+    /**
+     * No description
+     *
+     * @tags common-controller
+     * @name LoadPhoto
+     * @summary 사진 조회
+     * @request GET:/photo/{filename}
+     */
+    loadPhoto: (filename: string, params: RequestParams = {}) =>
+      this.request<File, ErrorResult>({
+        path: `/photo/${filename}`,
         method: 'GET',
         ...params,
       }),

@@ -1,1 +1,0 @@
-export type ITEM_TYPE = 'CONSUMABLE' | 'EQUIPMENT'

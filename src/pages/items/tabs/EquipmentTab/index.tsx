@@ -1,7 +1,7 @@
 import { Form } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
-import SearchArea, { SearchAreaForm } from '../SearchArea'
-import EquipmentTable from '../tables/EquipmentTable'
+import SearchArea, { SearchAreaForm } from './SearchArea'
+import EquipmentTable from './tables/EquipmentTable'
 
 const EquipmentTab = () => {
   const [form] = useForm<SearchAreaForm>()
@@ -11,7 +11,7 @@ const EquipmentTab = () => {
 
   return (
     <>
-      <SearchArea form={form} type={'EQUIPMENT'} />
+      <SearchArea form={form} />
       <EquipmentTable name={name} labels={labels} />
     </>
   )
