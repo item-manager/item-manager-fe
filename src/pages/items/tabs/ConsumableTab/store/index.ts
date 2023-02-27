@@ -12,6 +12,7 @@ import { atom } from 'recoil'
 import { urlSyncEffect } from 'recoil-sync'
 
 const consumableSearchRefine = object({
+  currentTabKey: optional(string()),
   labels: optional(array(string())),
   name: optional(string()),
   orderBy: optional(
@@ -32,6 +33,7 @@ export type ConsumableSearchType = CheckerReturnType<typeof consumableSearchRefi
 export const consumableSearchState = atom({
   key: 'consumableSearchState',
   default: {
+    currentTabKey: '0',
     sort: '+',
     page: 1,
     size: 8,

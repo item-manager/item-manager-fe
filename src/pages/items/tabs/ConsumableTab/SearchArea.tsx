@@ -6,10 +6,17 @@ import { useForm } from 'antd/lib/form/Form'
 import { useRecoilState } from 'recoil'
 import { consumableSearchState, ConsumableSearchType } from './store'
 
+type SearchAreaForm = Omit<ConsumableSearchType, 'orderBy' | 'sort'> & {
+  order?: `${NonNullable<ConsumableSearchType['orderBy']>}${NonNullable<
+    ConsumableSearchType['sort']
+  >}`
+}
+
 const SearchArea = () => {
-  const [form] = useForm<ConsumableSearchType>()
+  const [form] = useForm<SearchAreaForm>()
 
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
+
   const getLabelsQuery = useQuery(['labels'], httpClient.labels.getLabels, {
     select({ data }) {
       return (
@@ -23,12 +30,31 @@ const SearchArea = () => {
 
   const handleValuesChange: FormProps['onValuesChange'] = (changedValues) => {
     if (!changedValues.name) {
-      setConsumableSearch(form.getFieldsValue())
+      setSearchValue()
     }
   }
 
   const handleSubmit: FormProps['onFinish'] = () => {
-    setConsumableSearch(form.getFieldsValue())
+    setSearchValue()
+  }
+
+  const setSearchValue = () => {
+    const { order, ...rest } = form.getFieldsValue()
+
+    const matchedValue = order?.match(/(.+)([+-])/) as [
+      never,
+      ConsumableSearchType['orderBy'],
+      ConsumableSearchType['sort']
+    ]
+
+    let orderBy: ConsumableSearchType['orderBy'], sort: ConsumableSearchType['sort']
+
+    if (matchedValue) {
+      orderBy = matchedValue[1]
+      sort = matchedValue[2]
+    }
+
+    setConsumableSearch((data) => ({ ...data, ...rest, orderBy, sort }))
   }
 
   return (
@@ -36,7 +62,12 @@ const SearchArea = () => {
       <Form
         form={form}
         onValuesChange={handleValuesChange}
-        initialValues={consumableSearch}
+        initialValues={{
+          ...consumableSearch,
+          order: consumableSearch.orderBy
+            ? `${consumableSearch.orderBy}${consumableSearch.sort}`
+            : undefined,
+        }}
         onFinish={handleSubmit}
       >
         <div className='flex flex-wrap gap-x-3'>
@@ -60,12 +91,16 @@ const SearchArea = () => {
               optionFilterProp='label'
             />
           </Form.Item>
-          <Form.Item name='orderBy'>
+          <Form.Item name='order'>
             <Select placeholder='정렬' className='w-48' allowClear>
-              <Select.Option value='PRIORITY'>중요도</Select.Option>
-              <Select.Option value='QUANTITY'>남은 수량</Select.Option>
-              <Select.Option value='LATEST_PURCHASE_DATE'>최근 구매일</Select.Option>
-              <Select.Option value='LATEST_CONSUME_DATE'>최근 사용일</Select.Option>
+              <Select.Option value='PRIORITY+'>중요도 오름차순</Select.Option>
+              <Select.Option value='PRIORITY-'>중요도 내림차순</Select.Option>
+              <Select.Option value='QUANTITY+'>남은 수량 오름차순</Select.Option>
+              <Select.Option value='QUANTITY-'>남은 수량 내림차순</Select.Option>
+              <Select.Option value='LATEST_PURCHASE_DATE+'>구매일 오름차순</Select.Option>
+              <Select.Option value='LATEST_PURCHASE_DATE-'>구매일 내림차순</Select.Option>
+              <Select.Option value='LATEST_CONSUME_DATE+'>사용일 오름차순</Select.Option>
+              <Select.Option value='LATEST_CONSUME_DATE-'>사용일 내림차순</Select.Option>
             </Select>
           </Form.Item>
         </div>

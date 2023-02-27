@@ -7,15 +7,22 @@ import { RecoilRoot } from 'recoil'
 import Router from './routes'
 
 import 'antd/dist/reset.css'
+import { RecoilURLSync } from 'recoil-sync'
 import './index.css'
-import { RecoilURLSyncJSON } from 'recoil-sync'
 
 function App() {
   const queryClient = new QueryClient()
 
   return (
     <RecoilRoot>
-      <RecoilURLSyncJSON location={{ part: 'queryParams' }}>
+      <RecoilURLSync
+        location={{
+          part: 'queryParams',
+          param: 'q',
+        }}
+        serialize={(x) => window.btoa(window.unescape(encodeURIComponent(JSON.stringify(x))))}
+        deserialize={(x) => JSON.parse(decodeURIComponent(escape(window.atob(x))))}
+      >
         <QueryClientProvider client={queryClient}>
           <ConfigProvider
             locale={koKR}
@@ -34,7 +41,7 @@ function App() {
             </StyleProvider>
           </ConfigProvider>
         </QueryClientProvider>
-      </RecoilURLSyncJSON>
+      </RecoilURLSync>
     </RecoilRoot>
   )
 }
