@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEyeSlash, faUser, faEye } from '@fortawesome/free-solid-svg-icons'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, KeyboardEvent, MutableRefObject, useEffect, useRef, useState } from 'react'
 import { httpClient } from '@/apis'
 import { useNavigate } from 'react-router'
 import { NavigationUtil } from '@/utils'
@@ -10,6 +10,7 @@ import { userState } from '@/store/user'
 import { useMutation } from '@tanstack/react-query'
 
 const LoginPage = () => {
+  const focusRef = useRef() as MutableRefObject<HTMLInputElement>
   const navigate = useNavigate()
 
   const [isShow, setIsShow] = useRecoilState(showPassword)
@@ -51,9 +52,33 @@ const LoginPage = () => {
     )
   }
 
+  const onPressEnterLogin = async (event: KeyboardEvent<HTMLInputElement>) => {
+    const { id } = inputs
+    if (!id) {
+      return alert('정보를 입력해 주세요')
+    } else if (event.key === 'Enter') {
+      mutate(
+        { ...inputs },
+        {
+          onSuccess: (response) => {
+            setUser(response.data)
+            NavigationUtil.items
+          },
+          onError: (error) => {
+            if (error instanceof Error) console.log('error login:', error.message)
+          },
+        }
+      )
+    }
+  }
+
   const onClickMoveToRegister = (): void => {
     navigate(NavigationUtil.register)
   }
+
+  useEffect(() => {
+    focusRef.current.focus()
+  }, [])
 
   return (
     <div className='flex items-center justify-center w-screen h-screen bg-bkg'>
@@ -70,6 +95,7 @@ const LoginPage = () => {
             className='h-10 pl-3 bg-white border-b-2 outline-none w-72'
             name='id'
             onChange={onChangeInputs}
+            ref={focusRef}
           />
           <FontAwesomeIcon icon={faUser} className='relative right-6' />
         </div>
@@ -80,6 +106,7 @@ const LoginPage = () => {
             className='h-10 pl-3 border-b-2 outline-none w-72'
             name='password'
             onChange={onChangeInputs}
+            onKeyDown={onPressEnterLogin}
           />
           {isShow ? (
             <FontAwesomeIcon

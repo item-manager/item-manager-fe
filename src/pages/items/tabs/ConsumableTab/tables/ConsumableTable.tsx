@@ -6,11 +6,13 @@ import { useQuery } from '@tanstack/react-query'
 import { Button, PaginationProps, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
+import { useNavigate } from 'react-router'
 import { useRecoilState } from 'recoil'
 import { consumableSearchState } from '../store'
 
 const ConsumableTable = () => {
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
+  const navigate = useNavigate()
 
   const criteria: ConsumableItemsRQ = {
     name: consumableSearch.name,
@@ -151,6 +153,11 @@ const ConsumableTable = () => {
         total: query.data?.page?.totalDataCnt,
         onChange: handlePageChange,
         // showSizeChanger: true,
+      }}
+      onRow={(data) => {
+        return {
+          onClick: () => navigate(`/items/${data?.itemNo}`),
+        }
       }}
     />
   )
