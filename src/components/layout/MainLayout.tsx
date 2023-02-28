@@ -1,10 +1,13 @@
-import { theme } from 'antd'
+import { isContentLoadingState } from '@/store'
+import { Spin, theme } from 'antd'
 import Layout, { Content } from 'antd/es/layout/layout'
+import { useRecoilValue } from 'recoil'
 import { Header } from '../header'
 
 type Props = { children: React.ReactNode }
 
 export const MainLayout = ({ children }: Props) => {
+  const isLoading = useRecoilValue(isContentLoadingState)
   const {
     token: { colorBgContainer },
   } = theme.useToken()
@@ -12,15 +15,17 @@ export const MainLayout = ({ children }: Props) => {
   return (
     <Layout className='h-screen'>
       <Header />
-      <Content
-        className='p-6 m-0'
-        style={{
-          minHeight: 280,
-          background: colorBgContainer,
-        }}
-      >
-        {children}
-      </Content>
+      <Spin spinning={isLoading}>
+        <Content
+          className='p-6 m-0'
+          style={{
+            minHeight: 280,
+            background: colorBgContainer,
+          }}
+        >
+          {children}
+        </Content>
+      </Spin>
     </Layout>
   )
 }
