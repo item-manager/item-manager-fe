@@ -10,7 +10,12 @@ import { useState } from 'react'
 import { useSetRecoilState } from 'recoil'
 import RoomModal from '../modals/RoomModal'
 
-const RoomTable = ({ setRoomNo }: { setRoomNo: (roomNo: number) => void }) => {
+type Props = {
+  roomNo: number | undefined
+  setRoomNo: (roomNo: number) => void
+}
+
+const RoomTable = ({ roomNo, setRoomNo }: Props) => {
   const { visible, showModal, hideModal } = useModal()
   const [record, setRecord] = useState<RoomsRS | undefined>()
   const setIsLoadingState = useSetRecoilState(isContentLoadingState)
@@ -123,6 +128,7 @@ const RoomTable = ({ setRoomNo }: { setRoomNo: (roomNo: number) => void }) => {
         rowKey='roomNo'
         dataSource={query.data?.data}
         loading={query.isLoading}
+        rowClassName={(record) => (record.roomNo === roomNo ? 'selected-row' : '')}
       />
       {visible && <RoomModal record={record} hideModal={hideModal} setRoomNo={setRoomNo} />}
     </div>
