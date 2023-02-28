@@ -1,16 +1,20 @@
 import { httpClient, PlacesRQ, PlacesRS } from '@/apis'
 import BasicTable from '@/components/tables/BasicTable'
 import useModal from '@/hooks/useModal'
+import { isContentLoadingState } from '@/store'
 import { DeleteFilled, EditOutlined, EllipsisOutlined } from '@ant-design/icons'
-import { useQuery } from '@tanstack/react-query'
-import { Button, Space, Tooltip } from 'antd'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Button, message, Space, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { useState } from 'react'
+import { useSetRecoilState } from 'recoil'
 import PlaceModal from '../modals/PlaceModal'
 
 const PlaceTable = ({ roomNo }: PlacesRQ) => {
   const { visible, showModal, hideModal } = useModal()
   const [record, setRecord] = useState<PlacesRS | undefined>()
+  const setIsLoadingState = useSetRecoilState(isContentLoadingState)
+  const queryClient = useQueryClient()
 
   const query = useQuery({
     queryKey: ['rooms', roomNo],
@@ -28,7 +32,32 @@ const PlaceTable = ({ roomNo }: PlacesRQ) => {
     showModal()
   }
 
-  const deleteRoom = (_record: PlacesRS) => {}
+  const deleteRoom = async (record: PlacesRS) => {
+    setIsLoadingState(true)
+    try {
+      const locationNo = record.placeNo
+
+      // 1. 사용중인 물품정보 조회
+      const result = await httpClient.items.getItemsInLocation({ locationNo })
+      if (result.data?.length) {
+        // TODO 모달이든 어떻게든 변경
+        alert(
+          `메시지 변경 예정\n사용 중인 물품 : ${result.data.map((item) => item.name).join(', ')}`
+        )
+        return
+      }
+
+      // 2. 삭제
+      // TODO 에러 처리?
+      await httpClient.locations.deleteLocation(locationNo)
+      queryClient.invalidateQueries({ queryKey: ['rooms', roomNo] })
+      message.success('삭제되었습니다.')
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsLoadingState(false)
+    }
+  }
 
   const columns: ColumnsType<PlacesRS> = [
     {

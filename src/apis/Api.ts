@@ -233,6 +233,24 @@ export interface ResultItemRS {
   data?: ItemRS
 }
 
+export interface ItemsInLocationRQ {
+  /** @format int64 */
+  locationNo: number
+}
+
+export interface ItemNameRS {
+  /** @format int64 */
+  itemNo?: number
+  name?: string
+}
+
+export interface ResultListItemNameRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: ItemNameRS[]
+}
+
 export interface ConsumableItemsRQ {
   name?: string
   labelNos?: number[]
@@ -587,6 +605,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         type: ContentType.Json,
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags location-controller
+     * @name DeleteLocation
+     * @summary 방/위치 삭제
+     * @request DELETE:/locations/{locationNo}
+     */
+    deleteLocation: (locationNo: number, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/locations/${locationNo}`,
+        method: 'DELETE',
+        ...params,
+      }),
   }
   labels = {
     /**
@@ -698,6 +731,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       this.request<ResultItemRS, ErrorResult>({
         path: `/items/${itemNo}`,
         method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name GetItemsInLocation
+     * @summary 방/위치 pk로 조회
+     * @request GET:/items/location
+     */
+    getItemsInLocation: (query: ItemsInLocationRQ, params: RequestParams = {}) =>
+      this.request<ResultListItemNameRS, ErrorResult>({
+        path: `/items/location`,
+        method: 'GET',
+        query: query,
         ...params,
       }),
 
