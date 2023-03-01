@@ -7,11 +7,12 @@ import { NavigationUtil } from '@/utils'
 import { useRecoilState } from 'recoil'
 import { showPassword } from '@/store/atom'
 import { userState } from '@/store/user'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 const LoginPage = () => {
   const focusRef = useRef() as MutableRefObject<HTMLInputElement>
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const [isShow, setIsShow] = useRecoilState(showPassword)
 
@@ -43,6 +44,7 @@ const LoginPage = () => {
       {
         onSuccess: (response) => {
           setUser(response.data)
+          queryClient.clear()
           NavigationUtil.items
         },
         onError: (error) => {
@@ -62,6 +64,7 @@ const LoginPage = () => {
         {
           onSuccess: (response) => {
             setUser(response.data)
+            queryClient.clear()
             NavigationUtil.items
           },
           onError: (error) => {
