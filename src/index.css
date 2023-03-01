@@ -24,3 +24,7 @@ body {
 .ant-select-dropdown {
   overflow: visible !important;
 }
+
+.ant-table-row.selected-row {
+  background-color: #f5f5f5;
+}
