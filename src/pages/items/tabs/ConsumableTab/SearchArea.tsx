@@ -54,7 +54,7 @@ const SearchArea = () => {
       sort = matchedValue[2]
     }
 
-    setConsumableSearch((data) => ({ ...data, ...rest, orderBy, sort }))
+    setConsumableSearch((data) => ({ ...data, ...rest, orderBy, sort, page: 1 }))
   }
 
   return (
