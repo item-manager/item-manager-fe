@@ -13,8 +13,11 @@ module.exports = {
     proxy: {
       '/api': {
         target: endpoint,
-        pathRewrite: { '^/api': '' }
-      }
+        pathRewrite: { '^/api': '' },
+      },
+      '/photo': {
+        target: endpoint,
+      },
     },
   },
 }
