@@ -108,6 +108,28 @@ export interface ResultCreateItemRS {
   data?: CreateItemRS
 }
 
+export interface ConsumeItemRQ {
+  /** @format date-time */
+  date?: string
+  /**
+   * @format int32
+   * @min 0
+   */
+  count?: number
+}
+
+export interface ConsumeItemRS {
+  /** @format int32 */
+  quantity?: number
+}
+
+export interface ResultConsumeItemRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: ConsumeItemRS
+}
+
 export interface LoginUserRQ {
   id: string
   password: string
@@ -276,7 +298,7 @@ export interface ConsumableItemsRQ {
 
 export interface ConsumableItemRS {
   /** @format int64 */
-  itemNo?: number
+  itemNo: number
   /** @format int32 */
   priority?: number
   name?: string
@@ -716,6 +738,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: 'POST',
         body: data,
         type: ContentType.FormData,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name ConsumeItem
+     * @summary 물품 사용
+     * @request POST:/items/{itemNo}/consume
+     */
+    consumeItem: (itemNo: number, data: ConsumeItemRQ, params: RequestParams = {}) =>
+      this.request<ResultConsumeItemRS, ErrorResult>({
+        path: `/items/${itemNo}/consume`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
