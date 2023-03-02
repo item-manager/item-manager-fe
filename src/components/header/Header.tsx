@@ -24,10 +24,16 @@ export const Header = () => {
     }
   }
 
+  const onClickLogo = () => {
+    navigate(NavigationUtil.items)
+  }
+
   return (
     <div className='flex items-center w-screen h-16 bg-main'>
       <div className='flex items-center w-4/5 h-full'>
-        <h1 className='pl-10 text-2xl hover:cursor-pointer'>물품관리</h1>
+        <h1 className='pl-10 text-2xl hover:cursor-pointer' onClick={onClickLogo}>
+          물품관리
+        </h1>
       </div>
       <div className='flex items-center w-48 h-full justify-evenly'>
         <div
