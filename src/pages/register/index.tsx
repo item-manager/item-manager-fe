@@ -1,11 +1,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEyeSlash, faUser, faEye, faIdCard } from '@fortawesome/free-solid-svg-icons'
 import { ChangeEvent, useState } from 'react'
-import { Schema } from '@/utils'
+import { NavigationUtil, Schema } from '@/utils'
 import { useRecoilState } from 'recoil'
 import { showPassword, showPasswordConfirm } from '@/store/atom'
+import { useNavigate } from 'react-router'
 
 const Register = () => {
+  const navigate = useNavigate()
   const [isShow, setIsShow] = useRecoilState(showPassword)
   const [isShowPass, setIsShowPass] = useRecoilState(showPasswordConfirm)
   const [inputs, setInputs] = useState({
@@ -31,7 +33,23 @@ const Register = () => {
   }
 
   const onClickRegister = () => {
+    const { id, username, password, passwordConfirm } = inputs
+
     Schema({ ...inputs })
+
+    if (
+      (id.length > 2 || id.length < 10) &&
+      (username.length > 2 || username.length < 10) &&
+      (password.length > 6 || password.length < 20) &&
+      password === passwordConfirm
+    ) {
+      alert('정상적으로 회원가입 되셨습니다.')
+      navigate(NavigationUtil.login)
+    }
+  }
+
+  const onClickRouteLogin = () => {
+    navigate(NavigationUtil.login)
   }
 
   return (
@@ -108,6 +126,15 @@ const Register = () => {
         >
           REGISTER
         </button>
+        <div className='text-xs text-center text-gray'>
+          이미 회원이신가요?
+          <span
+            className='pl-1 cursor-pointer text-main hover:opacity-95'
+            onClick={onClickRouteLogin}
+          >
+            로그인하기
+          </span>
+        </div>
       </div>
     </div>
   )
