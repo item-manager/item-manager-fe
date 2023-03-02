@@ -108,6 +108,34 @@ export interface ResultCreateItemRS {
   data?: CreateItemRS
 }
 
+export interface PurchaseItemRQ {
+  mall?: string
+  /** @format date-time */
+  date?: string
+  /**
+   * @format int32
+   * @min 0
+   */
+  unitPrice?: number
+  /**
+   * @format int32
+   * @min 0
+   */
+  count?: number
+}
+
+export interface PurchaseItemRS {
+  /** @format int32 */
+  quantity?: number
+}
+
+export interface ResultPurchaseItemRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: PurchaseItemRS
+}
+
 export interface ConsumeItemRQ {
   /** @format date-time */
   date?: string
@@ -234,6 +262,7 @@ export interface ItemRS {
   room?: string
   place?: string
   locationMemo?: string
+  photoUrl?: string
   /** @format int32 */
   quantity?: number
   /** @format int32 */
@@ -738,6 +767,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: 'POST',
         body: data,
         type: ContentType.FormData,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name PurchaseItem
+     * @summary 물품 구매
+     * @request POST:/items/{itemNo}/purchase
+     */
+    purchaseItem: (itemNo: number, data: PurchaseItemRQ, params: RequestParams = {}) =>
+      this.request<ResultPurchaseItemRS, ErrorResult>({
+        path: `/items/${itemNo}/purchase`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 

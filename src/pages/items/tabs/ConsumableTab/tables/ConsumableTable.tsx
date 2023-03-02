@@ -1,21 +1,24 @@
 import { ConsumableItemRS, ConsumableItemsRQ, httpClient } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
-import { isContentLoadingState } from '@/store'
+import useModal from '@/hooks/useModal'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, message, PaginationProps, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil'
+import { useRecoilState, useResetRecoilState } from 'recoil'
+import PurchaseModal from '../modals/PurchaseModal'
 import { consumableSearchState } from '../store'
 
 const ConsumableTable = () => {
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
   const resetConsumableSearchState = useResetRecoilState(consumableSearchState)
-  const setIsLoadingState = useSetRecoilState(isContentLoadingState)
+  const [isLoading, setIsLoading] = useState(false)
+  const { visible, showModal, hideModal } = useModal()
+  const [record, setRecord] = useState<ConsumableItemRS | undefined>()
 
   const queryClient = useQueryClient()
 
@@ -43,7 +46,7 @@ const ConsumableTable = () => {
   // 1개 사용
   const consumeOneItem = async (record: ConsumableItemRS) => {
     const { itemNo } = record
-    setIsLoadingState(true)
+    setIsLoading(true)
 
     try {
       await httpClient.items.consumeItem(itemNo, {
@@ -56,8 +59,13 @@ const ConsumableTable = () => {
     } catch (e) {
       console.error(e)
     } finally {
-      setIsLoadingState(false)
+      setIsLoading(false)
     }
+  }
+
+  const openPurchaseModal = (record: ConsumableItemRS) => {
+    setRecord(record)
+    showModal()
   }
 
   const columns: ColumnsType<ConsumableItemRS> = [
@@ -154,8 +162,18 @@ const ConsumableTable = () => {
       title: '구매',
       key: '구매',
       align: 'center',
-      render(_value, _record, _index) {
-        return <Button type='primary'>구매</Button>
+      render(_value, record, _index) {
+        return (
+          <div
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+          >
+            <Button type='primary' onClick={() => openPurchaseModal(record)}>
+              구매
+            </Button>
+          </div>
+        )
       },
       width: 100,
     },
@@ -184,28 +202,30 @@ const ConsumableTable = () => {
   }
 
   return (
-    <BasicTable<ConsumableItemRS>
-      columns={columns}
-      rowKey='itemNo'
-      // @ts-ignore
-      dataSource={query.data?.data}
-      loading={query.isLoading}
-      tableLayout='fixed'
-      scroll={{ x: 250 }}
-      size='large'
-      pagination={{
-        current: consumableSearch.page,
-        pageSize: consumableSearch.size,
-        total: query.data?.page?.totalDataCnt,
-        onChange: handlePageChange,
-        // showSizeChanger: true,
-      }}
-      onRow={(data) => {
-        return {
-          onClick: () => navigate(`/items/${data?.itemNo}`),
-        }
-      }}
-    />
+    <>
+      <BasicTable<ConsumableItemRS>
+        columns={columns}
+        rowKey='itemNo'
+        dataSource={query.data?.data}
+        loading={query.isLoading || isLoading}
+        tableLayout='fixed'
+        scroll={{ x: 250 }}
+        size='large'
+        pagination={{
+          current: consumableSearch.page,
+          pageSize: consumableSearch.size,
+          total: query.data?.page?.totalDataCnt,
+          onChange: handlePageChange,
+          // showSizeChanger: true,
+        }}
+        onRow={(data) => {
+          return {
+            onClick: () => navigate(`/items/${data.itemNo}`),
+          }
+        }}
+      />
+      {visible && <PurchaseModal record={record!} hideModal={hideModal} />}
+    </>
   )
 }
 
