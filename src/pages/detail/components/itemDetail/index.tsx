@@ -43,8 +43,10 @@ const ItemDetail = () => {
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.type}</span>
             </div>
             <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>사용처:</span>
-              <span className='inline-block w-6/12 text-center'>욕실</span>
+              <span className='inline-block w-24 text-center'>라벨:</span>
+              <span className='inline-block w-6/12 text-center'>
+                {itemDetail?.data?.labels?.map((label) => label.name).join(', ')}
+              </span>
             </div>
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
@@ -59,7 +61,7 @@ const ItemDetail = () => {
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
             <div className='flex items-center text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>보관정소:</span>
+              <span className='inline-block w-24 text-center'>상세위치:</span>
               <span className='inline-block w-6/12 text-center truncate text-ellipsis'>
                 {itemDetail?.data?.locationMemo}
               </span>
