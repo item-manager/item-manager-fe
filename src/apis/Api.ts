@@ -108,6 +108,56 @@ export interface ResultCreateItemRS {
   data?: CreateItemRS
 }
 
+export interface PurchaseItemRQ {
+  mall?: string
+  /** @format date-time */
+  date?: string
+  /**
+   * @format int32
+   * @min 0
+   */
+  unitPrice?: number
+  /**
+   * @format int32
+   * @min 0
+   */
+  count?: number
+}
+
+export interface PurchaseItemRS {
+  /** @format int32 */
+  quantity?: number
+}
+
+export interface ResultPurchaseItemRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: PurchaseItemRS
+}
+
+export interface ConsumeItemRQ {
+  /** @format date-time */
+  date?: string
+  /**
+   * @format int32
+   * @min 0
+   */
+  count?: number
+}
+
+export interface ConsumeItemRS {
+  /** @format int32 */
+  quantity?: number
+}
+
+export interface ResultConsumeItemRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: ConsumeItemRS
+}
+
 export interface LoginUserRQ {
   id: string
   password: string
@@ -212,6 +262,7 @@ export interface ItemRS {
   room?: string
   place?: string
   locationMemo?: string
+  photoUrl?: string
   /** @format int32 */
   quantity?: number
   /** @format int32 */
@@ -255,7 +306,7 @@ export interface ConsumableItemsRQ {
   name?: string
   labelNos?: number[]
   /** priority(중요도), quantity(수량), latest_purchase_date(최근 구매일), latest_consume_date(최근 사용일), null(생성순) */
-  orderBy?: 'PRIORITY' | 'QUANTITY' | 'LATEST_PURCHASE_DATE' | 'LATEST_CONSUME_DATE'
+  orderBy?: 'priority' | 'quantity' | 'latest_purchase_date' | 'latest_consume_date'
   /**
    * +(오름차순), -(내림차순)
    * @default "+"
@@ -276,7 +327,7 @@ export interface ConsumableItemsRQ {
 
 export interface ConsumableItemRS {
   /** @format int64 */
-  itemNo?: number
+  itemNo: number
   /** @format int32 */
   priority?: number
   name?: string
@@ -716,6 +767,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: 'POST',
         body: data,
         type: ContentType.FormData,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name PurchaseItem
+     * @summary 물품 구매
+     * @request POST:/items/{itemNo}/purchase
+     */
+    purchaseItem: (itemNo: number, data: PurchaseItemRQ, params: RequestParams = {}) =>
+      this.request<ResultPurchaseItemRS, ErrorResult>({
+        path: `/items/${itemNo}/purchase`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name ConsumeItem
+     * @summary 물품 사용
+     * @request POST:/items/{itemNo}/consume
+     */
+    consumeItem: (itemNo: number, data: ConsumeItemRQ, params: RequestParams = {}) =>
+      this.request<ResultConsumeItemRS, ErrorResult>({
+        path: `/items/${itemNo}/consume`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 

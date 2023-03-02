@@ -9,7 +9,7 @@ const LocationsPage = () => {
   return (
     <Row gutter={20}>
       <Col span={12}>
-        <RoomTable setRoomNo={(roomNo) => setRoomNo(roomNo)} />
+        <RoomTable roomNo={roomNo} setRoomNo={(roomNo) => setRoomNo(roomNo)} />
       </Col>
       <Col span={12}>
         <PlaceTable roomNo={roomNo} />

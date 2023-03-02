@@ -1,12 +1,14 @@
 import { ConsumableItemRS, ConsumableItemsRQ, httpClient } from '@/apis'
+import PurchaseModal from '@/components/modals/PurchaseModal'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
+import useModal from '@/hooks/useModal'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
-import { useQuery } from '@tanstack/react-query'
-import { Button, PaginationProps, Tag, Tooltip } from 'antd'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Button, message, PaginationProps, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useRecoilState, useResetRecoilState } from 'recoil'
 import { consumableSearchState } from '../store'
@@ -14,6 +16,11 @@ import { consumableSearchState } from '../store'
 const ConsumableTable = () => {
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
   const resetConsumableSearchState = useResetRecoilState(consumableSearchState)
+  const [isLoading, setIsLoading] = useState(false)
+  const { visible, showModal, hideModal } = useModal()
+  const [itemNo, setItemNo] = useState<number | undefined>()
+
+  const queryClient = useQueryClient()
 
   const navigate = useNavigate()
   useEffect(() => {
@@ -35,6 +42,31 @@ const ConsumableTable = () => {
     queryKey: ['items', criteria],
     queryFn: () => httpClient.items.getConsumableItems(criteria),
   })
+
+  // 1개 사용
+  const consumeOneItem = async (record: ConsumableItemRS) => {
+    const { itemNo } = record
+    setIsLoading(true)
+
+    try {
+      await httpClient.items.consumeItem(itemNo, {
+        count: 1,
+        date: dayjs().toISOString(),
+      })
+
+      queryClient.invalidateQueries({ queryKey: ['items'] })
+      message.success('사용되었습니다.')
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const openPurchaseModal = (record: ConsumableItemRS) => {
+    setItemNo(record.itemNo)
+    showModal()
+  }
 
   const columns: ColumnsType<ConsumableItemRS> = [
     {
@@ -107,8 +139,22 @@ const ConsumableTable = () => {
       title: '사용하기',
       key: '사용하기',
       align: 'center',
-      render(_value, _record, _index) {
-        return <Button type='primary'>1개 사용</Button>
+      render(_value, record, _index) {
+        return (
+          <div
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+          >
+            <Button
+              type='primary'
+              disabled={!record.quantity}
+              onClick={() => consumeOneItem(record)}
+            >
+              1개 사용
+            </Button>
+          </div>
+        )
       },
       width: 100,
     },
@@ -116,14 +162,24 @@ const ConsumableTable = () => {
       title: '구매',
       key: '구매',
       align: 'center',
-      render(_value, _record, _index) {
-        return <Button type='primary'>구매</Button>
+      render(_value, record, _index) {
+        return (
+          <div
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+          >
+            <Button type='primary' onClick={() => openPurchaseModal(record)}>
+              구매
+            </Button>
+          </div>
+        )
       },
       width: 100,
     },
     {
       title: <EllipsisOutlined />,
-      key: '구매',
+      key: '...',
       align: 'center',
       render(_value, _record, _index) {
         return (
@@ -146,28 +202,30 @@ const ConsumableTable = () => {
   }
 
   return (
-    <BasicTable<ConsumableItemRS>
-      columns={columns}
-      rowKey='itemNo'
-      // @ts-ignore
-      dataSource={query.data?.data}
-      loading={query.isLoading}
-      tableLayout='fixed'
-      scroll={{ x: 250 }}
-      size='large'
-      pagination={{
-        current: consumableSearch.page,
-        pageSize: consumableSearch.size,
-        total: query.data?.page?.totalDataCnt,
-        onChange: handlePageChange,
-        // showSizeChanger: true,
-      }}
-      onRow={(data) => {
-        return {
-          onClick: () => navigate(`/items/${data?.itemNo}`),
-        }
-      }}
-    />
+    <>
+      <BasicTable<ConsumableItemRS>
+        columns={columns}
+        rowKey='itemNo'
+        dataSource={query.data?.data}
+        loading={query.isLoading || isLoading}
+        tableLayout='fixed'
+        scroll={{ x: 250 }}
+        size='large'
+        pagination={{
+          current: consumableSearch.page,
+          pageSize: consumableSearch.size,
+          total: query.data?.page?.totalDataCnt,
+          onChange: handlePageChange,
+          // showSizeChanger: true,
+        }}
+        onRow={(data) => {
+          return {
+            onClick: () => navigate(`/items/${data.itemNo}`),
+          }
+        }}
+      />
+      {visible && <PurchaseModal itemNo={itemNo!} hideModal={hideModal} />}
+    </>
   )
 }
 

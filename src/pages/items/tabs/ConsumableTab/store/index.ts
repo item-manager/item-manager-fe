@@ -17,10 +17,10 @@ const consumableSearchRefine = object({
   name: optional(string()),
   orderBy: optional(
     union(
-      literal('PRIORITY'),
-      literal('QUANTITY'),
-      literal('LATEST_PURCHASE_DATE'),
-      literal('LATEST_CONSUME_DATE')
+      literal('priority'),
+      literal('quantity'),
+      literal('latest_purchase_date'),
+      literal('latest_consume_date')
     )
   ),
   sort: optional(union(literal('+'), literal('-'))),

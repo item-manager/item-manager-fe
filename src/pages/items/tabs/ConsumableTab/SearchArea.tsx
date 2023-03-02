@@ -54,7 +54,7 @@ const SearchArea = () => {
       sort = matchedValue[2]
     }
 
-    setConsumableSearch((data) => ({ ...data, ...rest, orderBy, sort }))
+    setConsumableSearch((data) => ({ ...data, ...rest, orderBy, sort, page: 1 }))
   }
 
   return (
@@ -93,14 +93,14 @@ const SearchArea = () => {
           </Form.Item>
           <Form.Item name='order'>
             <Select placeholder='정렬' className='w-48' allowClear>
-              <Select.Option value='PRIORITY+'>중요도 오름차순</Select.Option>
-              <Select.Option value='PRIORITY-'>중요도 내림차순</Select.Option>
-              <Select.Option value='QUANTITY+'>남은 수량 오름차순</Select.Option>
-              <Select.Option value='QUANTITY-'>남은 수량 내림차순</Select.Option>
-              <Select.Option value='LATEST_PURCHASE_DATE+'>구매일 오름차순</Select.Option>
-              <Select.Option value='LATEST_PURCHASE_DATE-'>구매일 내림차순</Select.Option>
-              <Select.Option value='LATEST_CONSUME_DATE+'>사용일 오름차순</Select.Option>
-              <Select.Option value='LATEST_CONSUME_DATE-'>사용일 내림차순</Select.Option>
+              <Select.Option value='priority+'>중요도 오름차순</Select.Option>
+              <Select.Option value='priority-'>중요도 내림차순</Select.Option>
+              <Select.Option value='quantity+'>남은 수량 오름차순</Select.Option>
+              <Select.Option value='quantity-'>남은 수량 내림차순</Select.Option>
+              <Select.Option value='latest_purchase_date+'>구매일 오름차순</Select.Option>
+              <Select.Option value='latest_purchase_date-'>구매일 내림차순</Select.Option>
+              <Select.Option value='latest_consume_date+'>사용일 오름차순</Select.Option>
+              <Select.Option value='latest_consume_date-'>사용일 내림차순</Select.Option>
             </Select>
           </Form.Item>
         </div>

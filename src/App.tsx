@@ -1,6 +1,7 @@
 import { StyleProvider } from '@ant-design/cssinjs'
 import { ConfigProvider } from 'antd'
 import koKR from 'antd/locale/ko_KR'
+import 'dayjs/locale/ko'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RecoilRoot } from 'recoil'
