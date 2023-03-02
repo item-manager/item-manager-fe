@@ -1,4 +1,5 @@
 import { ConsumableItemRS, ConsumableItemsRQ, httpClient } from '@/apis'
+import PurchaseModal from '@/components/modals/PurchaseModal'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
 import useModal from '@/hooks/useModal'
@@ -10,7 +11,6 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useRecoilState, useResetRecoilState } from 'recoil'
-import PurchaseModal from '../modals/PurchaseModal'
 import { consumableSearchState } from '../store'
 
 const ConsumableTable = () => {
@@ -18,7 +18,7 @@ const ConsumableTable = () => {
   const resetConsumableSearchState = useResetRecoilState(consumableSearchState)
   const [isLoading, setIsLoading] = useState(false)
   const { visible, showModal, hideModal } = useModal()
-  const [record, setRecord] = useState<ConsumableItemRS | undefined>()
+  const [itemNo, setItemNo] = useState<number | undefined>()
 
   const queryClient = useQueryClient()
 
@@ -64,7 +64,7 @@ const ConsumableTable = () => {
   }
 
   const openPurchaseModal = (record: ConsumableItemRS) => {
-    setRecord(record)
+    setItemNo(record.itemNo)
     showModal()
   }
 
@@ -224,7 +224,7 @@ const ConsumableTable = () => {
           }
         }}
       />
-      {visible && <PurchaseModal record={record!} hideModal={hideModal} />}
+      {visible && <PurchaseModal itemNo={itemNo!} hideModal={hideModal} />}
     </>
   )
 }
