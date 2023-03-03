@@ -36,7 +36,7 @@ export const consumableSearchState = atom({
     currentTabKey: '0',
     sort: '+',
     page: 1,
-    size: 8,
+    size: 7,
   },
   effects: [
     urlSyncEffect({
