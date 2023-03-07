@@ -13,7 +13,12 @@
     "prettier/prettier": "error",
     "react/no-children-prop": "off",
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      {
+        "additionalHooks": "(useRecoilCallback|useRecoilTransaction_UNSTABLE)"
+      }
+    ],
     "no-empty-function": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/ban-ts-comment": "off",
