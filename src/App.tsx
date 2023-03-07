@@ -21,8 +21,10 @@ function App() {
           part: 'queryParams',
           param: 'q',
         }}
-        serialize={(x) => window.btoa(window.unescape(encodeURIComponent(JSON.stringify(x))))}
-        deserialize={(x) => JSON.parse(decodeURIComponent(escape(window.atob(x))))}
+        serialize={(x) => JSON.stringify(x)}
+        deserialize={(x) => JSON.parse(x)}
+        // serialize={(x) => window.btoa(window.unescape(encodeURIComponent(JSON.stringify(x))))}
+        // deserialize={(x) => JSON.parse(decodeURIComponent(escape(window.atob(x))))}
       >
         <QueryClientProvider client={queryClient}>
           <ConfigProvider
