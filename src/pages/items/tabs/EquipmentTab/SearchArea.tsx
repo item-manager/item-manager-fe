@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Button, Form, FormProps, Input, Select, TreeSelect } from 'antd'
 import { DefaultOptionType } from 'antd/es/select'
 import { useForm } from 'antd/lib/form/Form'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { equipmentSearchState, EquipmentSearchType } from './store'
 
@@ -12,6 +12,8 @@ const SearchArea = () => {
   const [form] = useForm<EquipmentSearchType>()
 
   const [equipmentSearch, setEquipmentSearch] = useRecoilState(equipmentSearchState)
+
+  useEffect(() => form.resetFields(), [form, equipmentSearch])
 
   const getLabelsQuery = useQuery(['labels'], httpClient.labels.getLabels, {
     select({ data }) {

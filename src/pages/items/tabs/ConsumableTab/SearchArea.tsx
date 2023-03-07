@@ -3,6 +3,7 @@ import { SearchOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
 import { Button, Form, FormProps, Input, Select } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
+import { useEffect } from 'react'
 import { useRecoilState } from 'recoil'
 import { consumableSearchState, ConsumableSearchType } from './store'
 
@@ -16,6 +17,8 @@ const SearchArea = () => {
   const [form] = useForm<SearchAreaForm>()
 
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
+
+  useEffect(() => form.resetFields(), [form, consumableSearch])
 
   const getLabelsQuery = useQuery(['labels'], httpClient.labels.getLabels, {
     select({ data }) {

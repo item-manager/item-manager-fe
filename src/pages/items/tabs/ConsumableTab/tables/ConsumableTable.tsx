@@ -10,7 +10,7 @@ import { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { useRecoilState, useResetRecoilState } from 'recoil'
+import { useRecoilState } from 'recoil'
 import { consumableSearchState } from '../store'
 
 const ConsumableTable = () => {
