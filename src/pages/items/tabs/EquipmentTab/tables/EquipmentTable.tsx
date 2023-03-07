@@ -1,12 +1,12 @@
 import { EquipmentItemsRQ, httpClient, ItemRS } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
+import { equipmentSearchState } from '@/store'
 import { useQuery } from '@tanstack/react-query'
 import { PaginationProps, Tag } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
-import { equipmentSearchState } from '../store'
 
 const EquipmentTable = () => {
   const [equipmentSearch, setEquipmentSearch] = useRecoilState(equipmentSearchState)
@@ -14,11 +14,11 @@ const EquipmentTable = () => {
   const navigate = useNavigate()
 
   const criteria: EquipmentItemsRQ = {
-    name: equipmentSearch.name,
+    name: equipmentSearch.name || undefined,
     labelNos: equipmentSearch.labels?.map((item) => +item) || [],
-    page: equipmentSearch.page,
-    size: equipmentSearch.size,
-    locationNo: equipmentSearch.locationNo,
+    page: equipmentSearch.page || 1,
+    size: equipmentSearch.size || 7,
+    locationNo: equipmentSearch.locationNo || undefined,
   }
 
   const query = useQuery({
@@ -103,8 +103,8 @@ const EquipmentTable = () => {
       scroll={{ x: 250 }}
       size='large'
       pagination={{
-        current: equipmentSearch.page,
-        pageSize: equipmentSearch.size,
+        current: equipmentSearch.page || 1,
+        pageSize: equipmentSearch.size || 7,
         total: query.data?.page?.totalDataCnt,
         onChange: handlePageChange,
         // showSizeChanger: true,

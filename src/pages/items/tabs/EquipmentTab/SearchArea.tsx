@@ -1,4 +1,5 @@
 import { httpClient } from '@/apis'
+import { equipmentSearchState } from '@/store'
 import { SearchOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
 import { Button, Form, FormProps, Input, Select, TreeSelect } from 'antd'
@@ -6,10 +7,13 @@ import { DefaultOptionType } from 'antd/es/select'
 import { useForm } from 'antd/lib/form/Form'
 import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import { equipmentSearchState, EquipmentSearchType } from './store'
 
 const SearchArea = () => {
-  const [form] = useForm<EquipmentSearchType>()
+  const [form] = useForm<{
+    name: string
+    labels: string[]
+    locationNo: number
+  }>()
 
   const [equipmentSearch, setEquipmentSearch] = useRecoilState(equipmentSearchState)
 

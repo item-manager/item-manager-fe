@@ -3,6 +3,7 @@ import PurchaseModal from '@/components/modals/PurchaseModal'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
 import useModal from '@/hooks/useModal'
+import { consumableSearchState } from '@/store'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, message, PaginationProps, Tag, Tooltip } from 'antd'
@@ -11,10 +12,11 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useRecoilState } from 'recoil'
-import { consumableSearchState } from '../store'
 
 const ConsumableTable = () => {
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
+  console.log({ consumableSearch })
+
   const [isLoading, setIsLoading] = useState(false)
   const { visible, showModal, hideModal } = useModal()
   const [itemNo, setItemNo] = useState<number | undefined>()
@@ -24,12 +26,12 @@ const ConsumableTable = () => {
   const navigate = useNavigate()
 
   const criteria: ConsumableItemsRQ = {
-    name: consumableSearch.name,
+    name: consumableSearch.name || undefined,
     labelNos: consumableSearch.labels?.map((item) => +item) || [],
-    orderBy: consumableSearch.orderBy,
-    sort: consumableSearch.sort,
-    page: consumableSearch.page,
-    size: consumableSearch.size,
+    orderBy: consumableSearch.orderBy || undefined,
+    sort: consumableSearch.sort || '+',
+    page: consumableSearch.page || 1,
+    size: consumableSearch.size || 7,
   }
 
   const query = useQuery({
@@ -206,8 +208,8 @@ const ConsumableTable = () => {
         scroll={{ x: 250 }}
         size='large'
         pagination={{
-          current: consumableSearch.page,
-          pageSize: consumableSearch.size,
+          current: consumableSearch.page || 1,
+          pageSize: consumableSearch.size || 7,
           total: query.data?.page?.totalDataCnt,
           onChange: handlePageChange,
           // showSizeChanger: true,
