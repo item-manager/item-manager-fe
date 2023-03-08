@@ -1,12 +1,13 @@
 import { httpClient, PlacesRQ, PlacesRS } from '@/apis'
 import BasicTable from '@/components/tables/BasicTable'
 import useModal from '@/hooks/useModal'
+import useOnScreen from '@/hooks/useOnScreen'
 import { isContentLoadingState } from '@/store'
 import { DeleteFilled, EditOutlined, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, message, Modal, Space, Tooltip } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
-import { useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSetRecoilState } from 'recoil'
 import PlaceModal from '../modals/PlaceModal'
@@ -18,6 +19,16 @@ const PlaceTable = ({ roomNo }: PlacesRQ) => {
   const queryClient = useQueryClient()
   const [modal, contextHolder] = Modal.useModal()
   const navigate = useNavigate()
+
+  const ref = useRef<HTMLDivElement>(null)
+  const isOnScreen = useOnScreen(ref)
+
+  useEffect(() => {
+    console.log({ isOnScreen })
+    if (!isOnScreen) {
+      ref.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [roomNo])
 
   const query = useQuery({
     queryKey: ['rooms', roomNo],
@@ -147,6 +158,7 @@ const PlaceTable = ({ roomNo }: PlacesRQ) => {
         <PlaceModal key={roomNo} record={record} roomNo={roomNo!} hideModal={hideModal} />
       )}
       {contextHolder}
+      <div ref={ref} className='invisible'></div>
     </div>
   )
 }
