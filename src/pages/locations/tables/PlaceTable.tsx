@@ -22,9 +22,14 @@ const PlaceTable = ({ roomNo }: PlacesRQ) => {
 
   const ref = useRef<HTMLDivElement>(null)
   const isOnScreen = useOnScreen(ref)
+  const firstUpdate = useRef(true)
 
   useEffect(() => {
-    console.log({ isOnScreen })
+    if (firstUpdate.current) {
+      firstUpdate.current = false
+      return
+    }
+
     if (!isOnScreen) {
       ref.current?.scrollIntoView({ behavior: 'smooth' })
     }
