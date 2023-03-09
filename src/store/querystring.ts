@@ -40,22 +40,20 @@ export const orderByState = atom({
 
 export const sortState = atom({
   key: 'sort',
-  default: null,
-  effects: [
-    urlSyncEffect({ refine: nullable(union(literal('+'), literal('-'))), history: 'push' }),
-  ],
+  default: '+' as const,
+  effects: [urlSyncEffect({ refine: union(literal('+'), literal('-')), history: 'push' })],
 })
 
 export const pageState = atom({
   key: 'page',
-  default: null,
-  effects: [urlSyncEffect({ refine: nullable(number()), history: 'push' })],
+  default: 1,
+  effects: [urlSyncEffect({ refine: number(), history: 'push' })],
 })
 
 export const sizeState = atom({
   key: 'size',
-  default: null,
-  effects: [urlSyncEffect({ refine: nullable(number()), history: 'push' })],
+  default: 7,
+  effects: [urlSyncEffect({ refine: number(), history: 'push' })],
 })
 
 export const locationNoState = atom({
@@ -85,31 +83,14 @@ export const allSearchState = selector({
       locationNo,
     }
   },
-  set: ({ set }, newValue) => {
-    // if (!(newValue instanceof DefaultValue)) {
-    //   set(labelsState, newValue.labels || null)
-    //   set(nameState, newValue.name || null)
-    //   set(orderByState, newValue.orderBy || null)
-    //   set(sortState, newValue.sort || null)
-    //   set(pageState, newValue.page || null)
-    //   set(sizeState, newValue.size || null)
-    // } else {
-    // TODO 타입 체킹 하는 방법?
-    // @ts-ignore
-    set(labelsState, newValue.labels || [])
-    // @ts-ignore
-    set(nameState, newValue.name || null)
-    // @ts-ignore
-    set(orderByState, newValue.orderBy || null)
-    // @ts-ignore
-    set(sortState, newValue.sort || null)
-    // @ts-ignore
-    set(pageState, newValue.page || null)
-    // @ts-ignore
-    set(sizeState, newValue.size || null)
-    // @ts-ignore
-    set(locationNoState, newValue.locationNo || null)
-    // }
+  set: ({ reset }) => {
+    reset(labelsState)
+    reset(nameState)
+    reset(orderByState)
+    reset(sortState)
+    reset(pageState)
+    reset(sizeState)
+    reset(locationNoState)
   },
 })
 
@@ -132,29 +113,22 @@ export const consumableSearchState = selector({
       size,
     }
   },
-  set: ({ set }, newValue) => {
-    // if (!(newValue instanceof DefaultValue)) {
-    //   set(labelsState, newValue.labels || null)
-    //   set(nameState, newValue.name || null)
-    //   set(orderByState, newValue.orderBy || null)
-    //   set(sortState, newValue.sort || null)
-    //   set(pageState, newValue.page || null)
-    //   set(sizeState, newValue.size || null)
-    // } else {
-    // TODO 타입 체킹 하는 방법?
-    // @ts-ignore
-    set(labelsState, newValue.labels || [])
-    // @ts-ignore
-    set(nameState, newValue.name || null)
-    // @ts-ignore
-    set(orderByState, newValue.orderBy || null)
-    // @ts-ignore
-    set(sortState, newValue.sort || null)
-    // @ts-ignore
-    set(pageState, newValue.page || null)
-    // @ts-ignore
-    set(sizeState, newValue.size || null)
-    // }
+  set: ({ set, reset }, newValue) => {
+    if (newValue instanceof DefaultValue) {
+      reset(labelsState)
+      reset(nameState)
+      reset(orderByState)
+      reset(sortState)
+      reset(pageState)
+      reset(sizeState)
+    } else {
+      set(labelsState, newValue.labels || [])
+      set(nameState, newValue.name || null)
+      set(orderByState, newValue.orderBy || null)
+      set(sortState, newValue.sort || null)
+      set(pageState, newValue.page)
+      set(sizeState, newValue.size)
+    }
   },
 })
 
@@ -175,19 +149,19 @@ export const equipmentSearchState = selector({
       size,
     }
   },
-  set: ({ set }, newValue) => {
-    // if (!(newValue instanceof DefaultValue)) {
-    // TODO 타입 체킹 하는 방법?
-    // @ts-ignore
-    set(labelsState, newValue.labels || [])
-    // @ts-ignore
-    set(nameState, newValue.name || null)
-    // @ts-ignore
-    set(locationNoState, newValue.locationNo || null)
-    // @ts-ignore
-    set(pageState, newValue.page || null)
-    // @ts-ignore
-    set(sizeState, newValue.size || null)
-    // }
+  set: ({ set, reset }, newValue) => {
+    if (newValue instanceof DefaultValue) {
+      reset(labelsState)
+      reset(nameState)
+      reset(locationNoState)
+      reset(pageState)
+      reset(sizeState)
+    } else {
+      set(labelsState, newValue.labels || [])
+      set(nameState, newValue.name || null)
+      set(locationNoState, newValue.locationNo || null)
+      set(pageState, newValue.page)
+      set(sizeState, newValue.size)
+    }
   },
 })

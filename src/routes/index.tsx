@@ -1,7 +1,7 @@
 import { httpClient } from '@/apis'
 import { MainSpin } from '@/components/spin'
 import { allSearchState, isLoggedInState, userState } from '@/store'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
 import PrivateRoutes from './PrivateRoutes'
@@ -14,11 +14,25 @@ const Router = () => {
   const location = useLocation()
   const resetQuerystring = useResetRecoilState(allSearchState)
 
+  const firstUpdate = useRef(true)
+
   useEffect(() => {
-    console.log('최초탐?')
-    // FIXME 최초 타므로 기존 조회조건이 매핑이 안됨
-    resetQuerystring()
-  }, [location, resetQuerystring])
+    let boolean = false
+    ;(async function resetQuery() {
+      await setTimeout(() => Promise.resolve())
+      if (!boolean) {
+        if (firstUpdate.current) {
+          firstUpdate.current = false
+          return
+        }
+        resetQuerystring()
+      }
+    })()
+
+    return () => {
+      boolean = true
+    }
+  }, [location.pathname, resetQuerystring])
 
   useEffect(() => {
     getUser()
