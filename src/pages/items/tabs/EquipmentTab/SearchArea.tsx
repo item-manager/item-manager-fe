@@ -1,22 +1,24 @@
 import { httpClient } from '@/apis'
+import { equipmentSearchState } from '@/store'
 import { SearchOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
-import { Button, Form, FormInstance, Input, Select, TreeSelect, TreeSelectProps } from 'antd'
+import { Button, Form, FormProps, Input, Select, TreeSelect } from 'antd'
 import { DefaultOptionType } from 'antd/es/select'
-import { useState } from 'react'
+import { useForm } from 'antd/lib/form/Form'
+import { useEffect, useState } from 'react'
+import { useRecoilState } from 'recoil'
 
-type Props = {
-  form: FormInstance<SearchAreaForm>
-}
+const SearchArea = () => {
+  const [form] = useForm<{
+    name: string
+    labels: string[]
+    locationNo: number
+  }>()
 
-export type SearchAreaForm = {
-  name?: string
-  labels?: string[]
-  order?: string
-  // TODO tree
-}
+  const [equipmentSearch, setEquipmentSearch] = useRecoilState(equipmentSearchState)
 
-const SearchArea = ({ form }: Props) => {
+  useEffect(() => form.resetFields(), [form, equipmentSearch])
+
   const getLabelsQuery = useQuery(['labels'], httpClient.labels.getLabels, {
     select({ data }) {
       return (
@@ -31,42 +33,65 @@ const SearchArea = ({ form }: Props) => {
   const [treeData, setTreeData] = useState<Omit<DefaultOptionType, 'label'>[]>([])
 
   const allRoomsQuery = useQuery(['rooms'], httpClient.locations.allRooms, {
-    onSuccess: ({ data }) => {
+    onSuccess: async ({ data }) => {
       if (data) {
-        setTreeData(
-          data.map((item) => ({
-            id: item.roomNo,
-            pId: 0,
-            value: item.roomNo,
-            title: item.name,
-            isLeaf: false,
-          }))
+        const newData = await Promise.all(
+          data.map(async (item) => {
+            const parent = {
+              id: item.roomNo,
+              pId: 0,
+              value: item.roomNo,
+              title: item.name,
+              isLeaf: false,
+            }
+
+            const { data } = await httpClient.locations.getPlacesByRoomNo({ roomNo: parent.id })
+            if (data) {
+              const children = data.map((item) => ({
+                value: item.placeNo,
+                title: item.name,
+                isLeaf: true,
+                pId: parent.id,
+              }))
+
+              return [parent, ...children]
+            } else {
+              return [parent]
+            }
+          })
         )
+
+        setTreeData(newData.flat())
       }
     },
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
 
-  const onLoadData: TreeSelectProps['loadData'] = async ({ id }) => {
-    const { data } = await httpClient.locations.getPlacesByRoomNo({ roomNo: id })
-    if (data) {
-      setTreeData(
-        treeData.concat(
-          data.map((item) => ({
-            value: item.placeNo,
-            title: item.name,
-            isLeaf: true,
-            pId: id,
-          }))
-        )
-      )
+  const handleValuesChange: FormProps['onValuesChange'] = (changedValues) => {
+    if (!changedValues.name) {
+      setSearchValue()
     }
+  }
+
+  const handleSubmit: FormProps['onFinish'] = () => {
+    setSearchValue()
+  }
+
+  const setSearchValue = () => {
+    setEquipmentSearch((data) => ({ ...data, ...form.getFieldsValue(), page: 1 }))
   }
 
   return (
     <div className='flex flex-wrap justify-between mb-4'>
-      <Form form={form}>
+      <Form
+        form={form}
+        initialValues={{
+          ...equipmentSearch,
+        }}
+        onValuesChange={handleValuesChange}
+        onFinish={handleSubmit}
+      >
         <div className='flex flex-wrap gap-x-3'>
           <Form.Item name='name'>
             <Input
@@ -88,20 +113,21 @@ const SearchArea = ({ form }: Props) => {
               optionFilterProp='label'
             />
           </Form.Item>
-          <Form.Item name='tree'>
+          <Form.Item name='locationNo'>
             <TreeSelect
               treeDataSimpleMode
               style={{ width: '100%' }}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               placeholder='보관 장소'
-              loadData={onLoadData}
+              // loadData={onLoadData}
               treeData={treeData}
-              loading={allRoomsQuery.isLoading}
+              loading={!allRoomsQuery.isError && treeData.length === 0}
               allowClear
               dropdownMatchSelectWidth={200}
             />
           </Form.Item>
         </div>
+        <button type='submit' className='hidden'></button>
       </Form>
       <Button type='primary' className='ml-auto'>
         물품 추가

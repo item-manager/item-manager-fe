@@ -1,8 +1,9 @@
 import { httpClient } from '@/apis'
 import { MainSpin } from '@/components/spin'
-import { isLoggedInState, userState } from '@/store'
-import { useEffect, useState } from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { allSearchState, isLoggedInState, userState } from '@/store'
+import { useEffect, useState, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
+import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
 import PrivateRoutes from './PrivateRoutes'
 import PublicRoutes from './PublicRoutes'
 
@@ -10,6 +11,28 @@ const Router = () => {
   const [_user, setUser] = useRecoilState(userState)
   const isLoggedIn = useRecoilValue(isLoggedInState)
   const [isLoading, setIsLoading] = useState(true)
+  const location = useLocation()
+  const resetQuerystring = useResetRecoilState(allSearchState)
+
+  const firstUpdate = useRef(true)
+
+  useEffect(() => {
+    let boolean = false
+    ;(async function resetQuery() {
+      await setTimeout(() => Promise.resolve())
+      if (!boolean) {
+        if (firstUpdate.current) {
+          firstUpdate.current = false
+          return
+        }
+        resetQuerystring()
+      }
+    })()
+
+    return () => {
+      boolean = true
+    }
+  }, [location.pathname, resetQuerystring])
 
   useEffect(() => {
     getUser()

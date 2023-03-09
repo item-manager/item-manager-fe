@@ -302,6 +302,40 @@ export interface ResultListItemNameRS {
   data?: ItemNameRS[]
 }
 
+export interface EquipmentItemsRQ {
+  name?: string
+  labelNos?: number[]
+  /** @format int64 */
+  locationNo?: number
+  /**
+   * @format int32
+   * @default 1
+   */
+  page?: number
+  /**
+   * @format int32
+   * @default 10
+   */
+  size?: number
+}
+
+export interface EquipmentItemRS {
+  /** @format int64 */
+  itemNo?: number
+  /** @format int32 */
+  priority?: number
+  name?: string
+  roomName?: string
+  placeName?: string
+  locationMemo?: string
+  labels?: LabelRS[]
+}
+
+export interface ResultListEquipmentItemRS {
+  page?: Page
+  data?: EquipmentItemRS[]
+}
+
 export interface ConsumableItemsRQ {
   name?: string
   labelNos?: number[]
@@ -830,6 +864,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     getItemsInLocation: (query: ItemsInLocationRQ, params: RequestParams = {}) =>
       this.request<ResultListItemNameRS, ErrorResult>({
         path: `/items/location`,
+        method: 'GET',
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name GetEquipmentItems
+     * @summary 비품 목록 조회
+     * @request GET:/items/equipments
+     */
+    getEquipmentItems: (query: EquipmentItemsRQ, params: RequestParams = {}) =>
+      this.request<ResultListEquipmentItemRS, ErrorResult>({
+        path: `/items/equipments`,
         method: 'GET',
         query: query,
         ...params,

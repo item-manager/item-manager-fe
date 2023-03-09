@@ -41,3 +41,7 @@ body {
 .ant-message-custom-content {
   display: flex;
 }
+
+.ant-table-body {
+  overflow-y: auto !important;
+}

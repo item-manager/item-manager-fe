@@ -1,9 +1,8 @@
-import { userState } from '@/store'
+import { allSearchState, currentTabKeyState, userState } from '@/store'
 import { UserOutlined } from '@ant-design/icons'
 import { Avatar, Space, Tabs, TabsProps, Typography } from 'antd'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
 import ConsumableTab from './tabs/ConsumableTab'
-import { consumableSearchState } from './tabs/ConsumableTab/store'
 import EquipmentTab from './tabs/EquipmentTab'
 
 const Intro = () => {
@@ -19,7 +18,8 @@ const Intro = () => {
 }
 
 const ItemsPage = () => {
-  const [{ currentTabKey }, setConsumableSearch] = useRecoilState(consumableSearchState)
+  const [currentTabKey, setCurrentTabKey] = useRecoilState(currentTabKeyState)
+  const resetQuerystring = useResetRecoilState(allSearchState)
 
   const items: TabsProps['items'] = [
     {
@@ -38,9 +38,12 @@ const ItemsPage = () => {
     <>
       <Intro />
       <Tabs
-        activeKey={currentTabKey}
+        activeKey={currentTabKey || '0'}
         items={items}
-        onChange={(key) => setConsumableSearch((item) => ({ ...item, currentTabKey: key }))}
+        onChange={(key) => {
+          resetQuerystring()
+          setCurrentTabKey(key)
+        }}
       />
     </>
   )

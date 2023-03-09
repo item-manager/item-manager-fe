@@ -1,21 +1,22 @@
 import { httpClient } from '@/apis'
+import { consumableSearchState } from '@/store'
 import { SearchOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
 import { Button, Form, FormProps, Input, Select } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
+import { useEffect } from 'react'
 import { useRecoilState } from 'recoil'
-import { consumableSearchState, ConsumableSearchType } from './store'
-
-type SearchAreaForm = Omit<ConsumableSearchType, 'orderBy' | 'sort'> & {
-  order?: `${NonNullable<ConsumableSearchType['orderBy']>}${NonNullable<
-    ConsumableSearchType['sort']
-  >}`
-}
 
 const SearchArea = () => {
-  const [form] = useForm<SearchAreaForm>()
+  const [form] = useForm<{
+    labels: string[]
+    name: string
+    order: string
+  }>()
 
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
+
+  useEffect(() => form.resetFields(), [form, consumableSearch])
 
   const getLabelsQuery = useQuery(['labels'], httpClient.labels.getLabels, {
     select({ data }) {
@@ -43,11 +44,12 @@ const SearchArea = () => {
 
     const matchedValue = order?.match(/(.+)([+-])/) as [
       never,
-      ConsumableSearchType['orderBy'],
-      ConsumableSearchType['sort']
+      'priority' | 'quantity' | 'latest_purchase_date' | 'latest_consume_date',
+      '+' | '-'
     ]
 
-    let orderBy: ConsumableSearchType['orderBy'], sort: ConsumableSearchType['sort']
+    let orderBy: 'priority' | 'quantity' | 'latest_purchase_date' | 'latest_consume_date',
+      sort: '+' | '-'
 
     if (matchedValue) {
       orderBy = matchedValue[1]

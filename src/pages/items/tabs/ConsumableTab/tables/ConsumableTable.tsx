@@ -3,19 +3,20 @@ import PurchaseModal from '@/components/modals/PurchaseModal'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
 import useModal from '@/hooks/useModal'
+import { consumableSearchState } from '@/store'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, message, PaginationProps, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { useRecoilState, useResetRecoilState } from 'recoil'
-import { consumableSearchState } from '../store'
+import { useRecoilState } from 'recoil'
 
 const ConsumableTable = () => {
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
-  const resetConsumableSearchState = useResetRecoilState(consumableSearchState)
+  console.log({ consumableSearch })
+
   const [isLoading, setIsLoading] = useState(false)
   const { visible, showModal, hideModal } = useModal()
   const [itemNo, setItemNo] = useState<number | undefined>()
@@ -23,16 +24,11 @@ const ConsumableTable = () => {
   const queryClient = useQueryClient()
 
   const navigate = useNavigate()
-  useEffect(() => {
-    return function cleanup() {
-      resetConsumableSearchState()
-    }
-  }, [resetConsumableSearchState])
 
   const criteria: ConsumableItemsRQ = {
-    name: consumableSearch.name,
-    labelNos: consumableSearch.labels?.map((item) => +item) || [],
-    orderBy: consumableSearch.orderBy,
+    name: consumableSearch.name || undefined,
+    labelNos: consumableSearch.labels?.map((item) => +item),
+    orderBy: consumableSearch.orderBy || undefined,
     sort: consumableSearch.sort,
     page: consumableSearch.page,
     size: consumableSearch.size,

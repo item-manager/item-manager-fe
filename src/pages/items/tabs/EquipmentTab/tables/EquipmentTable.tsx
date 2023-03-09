@@ -1,40 +1,29 @@
-import { httpClient, ItemRS } from '@/apis'
+import { EquipmentItemsRQ, httpClient, ItemRS } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
+import { equipmentSearchState } from '@/store'
 import { useQuery } from '@tanstack/react-query'
-import { Tag } from 'antd'
+import { PaginationProps, Tag } from 'antd'
 import { ColumnsType } from 'antd/es/table'
-import { SearchAreaForm } from '../SearchArea'
+import { useNavigate } from 'react-router-dom'
+import { useRecoilState } from 'recoil'
 
-// TODO
-const TYPE = 'EQUIPMENT'
+const EquipmentTable = () => {
+  const [equipmentSearch, setEquipmentSearch] = useRecoilState(equipmentSearchState)
 
-const EquipmentTable = ({ name, labels }: SearchAreaForm) => {
+  const navigate = useNavigate()
+
+  const criteria: EquipmentItemsRQ = {
+    name: equipmentSearch.name || undefined,
+    labelNos: equipmentSearch.labels?.map((item) => +item),
+    page: equipmentSearch.page,
+    size: equipmentSearch.size,
+    locationNo: equipmentSearch.locationNo || undefined,
+  }
+
   const query = useQuery({
-    queryKey: ['items'],
-    queryFn: () => httpClient.items.getItems(),
-    select(data) {
-      // TODO
-      // @ts-ignore
-      return data.data.filter((item) => {
-        let result = true
-
-        // TODO
-        result = result && item.type === 'EQUIPMENT'
-
-        if (name?.trim()) {
-          result = result && !!item.name?.includes(name.trim())
-        }
-
-        if (labels?.length) {
-          result =
-            result &&
-            labels.every((labelNo) => item.labels?.map((item) => item.labelNo).includes(+labelNo))
-        }
-
-        return result
-      })
-    },
+    queryKey: ['items', criteria],
+    queryFn: () => httpClient.items.getEquipmentItems(criteria),
   })
 
   const columns: ColumnsType<ItemRS> = [
@@ -79,17 +68,17 @@ const EquipmentTable = ({ name, labels }: SearchAreaForm) => {
     },
     {
       title: '보관 장소',
-      dataIndex: 'room',
-      key: 'room',
+      dataIndex: 'roomName',
+      key: 'roomName',
       align: 'center',
       width: 100,
     },
     {
       title: '위치',
-      dataIndex: 'place',
-      key: 'place',
+      dataIndex: 'placeName',
+      key: 'placeName',
       align: 'center',
-      width: 100,
+      width: 200,
     },
     {
       title: '상세 위치',
@@ -100,16 +89,31 @@ const EquipmentTable = ({ name, labels }: SearchAreaForm) => {
     },
   ]
 
+  const handlePageChange: PaginationProps['onChange'] = (page, _pageSize) => {
+    setEquipmentSearch((value) => ({ ...value, page }))
+  }
+
   return (
     <BasicTable<ItemRS>
       columns={columns}
       rowKey='itemNo'
-      // @ts-ignore
-      dataSource={query.data}
+      dataSource={query.data?.data}
       loading={query.isLoading}
       tableLayout='fixed'
       scroll={{ x: 250 }}
       size='large'
+      pagination={{
+        current: equipmentSearch.page || 1,
+        pageSize: equipmentSearch.size || 7,
+        total: query.data?.page?.totalDataCnt,
+        onChange: handlePageChange,
+        // showSizeChanger: true,
+      }}
+      onRow={(data) => {
+        return {
+          onClick: () => navigate(`/items/${data.itemNo}`),
+        }
+      }}
     />
   )
 }

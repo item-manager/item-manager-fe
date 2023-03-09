@@ -8,7 +8,7 @@ import { RecoilRoot } from 'recoil'
 import Router from './routes'
 
 import 'antd/dist/reset.css'
-import { RecoilURLSync } from 'recoil-sync'
+import { RecoilURLSyncJSON } from 'recoil-sync'
 import './index.css'
 
 function App() {
@@ -16,14 +16,7 @@ function App() {
 
   return (
     <RecoilRoot>
-      <RecoilURLSync
-        location={{
-          part: 'queryParams',
-          param: 'q',
-        }}
-        serialize={(x) => window.btoa(window.unescape(encodeURIComponent(JSON.stringify(x))))}
-        deserialize={(x) => JSON.parse(decodeURIComponent(escape(window.atob(x))))}
-      >
+      <RecoilURLSyncJSON location={{ part: 'queryParams' }}>
         <QueryClientProvider client={queryClient}>
           <ConfigProvider
             locale={koKR}
@@ -42,7 +35,7 @@ function App() {
             </StyleProvider>
           </ConfigProvider>
         </QueryClientProvider>
-      </RecoilURLSync>
+      </RecoilURLSyncJSON>
     </RecoilRoot>
   )
 }
