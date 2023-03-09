@@ -27,11 +27,11 @@ const ConsumableTable = () => {
 
   const criteria: ConsumableItemsRQ = {
     name: consumableSearch.name || undefined,
-    labelNos: consumableSearch.labels?.map((item) => +item) || [],
+    labelNos: consumableSearch.labels?.map((item) => +item),
     orderBy: consumableSearch.orderBy || undefined,
-    sort: consumableSearch.sort || '+',
-    page: consumableSearch.page || 1,
-    size: consumableSearch.size || 7,
+    sort: consumableSearch.sort,
+    page: consumableSearch.page,
+    size: consumableSearch.size,
   }
 
   const query = useQuery({
@@ -208,8 +208,8 @@ const ConsumableTable = () => {
         scroll={{ x: 250 }}
         size='large'
         pagination={{
-          current: consumableSearch.page || 1,
-          pageSize: consumableSearch.size || 7,
+          current: consumableSearch.page,
+          pageSize: consumableSearch.size,
           total: query.data?.page?.totalDataCnt,
           onChange: handlePageChange,
           // showSizeChanger: true,

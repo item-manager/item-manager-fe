@@ -15,9 +15,9 @@ const EquipmentTable = () => {
 
   const criteria: EquipmentItemsRQ = {
     name: equipmentSearch.name || undefined,
-    labelNos: equipmentSearch.labels?.map((item) => +item) || [],
-    page: equipmentSearch.page || 1,
-    size: equipmentSearch.size || 7,
+    labelNos: equipmentSearch.labels?.map((item) => +item),
+    page: equipmentSearch.page,
+    size: equipmentSearch.size,
     locationNo: equipmentSearch.locationNo || undefined,
   }
 
