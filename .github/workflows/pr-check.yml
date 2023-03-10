@@ -15,7 +15,6 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
-        platforms: linux/arm/v7
         push: false
         tags: youngjins/item-manager-fe:latest
         cache-from: type=gha
