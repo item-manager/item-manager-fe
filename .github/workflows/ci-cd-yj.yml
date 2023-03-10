@@ -1,0 +1,36 @@
+name: Docker Image CI-CD yj
+
+on:
+  push:
+    branches: ['develop']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build the Docker image
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: youngjins/item-manager-fe-yj:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: run script ssh
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST_YJ }}
+          username: ${{ secrets.REMOTE_USERNAME_YJ }}
+          key: ${{ secrets.REMOTE_KEY_YJ }}
+          script: |
+            sudo docker stop item-manager-fe
+            sudo docker rm item-manager-fe
+            sudo docker run --name item-manager-fe -d -p 80:80 --pull=always --add-host=host.docker.internal:http://ycrpark.iptime.org:8080 youngjins/item-manager-fe-yj:latest
