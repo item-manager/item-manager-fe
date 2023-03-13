@@ -5,6 +5,8 @@ import { Button, Form, FormProps, Input, Select } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
 import { useRecoilState } from 'recoil'
 import { consumableSearchState, ConsumableSearchType } from './store'
+import useModal from '@/hooks/useModal'
+import CreateItemModal from './createItemModal'
 
 type SearchAreaForm = Omit<ConsumableSearchType, 'orderBy' | 'sort'> & {
   order?: `${NonNullable<ConsumableSearchType['orderBy']>}${NonNullable<
@@ -16,6 +18,8 @@ const SearchArea = () => {
   const [form] = useForm<SearchAreaForm>()
 
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
+
+  const { visible, showModal, hideModal } = useModal()
 
   const getLabelsQuery = useQuery(['labels'], httpClient.labels.getLabels, {
     select({ data }) {
@@ -106,9 +110,10 @@ const SearchArea = () => {
         </div>
         <button type='submit' className='hidden'></button>
       </Form>
-      <Button type='primary' className='ml-auto'>
+      <Button type='primary' className='ml-auto' onClick={showModal}>
         물품 추가
       </Button>
+      {visible && <CreateItemModal hideModal={hideModal} />}
     </div>
   )
 }

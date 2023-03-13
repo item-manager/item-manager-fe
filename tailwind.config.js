@@ -14,6 +14,7 @@ module.exports = {
       colors: {
         bkg: '#FBFBFB',
         gray: '#D3D3D3',
+        darkGray: '#D9D9D9',
         lightGray: '#E8E8E8',
         main: '#2E8B57',
       },

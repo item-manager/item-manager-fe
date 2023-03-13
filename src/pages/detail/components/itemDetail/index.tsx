@@ -6,10 +6,13 @@ import { useQuery } from '@tanstack/react-query'
 import { httpClient } from '@/apis'
 import { CreateItemRS } from '@/apis/Api'
 import { useNavigate } from 'react-router'
+import useModal from '@/hooks/useModal'
+import ItemEditModal from './modal/itemEditModal'
 
 const ItemDetail = () => {
   const { itemNo }: CreateItemRS = useParams()
   const navigate = useNavigate()
+  const { visible, showModal, hideModal } = useModal()
   const { data: itemDetail } = useQuery(['itemDetail'], () =>
     httpClient.items.getItem(Number(itemNo))
   )
@@ -26,7 +29,7 @@ const ItemDetail = () => {
           className='text-4xl ml-10 hover:cursor-pointer'
           onClick={onClickMovePrev}
         />
-        <Button type='primary' className='ml-auto mr-10'>
+        <Button type='primary' className='ml-auto mr-10' onClick={showModal}>
           정보 수정
         </Button>
         <FontAwesomeIcon icon={faTrashCan} className='h-6 mr-10 hover:cursor-pointer' />
@@ -83,6 +86,7 @@ const ItemDetail = () => {
           </div>
         </div>
       </section>
+      {visible && <ItemEditModal hideModal={hideModal} itemDetail={itemDetail} />}
     </>
   )
 }

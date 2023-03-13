@@ -180,6 +180,16 @@ export interface UpdateRoomRQ {
   name: string
 }
 
+export interface UpdateItemRQ {
+  name: string
+  type: string
+  locationNo: number
+  locationMemo?: string
+  photo?: File
+  priority?: number
+  labels?: LabelRS[]
+}
+
 export interface ResultVoid {
   /** @format int32 */
   code?: number
@@ -823,9 +833,26 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags item-controller
-     * @name GetItemsInLocation
-     * @summary 방/위치 pk로 조회
-     * @request GET:/items/location
+     * @name PatchItem
+     * @summary 물품 수정
+     * @request PATCH:/items/{itemNo}
+     */
+    patchItem: (itemNo: number, data: UpdateItemRQ, params: RequestParams = {}) =>
+    this.request<ResultItemRS, ErrorResult>({
+      path: `/items/${itemNo}`,
+      method: 'PATCH',
+      body: data,
+      type: ContentType.FormData,
+      ...params,
+    }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name LoadPhoto
+     * @summary 물품 사진 조회
+     * @request GET:/items/{itemNo}/photo
      */
     getItemsInLocation: (query: ItemsInLocationRQ, params: RequestParams = {}) =>
       this.request<ResultListItemNameRS, ErrorResult>({
