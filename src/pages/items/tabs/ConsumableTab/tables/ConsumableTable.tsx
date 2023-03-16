@@ -64,6 +64,12 @@ const ConsumableTable = () => {
     showModal()
   }
 
+  const deleteItem = async (record: ConsumableItemRS) => {
+    await httpClient.items.deleteItem(record.itemNo)
+    queryClient.invalidateQueries({ queryKey: ['items'] })
+    message.success('삭제되었습니다.')
+  }
+
   const columns: ColumnsType<ConsumableItemRS> = [
     {
       title: '중요도',
@@ -177,7 +183,7 @@ const ConsumableTable = () => {
       title: <EllipsisOutlined />,
       key: '...',
       align: 'center',
-      render(_value, _record, _index) {
+      render(_value, record, _index) {
         return (
           <Tooltip title='삭제'>
             <Button
@@ -185,6 +191,10 @@ const ConsumableTable = () => {
               shape='circle'
               icon={<DeleteFilled className='text-stone-500' />}
               className='flex items-center justify-center py-0 mx-auto'
+              onClick={(e) => {
+                e.stopPropagation()
+                deleteItem(record)
+              }}
             />
           </Tooltip>
         )

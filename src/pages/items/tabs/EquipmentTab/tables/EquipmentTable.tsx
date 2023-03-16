@@ -1,15 +1,18 @@
-import { EquipmentItemsRQ, httpClient, ItemRS } from '@/apis'
+import { EquipmentItemRS, EquipmentItemsRQ, httpClient, ItemRS } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
 import { equipmentSearchState } from '@/store'
-import { useQuery } from '@tanstack/react-query'
-import { PaginationProps, Tag } from 'antd'
+import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Button, message, PaginationProps, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
 
 const EquipmentTable = () => {
   const [equipmentSearch, setEquipmentSearch] = useRecoilState(equipmentSearchState)
+
+  const queryClient = useQueryClient()
 
   const navigate = useNavigate()
 
@@ -26,7 +29,13 @@ const EquipmentTable = () => {
     queryFn: () => httpClient.items.getEquipmentItems(criteria),
   })
 
-  const columns: ColumnsType<ItemRS> = [
+  const deleteItem = async (record: EquipmentItemRS) => {
+    await httpClient.items.deleteItem(record.itemNo)
+    await queryClient.invalidateQueries({ queryKey: ['items'] })
+    message.success('삭제되었습니다.')
+  }
+
+  const columns: ColumnsType<EquipmentItemRS> = [
     {
       title: '중요도',
       dataIndex: 'priority',
@@ -87,6 +96,28 @@ const EquipmentTable = () => {
       align: 'center',
       width: 300,
     },
+    {
+      title: <EllipsisOutlined />,
+      key: '...',
+      align: 'center',
+      render(_value, record, _index) {
+        return (
+          <Tooltip title='삭제'>
+            <Button
+              type='text'
+              shape='circle'
+              icon={<DeleteFilled className='text-stone-500' />}
+              className='flex items-center justify-center py-0 mx-auto'
+              onClick={(e) => {
+                e.stopPropagation()
+                deleteItem(record)
+              }}
+            />
+          </Tooltip>
+        )
+      },
+      width: 70,
+    },
   ]
 
   const handlePageChange: PaginationProps['onChange'] = (page, _pageSize) => {
@@ -94,7 +125,7 @@ const EquipmentTable = () => {
   }
 
   return (
-    <BasicTable<ItemRS>
+    <BasicTable<EquipmentItemRS>
       columns={columns}
       rowKey='itemNo'
       dataSource={query.data?.data}
