@@ -17,7 +17,7 @@ module.exports = {
         target: endpoint,
         pathRewrite: { '^/api': '' },
       },
-      '/photo': {
+      '/images': {
         target: endpoint,
       },
     },
