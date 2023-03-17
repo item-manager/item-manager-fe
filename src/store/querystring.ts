@@ -40,8 +40,10 @@ export const orderByState = atom({
 
 export const sortState = atom({
   key: 'sort',
-  default: '+' as const,
-  effects: [urlSyncEffect({ refine: union(literal('+'), literal('-')), history: 'push' })],
+  default: null,
+  effects: [
+    urlSyncEffect({ refine: nullable(union(literal('+'), literal('-'))), history: 'push' }),
+  ],
 })
 
 export const pageState = atom({
