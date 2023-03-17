@@ -106,7 +106,7 @@ const SearchArea = () => {
             <Select<string[]>
               className='min-w-[100px]'
               allowClear
-              mode='tags'
+              mode='multiple'
               placeholder='라벨 검색'
               options={getLabelsQuery.data}
               loading={getLabelsQuery.isLoading}
