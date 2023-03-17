@@ -1,15 +1,23 @@
 import { httpClient } from '@/apis'
-import { isSideCollapsedState, userState } from '@/store'
+import { drawerOpenState, isSideCollapsedState, userState } from '@/store'
 import { NavigationUtil } from '@/utils'
 import { MenuOutlined } from '@ant-design/icons'
-import { message } from 'antd'
+import { Grid, message } from 'antd'
 import { useNavigate } from 'react-router'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import MainLogo from '../logo/MainLogo'
 
+const { useBreakpoint } = Grid
+
 export const Header = () => {
   const setCollapsed = useSetRecoilState(isSideCollapsedState)
   const [_user, setUser] = useRecoilState(userState)
+
+  const screens = useBreakpoint()
+  const setOpen = useSetRecoilState(drawerOpenState)
+  const showDrawer = () => {
+    setOpen(true)
+  }
 
   const navigate = useNavigate()
 
@@ -30,7 +38,16 @@ export const Header = () => {
 
   return (
     <div className='z-10 flex items-center flex-grow-0 flex-shrink-0 w-full pl-6 pr-10 shadow-sm basis-16 bg-bkg'>
-      <MenuOutlined className='w-5 h-5' onClick={() => setCollapsed((value) => !value)} />
+      <MenuOutlined
+        className='w-5 h-5'
+        onClick={() => {
+          if (screens.xs) {
+            showDrawer()
+          } else {
+            setCollapsed((value) => !value)
+          }
+        }}
+      />
       <div className='ml-2'>
         <div className='flex items-center cursor-pointer' onClick={() => goHome()}>
           <div className='w-8'>
