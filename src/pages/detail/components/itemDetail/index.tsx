@@ -6,7 +6,9 @@ import { useQuery } from '@tanstack/react-query'
 import { httpClient } from '@/apis'
 import { CreateItemRS } from '@/apis/Api'
 import { useNavigate } from 'react-router'
+import { PriorityProgressBar } from '@/components/progress'
 import { LabelRS } from '@/apis'
+
 
 const ItemDetail = () => {
   const { itemNo }: CreateItemRS = useParams()
@@ -32,7 +34,12 @@ const ItemDetail = () => {
         </Button>
         <FontAwesomeIcon icon={faTrashCan} className='h-6 mr-10 hover:cursor-pointer' />
       </div>
-      <h1 className='w-6/12 text-4xl text-center p-4'>{itemDetail?.data?.name}</h1>
+      <h1 className='flex justify-center items-center w-6/12 text-4xl text-center p-4'>
+        <div className='w-11 mr-4'>
+          <PriorityProgressBar priority={itemDetail?.data?.priority} strokeWidth={4} />
+        </div>
+        {itemDetail?.data?.name}
+      </h1>
       <section className='h-full flex'>
         <div id='left-section' className='w-6/12 flex justify-center'>
           <div className='w-300 h-332 bg-slate-300'>picture</div>

@@ -10,7 +10,7 @@ type OptionType = {
   value: string
 }
 
-const selectedValuesState = atom<string[]>({
+export const selectedValuesState = atom<string[]>({
   key: 'selectedValuesState',
   default: [],
 })

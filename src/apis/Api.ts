@@ -86,7 +86,7 @@ export interface ResultCreateLabelRS {
 
 export interface CreateItemRQ {
   name: string
-  type: 'CONSUMABLE' | 'EQUIPMENT'
+  type: string
   /** @format int64 */
   locationNo: number
   locationMemo?: string
@@ -94,6 +94,7 @@ export interface CreateItemRQ {
   photo?: File
   /** @format int32 */
   priority?: number
+  labels: string[]
 }
 
 export interface CreateItemRS {
@@ -800,7 +801,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/items`,
         method: 'POST',
         body: data,
-        type: ContentType.FormData,
+        type: ContentType.Json,
         ...params,
       }),
 

@@ -7,6 +7,8 @@ import { DefaultOptionType } from 'antd/es/select'
 import { useForm } from 'antd/lib/form/Form'
 import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
+import useModal from '@/hooks/useModal'
+import CreateItemModal from '../ConsumableTab/createItemModal'
 
 const SearchArea = () => {
   const [form] = useForm<{
@@ -16,6 +18,8 @@ const SearchArea = () => {
   }>()
 
   const [equipmentSearch, setEquipmentSearch] = useRecoilState(equipmentSearchState)
+
+  const { visible, showModal, hideModal } = useModal()
 
   useEffect(() => form.resetFields(), [form, equipmentSearch])
 
@@ -129,9 +133,10 @@ const SearchArea = () => {
         </div>
         <button type='submit' className='hidden'></button>
       </Form>
-      <Button type='primary' className='ml-auto'>
+      <Button type='primary' className='ml-auto' onClick={showModal}>
         물품 추가
       </Button>
+      {visible && <CreateItemModal hideModal={hideModal} />}
     </div>
   )
 }
