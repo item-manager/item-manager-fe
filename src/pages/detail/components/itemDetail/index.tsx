@@ -7,6 +7,8 @@ import { httpClient } from '@/apis'
 import { CreateItemRS } from '@/apis/Api'
 import { useNavigate } from 'react-router'
 import { PriorityProgressBar } from '@/components/progress'
+import { LabelRS } from '@/apis'
+
 
 const ItemDetail = () => {
   const { itemNo }: CreateItemRS = useParams()
@@ -49,10 +51,8 @@ const ItemDetail = () => {
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.type}</span>
             </div>
             <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>라벨:</span>
-              <span className='inline-block w-6/12 text-center'>
-                {itemDetail?.data?.labels?.map((label) => label.name).join(', ')}
-              </span>
+              <span className='inline-block w-24 text-center'>남은 수량:</span>
+              <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.quantity}</span>
             </div>
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
@@ -75,8 +75,14 @@ const ItemDetail = () => {
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
             <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>남은 수량:</span>
-              <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.quantity}</span>
+              <span className='inline-block w-24 text-center'>라벨:</span>
+              <span className='inline-block w-6/12 text-center'>
+                {itemDetail?.data?.labels?.map((label: LabelRS) => (
+                  <span key={itemDetail?.data?.itemNo}>
+                    <span className='border-1 rounded-lg p-1 ml-1'>#{label.name}</span>
+                  </span>
+                ))}
+              </span>
             </div>
           </div>
           <div className='flex items-center justify-center w-530 mt-6'>

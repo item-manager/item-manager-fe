@@ -322,7 +322,7 @@ export interface EquipmentItemsRQ {
 
 export interface EquipmentItemRS {
   /** @format int64 */
-  itemNo?: number
+  itemNo: number
   /** @format int32 */
   priority?: number
   name?: string
@@ -858,6 +858,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags item-controller
+     * @name DeleteItem
+     * @summary 물품 제거
+     * @request DELETE:/items/{itemNo}
+     */
+    deleteItem: (itemNo: number, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/items/${itemNo}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
      * @name GetItemsInLocation
      * @summary 방/위치 pk로 조회
      * @request GET:/items/location
@@ -902,6 +917,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   }
+  images = {
+    /**
+     * No description
+     *
+     * @tags image-controller
+     * @name LoadImage
+     * @summary 이미지 조회
+     * @request GET:/images/{filename}
+     */
+    loadImage: (filename: string, params: RequestParams = {}) =>
+      this.request<File, ErrorResult>({
+        path: `/images/${filename}`,
+        method: 'GET',
+        ...params,
+      }),
+  }
   auth = {
     /**
      * No description
@@ -931,22 +962,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     logout: (params: RequestParams = {}) =>
       this.request<ResultVoid, ErrorResult>({
         path: `/auth/logout`,
-        method: 'GET',
-        ...params,
-      }),
-  }
-  photo = {
-    /**
-     * No description
-     *
-     * @tags common-controller
-     * @name LoadPhoto
-     * @summary 사진 조회
-     * @request GET:/photo/{filename}
-     */
-    loadPhoto: (filename: string, params: RequestParams = {}) =>
-      this.request<File, ErrorResult>({
-        path: `/photo/${filename}`,
         method: 'GET',
         ...params,
       }),
