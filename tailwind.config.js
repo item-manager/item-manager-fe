@@ -17,6 +17,9 @@ module.exports = {
         lightGray: '#E8E8E8',
         main: '#2E8B57',
       },
+      fontSize: {
+        10: '10px',
+      },
       height: {
         18: '70px',
         46: '46px',
