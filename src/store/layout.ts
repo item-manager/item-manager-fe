@@ -17,3 +17,5 @@ export const isSideCollapsedState = atom({
   default: false,
   effects: [localStorageEffect('isSideCollapsedState')],
 })
+
+export const drawerOpenState = atom({ key: 'drawerOpen', default: false })

@@ -15,7 +15,6 @@ import { useRecoilState } from 'recoil'
 
 const ConsumableTable = () => {
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
-  console.log({ consumableSearch })
 
   const [isLoading, setIsLoading] = useState(false)
   const { visible, showModal, hideModal } = useModal()
@@ -29,7 +28,7 @@ const ConsumableTable = () => {
     name: consumableSearch.name || undefined,
     labelNos: consumableSearch.labels?.map((item) => +item),
     orderBy: consumableSearch.orderBy || undefined,
-    sort: consumableSearch.sort,
+    sort: consumableSearch.sort || undefined,
     page: consumableSearch.page,
     size: consumableSearch.size,
   }

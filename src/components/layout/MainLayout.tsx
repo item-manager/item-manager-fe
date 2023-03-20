@@ -1,11 +1,11 @@
-import { isContentLoadingState, isSideCollapsedState } from '@/store'
+import { drawerOpenState, isContentLoadingState, isSideCollapsedState } from '@/store'
 import { ApartmentOutlined, HomeOutlined, SmileOutlined } from '@ant-design/icons'
-import { Grid, Menu, MenuProps, Spin, theme } from 'antd'
+import { Drawer, Grid, Menu, MenuProps, Spin, theme } from 'antd'
 import Layout, { Content } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useRecoilValue } from 'recoil'
+import { atom, useRecoilState, useRecoilValue } from 'recoil'
 import { Header } from '../header'
 
 const { useBreakpoint } = Grid
@@ -29,10 +29,15 @@ export const MainLayout = ({ children }: Props) => {
   } = theme.useToken()
   const location = useLocation()
   const [selectedKey, setSelectedKey] = useState(findKey())
+  const [open, setOpen] = useRecoilState(drawerOpenState)
 
   useEffect(() => {
     setSelectedKey(findKey())
   }, [location])
+
+  const onClose = () => {
+    setOpen(false)
+  }
 
   const handleMenuClick: MenuProps['onClick'] = (item) => {
     const clicked = items.find(({ key }) => key === item.key)
@@ -57,14 +62,43 @@ export const MainLayout = ({ children }: Props) => {
             <Menu
               theme='light'
               mode='inline'
-              // defaultSelectedKeys={['1']}
               selectedKeys={selectedKey ? [selectedKey] : []}
               onClick={handleMenuClick}
               items={items}
             />
           </Sider>
         )}
+
+        <Drawer
+          title='Basic Drawer'
+          placement='left'
+          autoFocus
+          closable
+          onClose={onClose}
+          open={open}
+        >
+          <Menu
+            theme='light'
+            mode='vertical'
+            selectedKeys={selectedKey ? [selectedKey] : []}
+            onClick={(e) => {
+              onClose()
+              handleMenuClick(e)
+            }}
+            items={items}
+          />
+        </Drawer>
         <Layout>
+          {/* {screens.xs && (
+            <Menu
+              theme='light'
+              mode='horizontal'
+              // defaultSelectedKeys={['1']}
+              selectedKeys={selectedKey ? [selectedKey] : []}
+              onClick={handleMenuClick}
+              items={items}
+            />
+          )} */}
           <div className='p-2 mx-4 my-0'></div>
           <Spin spinning={isLoading} wrapperClassName='flex-1'>
             <Content
