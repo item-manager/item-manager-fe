@@ -6,7 +6,7 @@ import useModal from '@/hooks/useModal'
 import { consumableSearchState } from '@/store'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button, message, PaginationProps, Tag, Tooltip } from 'antd'
+import { Button, message, Modal, PaginationProps, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useState } from 'react'
@@ -18,6 +18,7 @@ const ConsumableTable = () => {
 
   const [isLoading, setIsLoading] = useState(false)
   const { visible, showModal, hideModal } = useModal()
+  const [modal, contextHolder] = Modal.useModal()
   const [itemNo, setItemNo] = useState<number | undefined>()
 
   const queryClient = useQueryClient()
@@ -36,6 +37,14 @@ const ConsumableTable = () => {
   const query = useQuery({
     queryKey: ['items', criteria],
     queryFn: () => httpClient.items.getConsumableItems(criteria),
+    onSuccess({ page }) {
+      const { requestPage, totalPages } = page
+
+      // 특정 페이지의 데이터를 모두 지웠을 경우 그 전 페이지로 재조회하도록 함
+      if (totalPages !== 0 && totalPages < requestPage) {
+        setConsumableSearch((value) => ({ ...value, page: totalPages }))
+      }
+    },
   })
 
   // 1개 사용
@@ -64,9 +73,19 @@ const ConsumableTable = () => {
   }
 
   const deleteItem = async (record: ConsumableItemRS) => {
-    await httpClient.items.deleteItem(record.itemNo)
-    queryClient.invalidateQueries({ queryKey: ['items'] })
-    message.success('삭제되었습니다.')
+    modal.confirm({
+      title: `물품 삭제`,
+      content: (
+        <>
+          해당 물품(<b>{record.name}</b>)을 삭제하시겠습니까?
+        </>
+      ),
+      onOk: async () => {
+        await httpClient.items.deleteItem(record.itemNo)
+        queryClient.invalidateQueries({ queryKey: ['items'] })
+        message.success('삭제되었습니다.')
+      },
+    })
   }
 
   const columns: ColumnsType<ConsumableItemRS> = [
@@ -230,6 +249,7 @@ const ConsumableTable = () => {
         }}
       />
       {visible && <PurchaseModal itemNo={itemNo!} hideModal={hideModal} />}
+      {contextHolder}
     </>
   )
 }

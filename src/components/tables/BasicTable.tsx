@@ -24,7 +24,7 @@ function BasicTable<RecordType extends object>(props: TableProps<RecordType>) {
     <Table<RecordType>
       pagination={{
         defaultPageSize: 8,
-        hideOnSinglePage: true,
+        // hideOnSinglePage: true,
         position: ['bottomCenter'],
         itemRender: itemRender,
         ...pagination,
