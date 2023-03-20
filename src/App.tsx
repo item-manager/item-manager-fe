@@ -9,23 +9,27 @@ import Router from './routes'
 
 import 'antd/dist/reset.css'
 import { AxiosError } from 'axios'
+import { useCallback } from 'react'
 import { RecoilURLSyncJSON } from 'recoil-sync'
 import SessionInvalidModal from './components/modals/SessionInvalidModal'
 import useModal from './hooks/useModal'
 import './index.css'
-import { useCallback } from 'react'
 
-const isAxiosUnauthorizedError = (error: unknown) =>
-  error instanceof AxiosError && error.response?.status === 401
+const isAxiosUnauthorizedError = (error: AxiosError) => error.response?.status === 401
 
 function App() {
   const { showModal, visible } = useModal()
 
   const retryFn = useCallback(
     (_failureCount: number, error: unknown) => {
-      if (isAxiosUnauthorizedError(error)) {
-        showModal()
-        return false
+      if (error instanceof AxiosError) {
+        if (isAxiosUnauthorizedError(error)) {
+          if (error.config?.url !== '/users/session') {
+            showModal()
+          }
+
+          return false
+        }
       }
 
       return true
