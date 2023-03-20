@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashCan, faLeftLong } from '@fortawesome/free-solid-svg-icons'
-import { Button } from 'antd'
+import { Button, Tag } from 'antd'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { httpClient } from '@/apis'
@@ -8,7 +8,6 @@ import { CreateItemRS } from '@/apis/Api'
 import { useNavigate } from 'react-router'
 import { PriorityProgressBar } from '@/components/progress'
 import { LabelRS } from '@/apis'
-
 
 const ItemDetail = () => {
   const { itemNo }: CreateItemRS = useParams()
@@ -74,12 +73,14 @@ const ItemDetail = () => {
             </div>
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
-            <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>라벨:</span>
-              <span className='inline-block w-6/12 text-center'>
+            <div className='text-base w-full'>
+              <span className='inline-flex flex-wrap gap-y-2'>
+                <span className='inline-block w-24 text-center'>라벨:</span>
                 {itemDetail?.data?.labels?.map((label: LabelRS) => (
                   <span key={itemDetail?.data?.itemNo}>
-                    <span className='border-1 rounded-lg p-1 ml-1'>#{label.name}</span>
+                    <Tag color='default' className='border-1 rounded-lg p-1 ml-1'>
+                      {label.name}
+                    </Tag>
                   </span>
                 ))}
               </span>
