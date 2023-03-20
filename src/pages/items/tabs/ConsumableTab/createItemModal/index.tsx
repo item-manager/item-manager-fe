@@ -1,10 +1,11 @@
 import { httpClient } from '@/apis'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, Form, Modal, Input, Select, Slider, Row, Col, InputNumber, message } from 'antd'
 import { ChangeEvent, useState } from 'react'
 import { RoomsRS, PlacesRS } from '@/apis'
 import { Label, selectedValuesState } from '@/components/label/Label'
 import { useRecoilState } from 'recoil'
+import { PriorityProgressBar } from '@/components/progress'
 
 type createItemProps = {
   hideModal: () => void
@@ -22,6 +23,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
   const { TextArea } = Input
 
   const [roomValue, setRoomValue] = useState<any>()
+  const queryClient = useQueryClient()
 
   const [inputs, setInputs] = useState({
     name: '',
@@ -34,7 +36,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
     queryFn: async () => await httpClient.locations.allRooms(),
   })
 
-  const { mutate } = useMutation(httpClient.items.createItem)
+  const { mutateAsync } = useMutation(httpClient.items.createItem)
 
   const handleOk = () => {
     form.submit()
@@ -82,7 +84,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
     }
 
     try {
-      mutate({
+      await mutateAsync({
         name,
         type,
         locationNo: placeNo,
@@ -91,6 +93,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
         labels: selectedValues,
       })
       message.success('물품을 추가 하셨습니다.')
+      queryClient.invalidateQueries({ queryKey: ['items'] })
       hideModal()
     } catch (error) {
       if (error instanceof Error) console.log('error createItem:', error.message)
@@ -120,41 +123,32 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
               <div className='w-300 h-332 bg-slate-300'>picture</div>
             </div>
             <div className='w-2/4'>
-              <div className='mt-8 ml-10'>
-                <Form.Item label='' name='name'>
-                  <Input
-                    size='middle'
-                    placeholder='물품명 입력'
-                    className='w-80 h-12 border-none ml-4'
-                    allowClear
-                    name='name'
-                    onChange={onChangeInputs}
-                  />
-                </Form.Item>
-              </div>
-
-              <Form.Item label='중요도' name='priority'>
-                <Row className='ml-4'>
-                  <Col span={12}>
-                    <Slider
-                      min={0}
-                      max={6}
-                      onChange={onChangePriority}
-                      value={typeof inputValue === 'number' ? inputValue : 0}
-                    />
+              <div className='mt-8 ml-2'>
+                <Row className='items-center'>
+                  <Col span={2}>
+                    <Form.Item name='priority' labelCol={{ span: 0 }}>
+                      <PriorityProgressBar
+                        priority={inputValue}
+                        strokeWidth={4}
+                        className='cursor-pointer select-none'
+                        onChange={onChangePriority}
+                      />
+                    </Form.Item>
                   </Col>
-                  <Col span={4}>
-                    <InputNumber
-                      min={0}
-                      max={6}
-                      style={{ margin: '0 24px' }}
-                      value={inputValue}
-                      onChange={onChangePriority}
-                    />
+                  <Col className='flex-1'>
+                    <Form.Item label='' name='name'>
+                      <Input
+                        size='middle'
+                        placeholder='물품명 입력'
+                        className='h-12 ml-4 border-none'
+                        allowClear
+                        name='name'
+                        onChange={onChangeInputs}
+                      />
+                    </Form.Item>
                   </Col>
                 </Row>
-              </Form.Item>
-
+              </div>
               <Form.Item label='분류' name='type'>
                 <Select
                   className='w-48 ml-6'
@@ -192,7 +186,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                 <TextArea
                   placeholder='물품명으로 검색'
                   rows={4}
-                  className='w-62 h-20'
+                  className='h-20 w-62'
                   allowClear
                   name='description'
                   onChange={onChangeInputs}
@@ -200,14 +194,14 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
               </Form.Item>
 
               <Form.Item label='라벨' name='labels'>
-                <Label className='w-52 ml-6' />
+                <Label className='ml-6 w-52' />
               </Form.Item>
 
-              <div className='flex justify-evenly items-center'>
-                <Button className='w-32 h-11 bg-main text-white' onClick={onClickSave}>
+              <div className='flex items-center justify-evenly'>
+                <Button className='w-32 text-white h-11 bg-main' onClick={onClickSave}>
                   저장
                 </Button>
-                <Button className='w-44 h-11 bg-main text-white'>저장 후 구매</Button>
+                <Button className='text-white w-44 h-11 bg-main'>저장 후 구매</Button>
               </div>
             </div>
           </div>
