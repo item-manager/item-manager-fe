@@ -69,14 +69,7 @@ export const MainLayout = ({ children }: Props) => {
           </Sider>
         )}
 
-        <Drawer
-          title='Basic Drawer'
-          placement='left'
-          autoFocus
-          closable
-          onClose={onClose}
-          open={open}
-        >
+        <Drawer placement='left' autoFocus closable onClose={onClose} open={open}>
           <Menu
             theme='light'
             mode='vertical'
