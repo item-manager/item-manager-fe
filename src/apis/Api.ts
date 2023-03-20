@@ -347,7 +347,7 @@ export interface ConsumableItemsRQ {
    * @default "+"
    * @pattern ^[+-]?$
    */
-  sort?: '+' | '-'
+  sort: '+' | '-' | null
   /**
    * @format int32
    * @default 1
