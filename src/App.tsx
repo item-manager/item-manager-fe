@@ -8,11 +8,37 @@ import { RecoilRoot } from 'recoil'
 import Router from './routes'
 
 import 'antd/dist/reset.css'
+import { AxiosError } from 'axios'
 import { RecoilURLSyncJSON } from 'recoil-sync'
+import SessionInvalidModal from './components/modals/SessionInvalidModal'
+import useModal from './hooks/useModal'
 import './index.css'
+import { useCallback } from 'react'
+
+const isAxiosUnauthorizedError = (error: unknown) =>
+  error instanceof AxiosError && error.response?.status === 401
 
 function App() {
-  const queryClient = new QueryClient()
+  const { showModal, visible } = useModal()
+
+  const retryFn = useCallback(
+    (_failureCount: number, error: unknown) => {
+      if (isAxiosUnauthorizedError(error)) {
+        showModal()
+        return false
+      }
+
+      return true
+    },
+    [showModal]
+  )
+
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: retryFn },
+      mutations: { retry: retryFn },
+    },
+  })
 
   return (
     <RecoilRoot>
@@ -31,6 +57,7 @@ function App() {
             <StyleProvider hashPriority='high'>
               <div className='App'>
                 <Router />
+                {visible && <SessionInvalidModal />}
               </div>
             </StyleProvider>
           </ConfigProvider>
