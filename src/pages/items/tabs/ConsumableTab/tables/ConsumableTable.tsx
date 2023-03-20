@@ -28,7 +28,7 @@ const ConsumableTable = () => {
     name: consumableSearch.name || undefined,
     labelNos: consumableSearch.labels?.map((item) => +item),
     orderBy: consumableSearch.orderBy || undefined,
-    sort: consumableSearch.sort || undefined,
+    sort: consumableSearch.sort || null,
     page: consumableSearch.page,
     size: consumableSearch.size,
   }
