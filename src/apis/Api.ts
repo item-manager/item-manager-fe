@@ -333,7 +333,7 @@ export interface EquipmentItemRS {
 }
 
 export interface ResultListEquipmentItemRS {
-  page?: Page
+  page: Page
   data?: EquipmentItemRS[]
 }
 
@@ -387,7 +387,7 @@ export interface Page {
 }
 
 export interface ResultListConsumableItemRS {
-  page?: Page
+  page: Page
   data?: ConsumableItemRS[]
 }
 

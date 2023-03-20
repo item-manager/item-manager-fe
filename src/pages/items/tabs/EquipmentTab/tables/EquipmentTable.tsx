@@ -27,6 +27,14 @@ const EquipmentTable = () => {
   const query = useQuery({
     queryKey: ['items', criteria],
     queryFn: () => httpClient.items.getEquipmentItems(criteria),
+    onSuccess({ page }) {
+      const { requestPage, totalPages } = page
+
+      // 특정 페이지의 데이터를 모두 지웠을 경우 그 전 페이지로 재조회하도록 함
+      if (totalPages !== 0 && totalPages < requestPage) {
+        setEquipmentSearch((value) => ({ ...value, page: totalPages }))
+      }
+    },
   })
 
   const deleteItem = async (record: EquipmentItemRS) => {
