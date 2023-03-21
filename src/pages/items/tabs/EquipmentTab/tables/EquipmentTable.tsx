@@ -1,10 +1,10 @@
-import { EquipmentItemRS, EquipmentItemsRQ, httpClient, ItemRS } from '@/apis'
+import { EquipmentItemRS, EquipmentItemsRQ, httpClient, ItemRS, ITEM_TYPE } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
 import { equipmentSearchState } from '@/store'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button, message, PaginationProps, Tag, Tooltip } from 'antd'
+import { Button, message, Modal, PaginationProps, Tag, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
@@ -13,6 +13,8 @@ const EquipmentTable = () => {
   const [equipmentSearch, setEquipmentSearch] = useRecoilState(equipmentSearchState)
 
   const queryClient = useQueryClient()
+
+  const [modal, contextHolder] = Modal.useModal()
 
   const navigate = useNavigate()
 
@@ -25,7 +27,7 @@ const EquipmentTable = () => {
   }
 
   const query = useQuery({
-    queryKey: ['items', criteria],
+    queryKey: ['items', ITEM_TYPE.EQUIPMENT, criteria],
     queryFn: () => httpClient.items.getEquipmentItems(criteria),
     onSuccess({ page }) {
       const { requestPage, totalPages } = page
@@ -38,9 +40,19 @@ const EquipmentTable = () => {
   })
 
   const deleteItem = async (record: EquipmentItemRS) => {
-    await httpClient.items.deleteItem(record.itemNo)
-    await queryClient.invalidateQueries({ queryKey: ['items'] })
-    message.success('삭제되었습니다.')
+    modal.confirm({
+      title: `물품 삭제`,
+      content: (
+        <>
+          해당 물품(<b>{record.name}</b>)을 삭제하시겠습니까?
+        </>
+      ),
+      onOk: async () => {
+        await httpClient.items.deleteItem(record.itemNo)
+        await queryClient.invalidateQueries({ queryKey: ['items'] })
+        message.success('삭제되었습니다.')
+      },
+    })
   }
 
   const columns: ColumnsType<EquipmentItemRS> = [
@@ -133,27 +145,30 @@ const EquipmentTable = () => {
   }
 
   return (
-    <BasicTable<EquipmentItemRS>
-      columns={columns}
-      rowKey='itemNo'
-      dataSource={query.data?.data}
-      loading={query.isLoading}
-      tableLayout='fixed'
-      scroll={{ x: 250 }}
-      size='large'
-      pagination={{
-        current: equipmentSearch.page || 1,
-        pageSize: equipmentSearch.size || 7,
-        total: query.data?.page?.totalDataCnt,
-        onChange: handlePageChange,
-        // showSizeChanger: true,
-      }}
-      onRow={(data) => {
-        return {
-          onClick: () => navigate(`/items/${data.itemNo}`),
-        }
-      }}
-    />
+    <>
+      <BasicTable<EquipmentItemRS>
+        columns={columns}
+        rowKey='itemNo'
+        dataSource={query.data?.data}
+        loading={query.isLoading}
+        tableLayout='fixed'
+        scroll={{ x: 250 }}
+        size='large'
+        pagination={{
+          current: equipmentSearch.page || 1,
+          pageSize: equipmentSearch.size || 7,
+          total: query.data?.page?.totalDataCnt,
+          onChange: handlePageChange,
+          // showSizeChanger: true,
+        }}
+        onRow={(data) => {
+          return {
+            onClick: () => navigate(`/items/${data.itemNo}`),
+          }
+        }}
+      />
+      {contextHolder}
+    </>
   )
 }
 

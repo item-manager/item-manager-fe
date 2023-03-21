@@ -1,9 +1,10 @@
-import { ConsumableItemRS, ConsumableItemsRQ, httpClient } from '@/apis'
+import { ConsumableItemRS, ConsumableItemsRQ, httpClient, ITEM_TYPE } from '@/apis'
 import PurchaseModal from '@/components/modals/PurchaseModal'
 import { PriorityProgressBar } from '@/components/progress'
 import BasicTable from '@/components/tables/BasicTable'
 import useModal from '@/hooks/useModal'
 import { consumableSearchState } from '@/store'
+import dateUtil from '@/utils/dateUtil'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, message, Modal, PaginationProps, Tag, Tooltip } from 'antd'
@@ -35,7 +36,7 @@ const ConsumableTable = () => {
   }
 
   const query = useQuery({
-    queryKey: ['items', criteria],
+    queryKey: ['items', ITEM_TYPE.CONSUMABLE, criteria],
     queryFn: () => httpClient.items.getConsumableItems(criteria),
     onSuccess({ page }) {
       const { requestPage, totalPages } = page
@@ -134,7 +135,7 @@ const ConsumableTable = () => {
       key: 'latestPurchaseDate',
       align: 'center',
       width: 120,
-      render: (value) => value && dayjs(value).format('YYYY.MM.DD'),
+      render: (value) => value && dateUtil.formatUtc(value, 'YYYY.MM.DD'),
     },
     {
       title: '최근 사용일',
@@ -142,7 +143,7 @@ const ConsumableTable = () => {
       key: 'latestConsumeDate',
       align: 'center',
       width: 120,
-      render: (value) => value && dayjs(value).format('YYYY.MM.DD'),
+      render: (value) => value && dateUtil.formatUtc(value, 'YYYY.MM.DD'),
     },
     {
       title: '남은 수량',
