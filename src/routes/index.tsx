@@ -7,22 +7,25 @@ import { useLocation } from 'react-router-dom'
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
 import PrivateRoutes from './PrivateRoutes'
 import PublicRoutes from './PublicRoutes'
+import { useState } from 'react'
 
 const Router = () => {
   const [_user, setUser] = useRecoilState(userState)
   const isLoggedIn = useRecoilValue(isLoggedInState)
   const location = useLocation()
   const resetQuerystring = useResetRecoilState(allSearchState)
+  const [isFetched, setIsFetched] = useState(false)
 
   const firstUpdate = useRef(true)
 
-  const { isLoading, data } = useQuery(['users'], httpClient.users.getUser, {
+  const { data, isError } = useQuery(['users'], httpClient.users.getUser, {
     refetchOnWindowFocus: false,
   })
 
   useEffect(() => {
     if (data?.data) {
       setUser(data.data)
+      setIsFetched(true)
     }
   }, [data?.data, setUser])
 
@@ -44,6 +47,10 @@ const Router = () => {
     }
   }, [location.pathname, resetQuerystring])
 
-  return <>{isLoading ? <MainSpin /> : isLoggedIn ? <PrivateRoutes /> : <PublicRoutes />}</>
+  return (
+    <>
+      {!(isError || isFetched) ? <MainSpin /> : isLoggedIn ? <PrivateRoutes /> : <PublicRoutes />}
+    </>
+  )
 }
 export default Router

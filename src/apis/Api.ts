@@ -9,6 +9,10 @@
  * ---------------------------------------------------------------
  */
 
+export enum ITEM_TYPE {
+  'CONSUMABLE' = 'CONSUMABLE',
+  'EQUIPMENT' = 'EQUIPMENT',
+}
 export interface ErrorResult {
   /** @format int32 */
   code?: number
