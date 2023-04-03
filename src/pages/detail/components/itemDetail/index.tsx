@@ -53,27 +53,27 @@ const ItemDetail = () => {
         <div id='right-section'>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
             <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>분류:</span>
+              <span className='inline-block w-24 text-center'>분류</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.type}</span>
             </div>
             <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>남은 수량:</span>
+              <span className='inline-block w-24 text-center'>남은 수량</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.quantity}</span>
             </div>
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
             <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>보관장소:</span>
+              <span className='inline-block w-24 text-center'>보관장소</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.room}</span>
             </div>
             <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>위치:</span>
+              <span className='inline-block w-24 text-center'>위치</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.place}</span>
             </div>
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
             <div className='flex items-center text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>상세위치:</span>
+              <span className='inline-block w-24 text-center'>상세위치</span>
               <span className='inline-block w-6/12 text-center truncate text-ellipsis'>
                 {itemDetail?.data?.locationMemo}
               </span>
@@ -82,7 +82,7 @@ const ItemDetail = () => {
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
             <div className='text-base w-full'>
               <span className='inline-flex flex-wrap gap-y-2'>
-                <span className='inline-block w-24 text-center'>라벨:</span>
+                <span className='inline-block w-24 text-center'>라벨</span>
                 {itemDetail?.data?.labels?.map((label: LabelRS) => (
                   <span key={uuidv4()}>
                     <Tag color='default' className='border-1 rounded-lg p-1 ml-1'>

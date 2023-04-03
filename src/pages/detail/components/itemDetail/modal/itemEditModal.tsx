@@ -73,15 +73,19 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
   const onFinish = async () => {
     const { editItemName, editPriority, editLocationMemo } = newDetail
 
-    await httpClient.items.patchItem(Number(itemNo), {
-      name: editItemName || itemDetail?.name,
-      type,
-      locationNo: editLocatioNo || itemDetail?.locationNo,
-      locationMemo: editLocationMemo || itemDetail?.locationMemo,
-      photoName: '',
-      priority: editPriority || itemDetail?.priority,
-      labels: selectedValues,
-    })
+    try {
+      await httpClient.items.patchItem(Number(itemNo), {
+        name: editItemName || itemDetail?.name,
+        type,
+        locationNo: editLocatioNo || itemDetail?.locationNo,
+        locationMemo: editLocationMemo || itemDetail?.locationMemo,
+        photoName: '',
+        priority: editPriority || itemDetail?.priority,
+        labels: selectedValues,
+      })
+    } catch (error) {
+      if (error instanceof Error) console.log('edit item:', error.message)
+    }
     hideModal()
   }
 

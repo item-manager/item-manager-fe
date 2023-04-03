@@ -200,7 +200,7 @@ export interface UpdateLabelRQ {
 
 export interface UpdateItemRQ {
   name?: string
-  type: string
+  type?: string
   /** @format int64 */
   locationNo?: number | string 
   locationMemo?: string
