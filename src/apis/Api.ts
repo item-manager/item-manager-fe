@@ -198,6 +198,20 @@ export interface UpdateLabelRQ {
   name?: string
 }
 
+export interface UpdateItemRQ {
+  name?: string
+  type: string
+  /** @format int64 */
+  locationNo?: number | string 
+  locationMemo?: string
+  /** @format binary */
+  photo?: File
+  photoName?: string
+  /** @format int32 */
+  priority?: number
+  labels?: string[]
+}
+
 export interface ResultSessionUser {
   /** @format int32 */
   code?: number
@@ -868,6 +882,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: 'DELETE',
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags item-controller
+     * @name PatchItem
+     * @summary 물품 정보 수정
+     * @request PATCH:/items/{itemNo}
+     */
+    patchItem: (itemNo: number, data: UpdateItemRQ, params: RequestParams = {}) =>
+    this.request<ResultVoid, ErrorResult>({
+      path: `/items/${itemNo}`,
+      method: 'PATCH',
+      body: data,
+      ...params,
+    }),
 
     /**
      * No description
