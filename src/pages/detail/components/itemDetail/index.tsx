@@ -13,6 +13,7 @@ import useModal from '@/hooks/useModal'
 import { v4 as uuidv4 } from 'uuid'
 import { NavigationUtil } from '@/utils'
 
+
 const ItemDetail = () => {
   const { itemNo }: CreateItemRS = useParams()
   const navigate = useNavigate()
@@ -85,6 +86,7 @@ const ItemDetail = () => {
                 <span className='inline-block w-24 text-center'>라벨:</span>
                 {itemDetail?.data?.labels?.map((label: LabelRS) => (
                   <span key={uuidv4()}>
+                  <span key={itemDetail?.data?.itemNo}>
                     <Tag color='default' className='border-1 rounded-lg p-1 ml-1'>
                       {label.name}
                     </Tag>
