@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashCan, faLeftLong } from '@fortawesome/free-solid-svg-icons'
-import { Button } from 'antd'
+import { Button, Tag } from 'antd'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { httpClient } from '@/apis'
@@ -8,6 +8,10 @@ import { CreateItemRS } from '@/apis/Api'
 import { useNavigate } from 'react-router'
 import { PriorityProgressBar } from '@/components/progress'
 import { LabelRS } from '@/apis'
+import ItemEditModal from './modal/itemEditModal'
+import useModal from '@/hooks/useModal'
+import { v4 as uuidv4 } from 'uuid'
+import { NavigationUtil } from '@/utils'
 
 const ItemDetail = () => {
   const { itemNo }: CreateItemRS = useParams()
@@ -16,8 +20,10 @@ const ItemDetail = () => {
     httpClient.items.getItem(Number(itemNo))
   )
 
+  const { visible, showModal, hideModal } = useModal()
+
   const onClickMovePrev = () => {
-    navigate(-1)
+    navigate(NavigationUtil.items)
   }
 
   return (
@@ -28,11 +34,14 @@ const ItemDetail = () => {
           className='ml-10 text-4xl hover:cursor-pointer'
           onClick={onClickMovePrev}
         />
-        <Button type='primary' className='ml-auto mr-10'>
+        <Button type='primary' className='ml-auto mr-10' onClick={showModal}>
           정보 수정
         </Button>
         <FontAwesomeIcon icon={faTrashCan} className='h-6 mr-10 hover:cursor-pointer' />
       </div>
+      {visible && <ItemEditModal hideModal={hideModal} itemDetail={itemDetail?.data} />}
+      <h1 className='flex justify-center items-center w-6/12 text-4xl text-center p-4'>
+        <div className='w-11 mr-4'>
       <h1 className='flex items-center justify-center w-6/12 p-4 text-4xl text-center'>
         <div className='mr-4 w-11'>
           <PriorityProgressBar priority={itemDetail?.data?.priority} strokeWidth={4} />
@@ -73,12 +82,15 @@ const ItemDetail = () => {
             </div>
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
-            <div className='w-6/12 text-base'>
-              <span className='inline-block w-24 text-center'>라벨:</span>
-              <span className='inline-block w-6/12 text-center'>
+            <div className='text-base w-full'>
+              <span className='inline-flex flex-wrap gap-y-2'>
+                <span className='inline-block w-24 text-center'>라벨</span>
                 {itemDetail?.data?.labels?.map((label: LabelRS) => (
-                  <span key={itemDetail?.data?.itemNo}>
-                    <span className='p-1 ml-1 rounded-lg border-1'>#{label.name}</span>
+                  <span key={uuidv4()}>
+                    <Tag color='default' className='border-1 rounded-lg p-1 ml-1'>
+                      {label.name}
+                    </Tag>
+
                   </span>
                 ))}
               </span>
