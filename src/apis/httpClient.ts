@@ -20,13 +20,3 @@ httpClient.instance.defaults.paramsSerializer = {
     return params.toString()
   },
 }
-
-// TODO
-// httpClient.instance.interceptors.response.use(
-//   (response) => response,
-//   function (error) {
-//     if (error?.response?.status === 401) {
-//       return
-//     }
-//   }
-// )

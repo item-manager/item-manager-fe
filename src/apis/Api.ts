@@ -9,6 +9,10 @@
  * ---------------------------------------------------------------
  */
 
+export enum ITEM_TYPE {
+  'CONSUMABLE' = 'CONSUMABLE',
+  'EQUIPMENT' = 'EQUIPMENT',
+}
 export interface ErrorResult {
   /** @format int32 */
   code?: number
@@ -347,7 +351,7 @@ export interface EquipmentItemRS {
 }
 
 export interface ResultListEquipmentItemRS {
-  page?: Page
+  page: Page
   data?: EquipmentItemRS[]
 }
 
@@ -361,7 +365,7 @@ export interface ConsumableItemsRQ {
    * @default "+"
    * @pattern ^[+-]?$
    */
-  sort?: string
+  sort: '+' | '-' | null
   /**
    * @format int32
    * @default 1
@@ -401,7 +405,7 @@ export interface Page {
 }
 
 export interface ResultListConsumableItemRS {
-  page?: Page
+  page: Page
   data?: ConsumableItemRS[]
 }
 

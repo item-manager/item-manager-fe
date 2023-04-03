@@ -31,7 +31,7 @@ const ItemDetail = () => {
       <div className='flex items-center h-16'>
         <FontAwesomeIcon
           icon={faLeftLong}
-          className='text-4xl ml-10 hover:cursor-pointer'
+          className='ml-10 text-4xl hover:cursor-pointer'
           onClick={onClickMovePrev}
         />
         <Button type='primary' className='ml-auto mr-10' onClick={showModal}>
@@ -42,38 +42,40 @@ const ItemDetail = () => {
       {visible && <ItemEditModal hideModal={hideModal} itemDetail={itemDetail?.data} />}
       <h1 className='flex justify-center items-center w-6/12 text-4xl text-center p-4'>
         <div className='w-11 mr-4'>
+      <h1 className='flex items-center justify-center w-6/12 p-4 text-4xl text-center'>
+        <div className='mr-4 w-11'>
           <PriorityProgressBar priority={itemDetail?.data?.priority} strokeWidth={4} />
         </div>
         {itemDetail?.data?.name}
       </h1>
-      <section className='h-full flex'>
-        <div id='left-section' className='w-6/12 flex justify-center'>
+      <section className='flex h-full'>
+        <div id='left-section' className='flex justify-center w-6/12'>
           <div className='w-300 h-332 bg-slate-300'>picture</div>
         </div>
         <div id='right-section'>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
-            <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>분류</span>
+            <div className='w-6/12 text-base'>
+              <span className='inline-block w-24 text-center'>분류:</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.type}</span>
             </div>
-            <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>남은 수량</span>
+            <div className='w-6/12 text-base'>
+              <span className='inline-block w-24 text-center'>남은 수량:</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.quantity}</span>
             </div>
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
-            <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>보관장소</span>
+            <div className='w-6/12 text-base'>
+              <span className='inline-block w-24 text-center'>보관장소:</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.room}</span>
             </div>
-            <div className='text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>위치</span>
+            <div className='w-6/12 text-base'>
+              <span className='inline-block w-24 text-center'>위치:</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.place}</span>
             </div>
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
-            <div className='flex items-center text-base w-6/12'>
-              <span className='inline-block w-24 text-center'>상세위치</span>
+            <div className='flex items-center w-6/12 text-base'>
+              <span className='inline-block w-24 text-center'>상세위치:</span>
               <span className='inline-block w-6/12 text-center truncate text-ellipsis'>
                 {itemDetail?.data?.locationMemo}
               </span>
@@ -88,16 +90,17 @@ const ItemDetail = () => {
                     <Tag color='default' className='border-1 rounded-lg p-1 ml-1'>
                       {label.name}
                     </Tag>
+
                   </span>
                 ))}
               </span>
             </div>
           </div>
-          <div className='flex items-center justify-center w-530 mt-6'>
-            <Button type='primary' className='w-14 h-10 text-base mr-9'>
+          <div className='flex items-center justify-center mt-6 w-530'>
+            <Button type='primary' className='h-10 text-base w-14 mr-9'>
               구매
             </Button>
-            <Button type='primary' className='w-14 h-10 text-base'>
+            <Button type='primary' className='h-10 text-base w-14'>
               사용
             </Button>
           </div>
