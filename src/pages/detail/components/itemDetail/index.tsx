@@ -8,6 +8,11 @@ import { CreateItemRS } from '@/apis/Api'
 import { useNavigate } from 'react-router'
 import { PriorityProgressBar } from '@/components/progress'
 import { LabelRS } from '@/apis'
+import ItemEditModal from './modal/itemEditModal'
+import useModal from '@/hooks/useModal'
+import { v4 as uuidv4 } from 'uuid'
+import { NavigationUtil } from '@/utils'
+
 
 const ItemDetail = () => {
   const { itemNo }: CreateItemRS = useParams()
@@ -16,8 +21,10 @@ const ItemDetail = () => {
     httpClient.items.getItem(Number(itemNo))
   )
 
+  const { visible, showModal, hideModal } = useModal()
+
   const onClickMovePrev = () => {
-    navigate(-1)
+    navigate(NavigationUtil.items)
   }
 
   return (
@@ -28,11 +35,12 @@ const ItemDetail = () => {
           className='text-4xl ml-10 hover:cursor-pointer'
           onClick={onClickMovePrev}
         />
-        <Button type='primary' className='ml-auto mr-10'>
+        <Button type='primary' className='ml-auto mr-10' onClick={showModal}>
           정보 수정
         </Button>
         <FontAwesomeIcon icon={faTrashCan} className='h-6 mr-10 hover:cursor-pointer' />
       </div>
+      {visible && <ItemEditModal hideModal={hideModal} itemDetail={itemDetail?.data} />}
       <h1 className='flex justify-center items-center w-6/12 text-4xl text-center p-4'>
         <div className='w-11 mr-4'>
           <PriorityProgressBar priority={itemDetail?.data?.priority} strokeWidth={4} />
@@ -77,6 +85,7 @@ const ItemDetail = () => {
               <span className='inline-flex flex-wrap gap-y-2'>
                 <span className='inline-block w-24 text-center'>라벨:</span>
                 {itemDetail?.data?.labels?.map((label: LabelRS) => (
+                  <span key={uuidv4()}>
                   <span key={itemDetail?.data?.itemNo}>
                     <Tag color='default' className='border-1 rounded-lg p-1 ml-1'>
                       {label.name}
