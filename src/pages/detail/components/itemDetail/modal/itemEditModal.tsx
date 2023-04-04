@@ -1,11 +1,10 @@
-import { Button, Form, Modal, Input, Select, Slider, Row, Col, InputNumber } from 'antd'
-import { Label, selectedValuesState } from '@/components/label/Label'
+import { httpClient, PlacesRS, UpdatePlaceRQ } from '@/apis'
+import { Label } from '@/components/label/Label'
+import { useQuery } from '@tanstack/react-query'
+import { Button, Col, Form, FormProps, Input, InputNumber, Modal, Row, Select, Slider } from 'antd'
 import { ChangeEvent, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { httpClient, PlacesRS, UpdatePlaceRQ } from '@/apis'
 import { v4 as uuidv4 } from 'uuid'
-import { useRecoilState } from 'recoil'
 
 interface ItemEditProps {
   hideModal: () => void
@@ -13,8 +12,6 @@ interface ItemEditProps {
 }
 
 const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
-  const [selectedValues] = useRecoilState(selectedValuesState)
-
   const [form] = Form.useForm()
 
   const { TextArea } = Input
@@ -32,9 +29,7 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
     queryFn: async () => await httpClient.locations.allRooms(),
   })
 
-  const labels = itemDetail?.labels?.map((el: any) => {
-    return el.name
-  })
+  const labels = itemDetail?.labels?.map((el: any) => el.labelNo.toString())
 
   const [newDetail, setNewDetail] = useState({
     editItemName: '',
@@ -70,7 +65,9 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
     form.submit()
   }
 
-  const onFinish = async () => {
+  const onFinish: FormProps['onFinish'] = async (values) => {
+    const { labels } = values
+
     const { editItemName, editPriority, editLocationMemo } = newDetail
 
     try {
@@ -81,7 +78,7 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
         locationMemo: editLocationMemo || itemDetail?.locationMemo,
         photoName: '',
         priority: editPriority || itemDetail?.priority,
-        labels: selectedValues,
+        labels: labels.map((label: string) => +label),
       })
     } catch (error) {
       if (error instanceof Error) console.log('edit item:', error.message)
@@ -110,8 +107,11 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 18 }}
           onFinish={onFinish}
+          initialValues={{
+            labels,
+          }}
         >
-          <div className='text-xl text-center mb-4'>물품 정보 수정</div>
+          <div className='mb-4 text-xl text-center'>물품 정보 수정</div>
           <div className='flex'>
             <div className='flex items-center justify-center w-2/4'>
               <div className='w-300 h-332 bg-slate-300'>picture</div>
@@ -192,8 +192,7 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
               </Form.Item>
 
               <Form.Item label='라벨' name='labels' colon={false}>
-                <Label value={labels} />
-                <input defaultValue={labels} hidden />
+                <Label />
               </Form.Item>
             </div>
           </div>

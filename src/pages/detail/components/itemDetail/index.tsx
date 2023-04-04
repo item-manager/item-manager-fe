@@ -40,8 +40,6 @@ const ItemDetail = () => {
         <FontAwesomeIcon icon={faTrashCan} className='h-6 mr-10 hover:cursor-pointer' />
       </div>
       {visible && <ItemEditModal hideModal={hideModal} itemDetail={itemDetail?.data} />}
-      <h1 className='flex justify-center items-center w-6/12 text-4xl text-center p-4'>
-        <div className='w-11 mr-4'>
       <h1 className='flex items-center justify-center w-6/12 p-4 text-4xl text-center'>
         <div className='mr-4 w-11'>
           <PriorityProgressBar priority={itemDetail?.data?.priority} strokeWidth={4} />
@@ -82,15 +80,14 @@ const ItemDetail = () => {
             </div>
           </div>
           <div className='flex items-center w-530 h-18 border-b-1 border-lightGray'>
-            <div className='text-base w-full'>
+            <div className='w-full text-base'>
               <span className='inline-flex flex-wrap gap-y-2'>
                 <span className='inline-block w-24 text-center'>라벨</span>
                 {itemDetail?.data?.labels?.map((label: LabelRS) => (
                   <span key={uuidv4()}>
-                    <Tag color='default' className='border-1 rounded-lg p-1 ml-1'>
+                    <Tag color='default' className='p-1 ml-1 rounded-lg border-1'>
                       {label.name}
                     </Tag>
-
                   </span>
                 ))}
               </span>
