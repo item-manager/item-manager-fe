@@ -95,7 +95,7 @@ export interface CreateItemRQ {
   locationNo: number
   locationMemo?: string
   /** @format binary */
-  photo?: File
+  photoName?: string
   /** @format int32 */
   priority?: number
   labels: string[]
@@ -206,7 +206,7 @@ export interface UpdateItemRQ {
   name?: string
   type?: string
   /** @format int64 */
-  locationNo?: number | string 
+  locationNo?: number | string
   locationMemo?: string
   /** @format binary */
   photo?: File
@@ -896,12 +896,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request PATCH:/items/{itemNo}
      */
     patchItem: (itemNo: number, data: UpdateItemRQ, params: RequestParams = {}) =>
-    this.request<ResultVoid, ErrorResult>({
-      path: `/items/${itemNo}`,
-      method: 'PATCH',
-      body: data,
-      ...params,
-    }),
+      this.request<ResultVoid, ErrorResult>({
+        path: `/items/${itemNo}`,
+        method: 'PATCH',
+        body: data,
+        ...params,
+      }),
 
     /**
      * No description
@@ -952,6 +952,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
   }
   images = {
+    /**
+     * No description
+     *
+     * @tags image-controller
+     * @name PostImage
+     * @summary 이미지 저장
+     * @request POST:/images
+     */
+    postImage: (file: string, params: RequestParams = {}) =>
+      this.request<File, ErrorResult>({
+        path: `/images`,
+        method: 'POST',
+        type: ContentType.FormData,
+        body: file,
+        ...params,
+      }),
+
     /**
      * No description
      *
