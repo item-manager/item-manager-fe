@@ -27,6 +27,7 @@ function BasicTable<RecordType extends object>(props: TableProps<RecordType>) {
         // hideOnSinglePage: true,
         position: ['bottomCenter'],
         itemRender: itemRender,
+        showSizeChanger: false,
         ...pagination,
       }}
       {...rest}
