@@ -1,19 +1,21 @@
 import { drawerOpenState, isContentLoadingState, isSideCollapsedState } from '@/store'
-import { ApartmentOutlined, HomeOutlined, SmileOutlined } from '@ant-design/icons'
+import { NavigationUtil } from '@/utils'
+import { ApartmentOutlined, HomeOutlined, SmileOutlined, UserOutlined } from '@ant-design/icons'
 import { Drawer, Grid, Menu, MenuProps, Spin, theme } from 'antd'
 import Layout, { Content } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { atom, useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { Header } from '../header'
 
 const { useBreakpoint } = Grid
 
 const items = [
-  { key: '1', icon: <HomeOutlined />, label: '물품 관리', path: '/items' },
-  { key: '2', icon: <ApartmentOutlined />, label: '보관장소 관리', path: '/locations' },
-  { key: '3', icon: <SmileOutlined />, label: '테스트 페이지', path: '/test' },
+  { key: '1', icon: <HomeOutlined />, label: '물품 관리', path: NavigationUtil.items },
+  { key: '2', icon: <ApartmentOutlined />, label: '보관장소 관리', path: NavigationUtil.locations },
+  { key: '3', icon: <UserOutlined />, label: '회원 정보', path: NavigationUtil.profileEdit },
+  { key: '4', icon: <SmileOutlined />, label: '테스트 페이지', path: NavigationUtil.test },
 ]
 
 const findKey = () => items.find((_item) => location.pathname.startsWith(_item.path))?.key

@@ -7,6 +7,7 @@ export const NavigationUtil = {
   items: '/items',
   test: '/test',
   detail: '/items/:itemNo',
+  profileEdit: '/profile/edit',
 } as const
 
 export const Schema = async ({ id, username, password, passwordConfirm }: CreateUserRQ) => {

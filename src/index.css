@@ -45,3 +45,7 @@ body {
 .ant-table-body {
   overflow-y: auto !important;
 }
+
+#root .ant-form-item-row {
+  align-items: center;
+}
