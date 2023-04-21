@@ -163,6 +163,17 @@ export interface ResultConsumeItemRS {
   data?: ConsumeItemRS
 }
 
+export interface ResultSaveImageRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: SaveImageRS
+}
+
+export interface SaveImageRS {
+  filename?: string
+}
+
 export interface LoginUserRQ {
   id: string
   password: string
@@ -181,6 +192,11 @@ export interface ResultLoginUserRS {
   data: LoginUserRS
 }
 
+export interface UpdateUserInfoRQ {
+  username?: string
+  photoName?: string
+}
+
 export interface UpdateRoomRQ {
   name: string
 }
@@ -190,6 +206,12 @@ export interface ResultVoid {
   code?: number
   message?: string
   data?: object
+}
+
+export interface ChangePasswordRQ {
+  currentPassword: string
+  /** @pattern ^(?=\w*\d)(?=\w*[a-z])(?=\w*[A-Z])[a-zA-Z\\d`~!@#$%^&*()-_=+]{6,20}$ */
+  newPassword: string
 }
 
 export interface UpdatePlaceRQ {
@@ -216,17 +238,18 @@ export interface UpdateItemRQ {
   labels?: string[]
 }
 
-export interface ResultSessionUser {
+export interface ResultUserRS {
   /** @format int32 */
   code?: number
   message?: string
-  data?: SessionUser
+  data?: UserRS
 }
 
-export interface SessionUser {
+export interface UserRS {
   /** @format int64 */
   userNo?: number
   username?: string
+  photoUrl?: string
 }
 
 export interface ResultListRoomsRS {
@@ -599,12 +622,46 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags user-controller
+     * @name UpdateUserInfo
+     * @summary 회원 정보 수정
+     * @request PATCH:/users
+     */
+    updateUserInfo: (data: UpdateUserInfoRQ, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/users`,
+        method: 'PATCH',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags user-controller
+     * @name ChangePassword
+     * @summary 회원 비밀번호 수정
+     * @request PATCH:/users/newPassword
+     */
+    changePassword: (data: ChangePasswordRQ, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/users/newPassword`,
+        method: 'PATCH',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags user-controller
      * @name GetUser
-     * @summary 로그인한 유저 pk, id
+     * @summary 로그인한 회원 정보
      * @request GET:/users/session
      */
     getUser: (params: RequestParams = {}) =>
-      this.request<ResultSessionUser, ErrorResult>({
+      this.request<ResultUserRS, ErrorResult>({
         path: `/users/session`,
         method: 'GET',
         ...params,
@@ -959,6 +1016,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name PostImage
      * @summary 이미지 저장
      * @request POST:/images
+     * @deprecated
      */
     postImage: (file: string, params: RequestParams = {}) =>
       this.request<File, ErrorResult>({
@@ -966,6 +1024,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: 'POST',
         type: ContentType.FormData,
         body: file,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags image-controller
+     * @name SaveImage
+     * @summary 이미지 저장
+     * @request POST:/images
+     */
+    saveImage: (
+      data: {
+        /** @format binary */
+        file: File
+      },
+      params: RequestParams = {}
+    ) =>
+      this.request<ResultSaveImageRS, ErrorResult>({
+        path: `/images`,
+        method: 'POST',
+        body: data,
+        type: ContentType.FormData,
         ...params,
       }),
 
