@@ -27,3 +27,6 @@ export const Schema = async ({ id, username, password, passwordConfirm }: Create
     if (error instanceof Error) console.log('register error:', error.message)
   }
 }
+
+export const DEFAULT_PROFILE_IMAGE_URL =
+  'https://icon-library.com/images/no-user-image-icon/no-user-image-icon-3.jpg'

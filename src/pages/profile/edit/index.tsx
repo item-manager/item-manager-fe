@@ -1,7 +1,7 @@
 import { httpClient, LoginUserRS, ResultSaveImageRS } from '@/apis'
 import useModal from '@/hooks/useModal'
 import { userState } from '@/store'
-import { NavigationUtil } from '@/utils'
+import { DEFAULT_PROFILE_IMAGE_URL, NavigationUtil } from '@/utils'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   Button,
@@ -21,9 +21,6 @@ import { useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
 import ChangePasswordModal from './changePasswordModal'
 
-const DEFAULT_IMAGE_URL =
-  'https://icon-library.com/images/no-user-image-icon/no-user-image-icon-3.jpg'
-
 const ProfileEditPage = () => {
   const navigate = useNavigate()
   const [confirmLoading, setConfirmLoading] = useState(false)
@@ -40,7 +37,7 @@ const ProfileEditPage = () => {
         uid: '-1',
         name: 'profile.png',
         status: 'done',
-        url: user!.photoUrl || DEFAULT_IMAGE_URL,
+        url: user!.photoUrl || DEFAULT_PROFILE_IMAGE_URL,
       },
     ]
   })
