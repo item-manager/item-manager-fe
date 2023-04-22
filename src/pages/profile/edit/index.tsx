@@ -98,7 +98,6 @@ const ProfileEditPage = () => {
       okText: '탈퇴하기',
       okType: 'danger',
       onOk: async () => {
-        // TODO 탈퇴
         try {
           await httpClient.users.deleteUser()
           queryClient.invalidateQueries()
