@@ -82,12 +82,33 @@ const ChangePasswordModal = ({ hideModal }: ChangePasswordModalProps) => {
             name='newPassword'
             label='변경 비밀번호'
             rules={[
-              { required: true, message: '${label}를 입력해 주세요.' },
               {
                 validator: async (_rule, value) => {
+                  if (!value?.trim()) {
+                    throw new Error('변경 비밀번호를 입력해 주세요.')
+                  }
+
                   const currentPassword = form.getFieldValue('currentPassword')
                   if (value && currentPassword && currentPassword === value) {
                     throw new Error('현재 비밀번호와 새 비밀번호가 동일합니다.')
+                  }
+
+                  if (!/\d/.test(value)) {
+                    throw new Error('최소한 하나 이상의 숫자가 있어야 합니다.')
+                  }
+
+                  if (!/[a-z]/.test(value)) {
+                    throw new Error('최소한 하나 이상의 소문자가 있어야 합니다.')
+                  }
+
+                  if (!/[A-Z]/.test(value)) {
+                    throw new Error('최소한 하나 이상의 대문자가 있어야 합니다.')
+                  }
+
+                  if (!/^[a-zA-Z\d`~!@#$%^&*()\-_=+]{6,20}$/.test(value)) {
+                    throw new Error(
+                      '길이가 6에서 20사이의 알파벳 대소문자와 숫자, 특수문자(`~!@#$%^&*()-_=+) 중 하나가 올 수 있습니다.'
+                    )
                   }
                 },
                 validateTrigger: 'onSubmit',
@@ -100,9 +121,12 @@ const ChangePasswordModal = ({ hideModal }: ChangePasswordModalProps) => {
             name='newPasswordConfirm'
             label='변경 비밀번호 확인'
             rules={[
-              { required: true, message: '${label}을 입력해 주세요.' },
               {
                 validator: async (_rule, value) => {
+                  if (!value?.trim()) {
+                    throw new Error('변경 비밀번호 확인을 입력해 주세요.')
+                  }
+
                   const newPassword = form.getFieldValue('newPassword')
                   if (value && newPassword && newPassword !== value) {
                     throw new Error('비밀번호와 비밀번호 확인 값이 다릅니다.')

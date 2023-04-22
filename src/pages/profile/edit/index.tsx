@@ -1,10 +1,9 @@
-import { LoginUserRS } from '@/apis'
+import { httpClient, LoginUserRS, ResultSaveImageRS } from '@/apis'
 import useModal from '@/hooks/useModal'
 import { userState } from '@/store'
-import { UserOutlined } from '@ant-design/icons'
+import { NavigationUtil } from '@/utils'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  Avatar,
   Button,
   Divider,
   Form,
@@ -13,38 +12,87 @@ import {
   Modal,
   Typography,
   Upload,
+  UploadFile,
   UploadProps,
 } from 'antd'
-import Search from 'antd/es/input/Search'
-import { useForm } from 'antd/lib/form/Form'
-import { useRecoilValue } from 'recoil'
+import { AxiosError } from 'axios'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useRecoilState } from 'recoil'
 import ChangePasswordModal from './changePasswordModal'
 
-const props: UploadProps = {
-  name: 'file',
-  action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-  headers: {
-    authorization: 'authorization-text',
-  },
-  onChange(info) {
-    if (info.file.status !== 'uploading') {
-      console.log(info.file, info.fileList)
-    }
-    if (info.file.status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully`)
-    } else if (info.file.status === 'error') {
-      message.error(`${info.file.name} file upload failed.`)
-    }
-  },
-}
+const DEFAULT_IMAGE_URL =
+  'https://icon-library.com/images/no-user-image-icon/no-user-image-icon-3.jpg'
 
 const ProfileEditPage = () => {
+  const navigate = useNavigate()
+  const [confirmLoading, setConfirmLoading] = useState(false)
   const { visible, showModal, hideModal } = useModal()
-  const user = useRecoilValue(userState)!
+  const [user, setUser] = useRecoilState(userState)
   const queryClient = useQueryClient()
 
-  const [form] = useForm()
+  const [form] = Form.useForm()
   const [modal, contextHolder] = Modal.useModal()
+
+  const [fileList, setFileList] = useState<UploadFile[]>(() => {
+    return [
+      {
+        uid: '-1',
+        name: 'profile.png',
+        status: 'done',
+        url: user!.photoUrl || DEFAULT_IMAGE_URL,
+      },
+    ]
+  })
+
+  const username = user!.username
+  const photoName = user!.photoUrl?.replace(/^\/images\//, '')
+  const newUsername = Form.useWatch('username', form)
+  const newPhotoName = Form.useWatch('photoName', form)
+
+  const isDirty = () => {
+    if (newUsername === undefined || newPhotoName === undefined) {
+      return false
+    }
+
+    return username !== newUsername || photoName !== newPhotoName
+  }
+
+  const handleChange: UploadProps<ResultSaveImageRS>['onChange'] = ({
+    fileList: newFileList,
+    file,
+  }) => {
+    const filename = file.response?.data?.filename
+
+    form.setFieldValue('photoName', filename)
+
+    setFileList(newFileList)
+  }
+
+  const onFinish = async (values: any) => {
+    setConfirmLoading(true)
+
+    try {
+      const { username, photoName } = values
+      console.log({ username, photoName })
+
+      await httpClient.users.updateUserInfo({
+        username,
+        photoName,
+      })
+
+      message.success('회원 정보가 변경되었습니다.')
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        return message.error(e.response?.data.message)
+      }
+
+      console.error(e)
+    } finally {
+      setConfirmLoading(false)
+    }
+  }
 
   const deleteUser = async () => {
     modal.confirm({
@@ -54,9 +102,19 @@ const ProfileEditPage = () => {
       okType: 'danger',
       onOk: async () => {
         // TODO 탈퇴
-        // await httpClient.items.deleteItem(record.itemNo)
-        queryClient.invalidateQueries()
-        message.success('회원님의 탈퇴 요청이 정상적으로 처리되었습니다.')
+        try {
+          await httpClient.users.deleteUser()
+          queryClient.invalidateQueries()
+          message.success('회원님의 탈퇴 요청이 정상적으로 처리되었습니다.')
+          setUser(null)
+          navigate(NavigationUtil.login)
+        } catch (e) {
+          if (e instanceof AxiosError) {
+            return message.error(e.response?.data.message)
+          }
+
+          console.error(e)
+        }
       },
     })
   }
@@ -64,35 +122,65 @@ const ProfileEditPage = () => {
   return (
     <div className='flex flex-col items-center'>
       <Typography.Title level={2}>회원 정보 수정</Typography.Title>
-      <Upload {...props}>
-        <Avatar size={100} icon={<UserOutlined />} />
-      </Upload>
-
-      <Divider>회원 정보</Divider>
       <Form<LoginUserRS>
         form={form}
-        initialValues={{
-          userNo: user.userNo,
-          username: user.username,
-        }}
+        initialValues={{ username, photoName }}
+        id='self'
         name='basic'
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
-        style={{ maxWidth: 700 }}
+        style={{ width: 300 }}
         autoComplete='off'
         colon={false}
+        requiredMark={false}
+        onFinish={onFinish}
       >
-        <Form.Item label='아이디'>
+        <div className='ml-auto mr-auto w-[110px]'>
+          <Upload
+            action={'/images'}
+            listType='picture-circle'
+            fileList={fileList}
+            onChange={handleChange}
+            multiple={false}
+            showUploadList={{
+              showPreviewIcon: false,
+              showRemoveIcon: false,
+            }}
+            maxCount={1}
+          >
+            {' '}
+          </Upload>
+        </div>
+
+        <Divider>회원 정보</Divider>
+
+        {/* <Form.Item label='아이디'>
           <Input disabled />
+        </Form.Item> */}
+
+        <Form.Item
+          label='닉네임'
+          name='username'
+          rules={[
+            { required: true, message: '${label}을 입력해 주세요.', validateTrigger: 'onSubmit' },
+          ]}
+        >
+          <Input placeholder='닉네임을 입력하세요.' />
         </Form.Item>
 
-        <Form.Item label='닉네임' name='username' rules={[{ message: '닉네임을 입력해 주세요.' }]}>
-          <Search
-            placeholder='닉네임을 입력하세요.'
-            enterButton='수정하기'
-            onSearch={(value) => console.log('xxx', value)}
-          />
+        <Form.Item name='photoName' hidden>
+          <Input />
         </Form.Item>
+
+        <Button
+          type='primary'
+          block
+          htmlType='submit'
+          loading={confirmLoading}
+          disabled={!isDirty()}
+        >
+          수정하기
+        </Button>
 
         <Divider></Divider>
         <div className='flex justify-end gap-2'>

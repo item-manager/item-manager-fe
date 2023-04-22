@@ -1,5 +1,4 @@
 import { allSearchState, currentTabKeyState, userState } from '@/store'
-import { UserOutlined } from '@ant-design/icons'
 import { Avatar, Space, Tabs, TabsProps, Typography } from 'antd'
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
 import ConsumableTab from './tabs/ConsumableTab'
@@ -9,7 +8,7 @@ const Intro = () => {
   const user = useRecoilValue(userState)!
   return (
     <Space wrap size={16} className='mb-2'>
-      <Avatar size={64} icon={<UserOutlined />} />
+      <Avatar size={64} src={<img src={user.photoUrl} className='object-contain' />} />
       <Typography.Title level={2} className='m-0'>
         {user.username}님 좋은 아침 입니다.
       </Typography.Title>
