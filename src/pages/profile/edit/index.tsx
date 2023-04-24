@@ -43,7 +43,7 @@ const ProfileEditPage = () => {
   })
 
   const username = user!.username
-  const photoName = user!.photoUrl?.replace(/^\/images\//, '')
+  const photoName = user!.photoUrl?.replace(/^\/images\//, '') || null
   const newUsername = Form.useWatch('username', form)
   const newPhotoName = Form.useWatch('photoName', form)
 
@@ -133,6 +133,7 @@ const ProfileEditPage = () => {
       >
         <div className='ml-auto mr-auto w-[110px]'>
           <Upload
+            accept='image/*'
             action={'/images'}
             listType='picture-circle'
             fileList={fileList}
