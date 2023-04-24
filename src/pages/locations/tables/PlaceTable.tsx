@@ -7,6 +7,7 @@ import { DeleteFilled, EditOutlined, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, message, Modal, Space, Tooltip } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
+import { AxiosError } from 'axios'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSetRecoilState } from 'recoil'
@@ -93,11 +94,14 @@ const PlaceTable = ({ roomNo }: PlacesRQ) => {
       }
 
       // 2. 삭제
-      // TODO 에러 처리?
       await httpClient.locations.deleteLocation(locationNo)
       queryClient.invalidateQueries({ queryKey: ['rooms', roomNo] })
       message.success('삭제되었습니다.')
     } catch (e) {
+      if (e instanceof AxiosError) {
+        return message.error(e.response?.data.message)
+      }
+
       console.error(e)
     } finally {
       setIsLoadingState(false)
