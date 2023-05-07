@@ -38,6 +38,17 @@ export const orderByState = atom({
   ],
 })
 
+export const orderByType = atom({
+  key: 'orderByType',
+  default: null,
+  effects: [
+    urlSyncEffect({
+      refine: nullable(union(literal('DATE'), literal('COUNT'), literal('PRICE'), literal('NULL'))),
+      history: 'push',
+    }),
+  ],
+})
+
 export const sortState = atom({
   key: 'sort',
   default: null,
@@ -60,6 +71,59 @@ export const sizeState = atom({
 
 export const locationNoState = atom({
   key: 'locationNo',
+  default: null,
+  effects: [urlSyncEffect({ refine: nullable(number()), history: 'push' })],
+})
+
+export const itemNoState = atom({
+  key: 'itemNo',
+  default: null,
+  effects: [urlSyncEffect({ refine: nullable(number()), history: 'push' })],
+})
+
+export const typeState = atom({
+  key: 'type',
+  default: null,
+  effects: [urlSyncEffect({ refine: nullable(string()), history: 'push' })],
+})
+
+export const yearState = atom({
+  key: 'year',
+  default: null,
+  effects: [
+    urlSyncEffect({
+      refine: nullable(
+        union(
+          literal(2023),
+          literal(2022),
+          literal(2021),
+          literal(2020),
+          literal(2019),
+          literal(2018),
+          literal(2017),
+          literal(2016),
+          literal(2015),
+          literal(2014),
+          literal(2013),
+          literal(2012),
+          literal(2011),
+          literal(2010),
+          literal(2009),
+          literal(2008),
+          literal(2007),
+          literal(2006),
+          literal(2005),
+          literal(2004),
+          literal(2003)
+        )
+      ),
+      history: 'push',
+    }),
+  ],
+})
+
+export const monthState = atom({
+  key: 'month',
   default: null,
   effects: [urlSyncEffect({ refine: nullable(number()), history: 'push' })],
 })
@@ -162,6 +226,52 @@ export const equipmentSearchState = selector({
       set(labelsState, newValue.labels || [])
       set(nameState, newValue.name || null)
       set(locationNoState, newValue.locationNo || null)
+      set(pageState, newValue.page)
+      set(sizeState, newValue.size)
+    }
+  },
+})
+
+export const quantityLogState = selector({
+  key: 'quantityLogState',
+  get: ({ get }) => {
+    const itemNo = get(itemNoState)
+    const type = get(typeState)
+    const year = get(yearState)
+    const month = get(monthState)
+    const orderBy = get(orderByType)
+    const sort = get(sortState)
+    const page = get(pageState)
+    const size = get(sizeState)
+
+    return {
+      itemNo,
+      type,
+      year,
+      month,
+      orderBy,
+      sort,
+      page,
+      size,
+    }
+  },
+  set: ({ set, reset }, newValue) => {
+    if (newValue instanceof DefaultValue) {
+      reset(itemNoState)
+      reset(typeState)
+      reset(yearState)
+      reset(monthState)
+      reset(orderByType)
+      reset(sortState)
+      reset(pageState)
+      reset(sizeState)
+    } else {
+      set(itemNoState, newValue.itemNo || null)
+      set(typeState, newValue.type || null)
+      set(yearState, newValue.year || null)
+      set(monthState, newValue.month || null)
+      set(orderByType, newValue.orderBy || null)
+      set(sortState, newValue.sort || null)
       set(pageState, newValue.page)
       set(sizeState, newValue.size)
     }

@@ -148,7 +148,7 @@ export interface ConsumeItemRQ {
    * @format int32
    * @min 0
    */
-  count?: number
+  count?: number | null
 }
 
 export interface ConsumeItemRS {
@@ -430,6 +430,38 @@ export interface Page {
 export interface ResultListConsumableItemRS {
   page: Page
   data?: ConsumableItemRS[]
+}
+
+export interface QuantityLogsRS {
+  typ: string
+  date: string
+  count: number
+  price: number
+  mall: string
+}
+
+export interface QuantityLogsRQ {
+  itemNo?: number
+  type?: string
+  year?: number
+  month?: number
+  orderBy?: 'DATE' | 'COUNT' | 'PRICE' | 'NULL'
+  /**
+   * +(오름차순), -(내림차순)
+   * @default "+"
+   * @pattern ^[+-]?$
+   */
+  sort: '+' | '-' | null
+  /**
+   * @format int32
+   * @default 1
+   */
+  page?: number
+  /**
+   * @format int32
+   * @default 10
+   */
+  size?: number
 }
 
 import axios, { AxiosInstance, AxiosRequestConfig, HeadersDefaults, ResponseType } from 'axios'
@@ -1095,6 +1127,37 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       this.request<ResultVoid, ErrorResult>({
         path: `/auth/logout`,
         method: 'GET',
+        ...params,
+      }),
+  }
+  quantity = {
+    /**
+     * No description
+     *
+     * @tags quantity-log-controller
+     * @name QuantityLog
+     * @summary 구매, 사용 기록 목록 조회
+     * @request GET:/quantity-logs
+     */
+    quantityLog: (query: QuantityLogsRQ, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/quantity-logs`,
+        method: 'GET',
+        query: query,
+        ...params,
+      }),
+    /**
+     * No description
+     *
+     * @tags quantity-log-controller
+     * @name DeleteQuantityLog
+     * @summary 구매, 사용 기록 제거
+     * @request DELETE:/quantity-logs/{quantityLogNo}
+     */
+    deleteLog: (quantityLogNo: number, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/quantity-logs/${quantityLogNo}`,
+        method: 'DELETE',
         ...params,
       }),
   }
