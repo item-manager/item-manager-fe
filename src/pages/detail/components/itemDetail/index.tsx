@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashCan, faLeftLong } from '@fortawesome/free-solid-svg-icons'
-import { Button, Tag, Image } from 'antd'
+import { Button, Tag, Image, Modal, message } from 'antd'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { httpClient } from '@/apis'
@@ -12,18 +12,45 @@ import ItemEditModal from './modal/itemEditModal'
 import useModal from '@/hooks/useModal'
 import { v4 as uuidv4 } from 'uuid'
 import { NavigationUtil } from '@/utils'
+import PurchaseModal from '@/components/modals/PurchaseModal'
+import ItemUseModal from '@/components/modals/ItemUseModal'
 
 const ItemDetail = () => {
   const { itemNo }: CreateItemRS = useParams()
   const navigate = useNavigate()
-  const { data: itemDetail } = useQuery(['itemDetail'], () =>
-    httpClient.items.getItem(Number(itemNo))
-  )
+  const { data: itemDetail } = useQuery(['items'], () => httpClient.items.getItem(Number(itemNo)))
 
-  const { visible, showModal, hideModal } = useModal()
+  const {
+    visible,
+    showModal,
+    hideModal,
+    isEdit,
+    showEditModal,
+    hideEditModal,
+    isItemUse,
+    showItemUseModal,
+    hideItemUseModal,
+  } = useModal()
+  const [modal, contextHolder] = Modal.useModal()
 
   const onClickMovePrev = () => {
     navigate(NavigationUtil.items)
+  }
+
+  const onClickDeleteItem = () => {
+    modal.confirm({
+      title: '물품 삭제',
+      content: (
+        <>
+          해당 물품(<b>{itemDetail?.data?.name}</b>)을 삭제하시겠습니까?
+        </>
+      ),
+      onOk: async () => {
+        await httpClient.items.deleteItem(Number(itemNo))
+        message.success('삭제되었습니다.')
+        navigate(NavigationUtil.items)
+      },
+    })
   }
 
   return (
@@ -34,12 +61,16 @@ const ItemDetail = () => {
           className='ml-10 text-4xl hover:cursor-pointer'
           onClick={onClickMovePrev}
         />
-        <Button type='primary' className='ml-auto mr-10' onClick={showModal}>
+        <Button type='primary' className='ml-auto mr-10' onClick={showEditModal}>
           정보 수정
         </Button>
-        <FontAwesomeIcon icon={faTrashCan} className='h-6 mr-10 hover:cursor-pointer' />
+        <FontAwesomeIcon
+          icon={faTrashCan}
+          className='h-6 mr-10 hover:cursor-pointer'
+          onClick={onClickDeleteItem}
+        />
       </div>
-      {visible && <ItemEditModal hideModal={hideModal} itemDetail={itemDetail?.data} />}
+      {isEdit && <ItemEditModal hideModal={hideEditModal} itemDetail={itemDetail?.data} />}
       <h1 className='flex items-center justify-center w-6/12 p-4 text-4xl text-center'>
         <div className='mr-4 w-11'>
           <PriorityProgressBar priority={itemDetail?.data?.priority} strokeWidth={4} />
@@ -106,15 +137,18 @@ const ItemDetail = () => {
             </div>
           </div>
           <div className='flex items-center justify-center mt-6 w-530'>
-            <Button type='primary' className='h-10 text-base w-14 mr-9'>
+            <Button type='primary' className='h-10 text-base w-14 mr-9' onClick={showModal}>
               구매
             </Button>
-            <Button type='primary' className='h-10 text-base w-14'>
+            <Button type='primary' className='h-10 text-base w-14' onClick={showItemUseModal}>
               사용
             </Button>
           </div>
         </div>
       </section>
+      {visible && <PurchaseModal itemNo={itemNo!} hideModal={hideModal} />}
+      {isItemUse && <ItemUseModal itemNo={itemNo!} hideModal={hideItemUseModal} />}
+      {contextHolder}
     </>
   )
 }

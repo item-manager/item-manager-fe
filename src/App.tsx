@@ -15,6 +15,8 @@ import SessionInvalidModal from './components/modals/SessionInvalidModal'
 import useModal from './hooks/useModal'
 import './index.css'
 
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
 const isAxiosUnauthorizedError = (error: AxiosError) => error.response?.status === 401
 
 function App() {
@@ -48,6 +50,7 @@ function App() {
     <RecoilRoot>
       <RecoilURLSyncJSON location={{ part: 'queryParams' }}>
         <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen={false} position={'bottom-right'} />
           <ConfigProvider
             locale={koKR}
             theme={{

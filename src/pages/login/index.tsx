@@ -39,6 +39,7 @@ const LoginPage = () => {
   const onClickLogin = async () => {
     const { id, password } = inputs
     if (!id || !password) return alert('정보를 입력해 주세요')
+
     mutate(
       { ...inputs },
       {
@@ -55,23 +56,8 @@ const LoginPage = () => {
   }
 
   const onPressEnterLogin = async (event: KeyboardEvent<HTMLInputElement>) => {
-    const { id } = inputs
-    if (!id) {
-      return alert('정보를 입력해 주세요')
-    } else if (event.key === 'Enter') {
-      mutate(
-        { ...inputs },
-        {
-          onSuccess: (response) => {
-            setUser(response.data)
-            queryClient.clear()
-            NavigationUtil.items
-          },
-          onError: (error) => {
-            if (error instanceof Error) console.log('error login:', error.message)
-          },
-        }
-      )
+    if (event.key === 'Enter') {
+      onClickLogin()
     }
   }
 

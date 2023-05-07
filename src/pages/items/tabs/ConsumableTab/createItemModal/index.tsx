@@ -34,7 +34,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
   const [inputs, setInputs] = useState({
     name: '',
     description: '',
-    type: '',
+    type: 'CONSUMABLE',
   })
 
   const { data: roomsList } = useQuery({
@@ -54,8 +54,6 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
 
   const handleTypeChange = (value: string) => {
     const { name, description } = inputs
-
-    console.log('value:', value)
 
     setInputs({
       name,
@@ -186,7 +184,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
               )}
             </div>
             <div className='w-2/4'>
-              <div className='mt-8 ml-2'>
+              <div className='mt-8 ml-6'>
                 <Row className='items-center'>
                   <Col span={2}>
                     <Form.Item name='priority' labelCol={{ span: 0 }}>
@@ -203,7 +201,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                       <Input
                         size='middle'
                         placeholder='물품명 입력'
-                        className='h-12 ml-4 border-none'
+                        className='w-[282px] h-12 border-none'
                         allowClear
                         name='name'
                         onChange={onChangeInputs}
@@ -212,19 +210,22 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   </Col>
                 </Row>
               </div>
-              <Form.Item label='분류' name='type'>
-                <Select
-                  className='w-48 ml-6'
-                  onChange={handleTypeChange}
-                  options={[
-                    { value: 'CONSUMABLE', label: '소모품' },
-                    { value: 'EQUIPMENT', label: '비품' },
-                  ]}
-                />
-              </Form.Item>
+
+              <div className='ml-6'>
+                <Form.Item label='분류' name='type' colon={false} labelCol={{ span: 2 }}>
+                  <Select
+                    onChange={handleTypeChange}
+                    defaultValue={'소모품'}
+                    options={[
+                      { value: 'CONSUMABLE', label: '소모품' },
+                      { value: 'EQUIPMENT', label: '비품' },
+                    ]}
+                  />
+                </Form.Item>
+              </div>
 
               <div className='flex'>
-                <Form.Item label='보관장소' name='roomNo' className='w-48'>
+                <Form.Item label='보관장소' name='roomNo' className='w-48' colon={false}>
                   <Select onChange={onChangeRoomsList} className='w-28'>
                     {roomsList?.data?.map((el: RoomsRS) => (
                       <Select.Option key={el.roomNo} value={el.roomNo}>
@@ -234,7 +235,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   </Select>
                 </Form.Item>
 
-                <Form.Item label='위치' name='placesNo' className='w-48'>
+                <Form.Item label='위치' name='placesNo' className='w-48 ml-1' colon={false}>
                   <Select className='w-28' onChange={onChangePlaceNo}>
                     {roomValue?.data?.map((el: PlacesRS) => (
                       <Select.Option key={el.placeNo} value={el.placeNo}>
@@ -245,20 +246,22 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                 </Form.Item>
               </div>
 
-              <Form.Item label='상세위치' name='locationMemo'>
+              <Form.Item label='상세위치' name='locationMemo' colon={false}>
                 <TextArea
                   placeholder='물품명으로 검색'
                   rows={4}
-                  className='h-20 w-62'
+                  className='w-[285px] h-12'
                   allowClear
                   name='description'
                   onChange={onChangeInputs}
                 />
               </Form.Item>
 
-              <Form.Item label='라벨' name='labels'>
-                <Label className='ml-6 w-52' />
-              </Form.Item>
+              <div className='ml-6'>
+                <Form.Item label='라벨' name='labels' colon={false} labelCol={{ span: 0 }}>
+                  <Label />
+                </Form.Item>
+              </div>
 
               <div className='flex items-center justify-evenly'>
                 <Button className='w-32 text-white h-11 bg-main' onClick={onClickSave}>
