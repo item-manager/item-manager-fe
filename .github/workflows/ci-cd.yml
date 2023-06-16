@@ -39,7 +39,7 @@ jobs:
 
   ## discord
   action-discord:
-    needs: CI-CD
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Discord notification
