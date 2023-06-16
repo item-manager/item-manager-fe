@@ -24,7 +24,6 @@ jobs:
           tags: youngjins/item-manager-fe:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/arm64/v8
       - name: run script ssh
         uses: appleboy/ssh-action@master
         with:
