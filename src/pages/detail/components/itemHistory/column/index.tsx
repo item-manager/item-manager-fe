@@ -1,3 +1,9 @@
+import { ConsumableItemRS, httpClient } from '@/apis'
+import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
+import { useQueryClient } from '@tanstack/react-query'
+import { Button, Modal, message, Tooltip } from 'antd'
+import useModal from '@/hooks/useModal'
+
 export const PurchaseStatus = (status: string) => {
   switch (status) {
     case 'PURCHASE':
@@ -7,6 +13,22 @@ export const PurchaseStatus = (status: string) => {
     default:
       return ''
   }
+}
+
+const deleteItem = async (record: ConsumableItemRS) => {
+  Modal.confirm({
+    title: `물품 삭제`,
+    content: (
+      <>
+        해당 물품(<b>{record.name}</b>)을 삭제하시겠습니까?
+      </>
+    ),
+    onOk: async () => {
+      await httpClient.items.deleteItem(record.itemNo)
+      // queryClient.invalidateQueries({ queryKey: ['items'] })
+      message.success('삭제되었습니다.')
+    },
+  })
 }
 
 export const columns: any = [
@@ -59,5 +81,27 @@ export const columns: any = [
     render(value: string, record: { mall: string }) {
       return record.mall
     },
+  },
+  {
+    title: <EllipsisOutlined />,
+    key: '...',
+    align: 'center',
+    render(record: any) {
+      return (
+        <Tooltip title='삭제'>
+          <Button
+            type='text'
+            shape='circle'
+            icon={<DeleteFilled className='text-stone-500' />}
+            className='flex items-center justify-center py-0 mx-auto'
+            onClick={(e) => {
+              e.stopPropagation()
+              deleteItem(record)
+            }}
+          />
+        </Tooltip>
+      )
+    },
+    width: 70,
   },
 ]

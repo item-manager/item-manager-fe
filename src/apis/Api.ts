@@ -433,17 +433,18 @@ export interface ResultListConsumableItemRS {
 }
 
 export interface QuantityLogsRS {
-  typ: string
+  type: string
   date: string
   count: number
   price: number
   mall: string
+  quantityLogNo: number
 }
 
 export interface QuantityLogsRQ {
   itemNo?: number
   type?: string
-  year?: number
+  year?: number | null
   month?: number
   orderBy?: 'DATE' | 'COUNT' | 'PRICE' | 'NULL'
   /**
@@ -462,6 +463,12 @@ export interface QuantityLogsRQ {
    * @default 10
    */
   size?: number
+}
+
+export interface QuantityLogSumsRQ {
+  itemNo: number
+  type: string | null
+  year: number | null
 }
 
 import axios, { AxiosInstance, AxiosRequestConfig, HeadersDefaults, ResponseType } from 'axios'
@@ -1142,6 +1149,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     quantityLog: (query: QuantityLogsRQ, params: RequestParams = {}) =>
       this.request<ResultVoid, ErrorResult>({
         path: `/quantity-logs`,
+        method: 'GET',
+        query: query,
+        ...params,
+      }),
+    quantitySum: (query: QuantityLogSumsRQ, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/quantity-logs/sums`,
         method: 'GET',
         query: query,
         ...params,
