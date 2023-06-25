@@ -24,7 +24,7 @@ type Props = {
 const ItemUseModal = ({ itemNo, hideModal }: Props) => {
   const inputRef = useRef<InputRef | null>(null)
   const [confirmLoading, setConfirmLoading] = useState(false)
-  const [count, setCount] = useState<number | null>()
+  const [count, setCount] = useState<number | null>(1)
   const queryClient = useQueryClient()
   const [form] = Form.useForm<PurchaseItemRQ>()
 

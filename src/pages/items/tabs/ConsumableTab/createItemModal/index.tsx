@@ -147,7 +147,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
           autoComplete='off'
         >
           <div className='flex'>
-            <div className='flex items-center justify-center w-2/4'>
+            <div className='flex items-center justify-center w-2/4 hover:cursor-pointer'>
               {imageUrl ? (
                 <>
                   <img src={imageUrl} onClick={onClickImg} />

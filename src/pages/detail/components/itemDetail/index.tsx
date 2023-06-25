@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query'
 import { httpClient } from '@/apis'
 import { CreateItemRS } from '@/apis/Api'
 import { useNavigate } from 'react-router'
-import { PriorityProgressBar } from '@/components/progress'
 import { LabelRS } from '@/apis'
 import ItemEditModal from './modal/itemEditModal'
 import useModal from '@/hooks/useModal'
@@ -17,7 +16,9 @@ import ItemUseModal from '@/components/modals/ItemUseModal'
 
 const ItemDetail = () => {
   const { itemNo }: CreateItemRS = useParams()
+
   const navigate = useNavigate()
+
   const { data: itemDetail } = useQuery(['items'], () => httpClient.items.getItem(Number(itemNo)))
 
   const {
@@ -71,12 +72,6 @@ const ItemDetail = () => {
         />
       </div>
       {isEdit && <ItemEditModal hideModal={hideEditModal} itemDetail={itemDetail?.data} />}
-      <h1 className='flex items-center justify-center w-6/12 p-4 text-4xl text-center'>
-        <div className='mr-4 w-11'>
-          <PriorityProgressBar priority={itemDetail?.data?.priority} strokeWidth={4} />
-        </div>
-        {itemDetail?.data?.name}
-      </h1>
       <section className='flex h-full'>
         <div id='left-section' className='flex justify-center w-6/12'>
           <div className='w-300 h-332 flex align-center justify-center'>

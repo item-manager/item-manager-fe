@@ -7,7 +7,7 @@ import { Form, Select, FormProps } from 'antd'
 export default function FilterArea() {
   const [form] = useForm<{
     type: string
-    year: number
+    year: number | null
     month: number
     order: string
   }>()
@@ -33,14 +33,14 @@ export default function FilterArea() {
       '+' | '-'
     ]
 
-    let orderByType: 'DATE' | 'COUNT' | 'PRICE' | 'NULL', sort: '+' | '-'
+    let orderBy: 'DATE' | 'COUNT' | 'PRICE' | 'NULL', sort: '+' | '-'
 
     if (matchedValue) {
-      orderByType = matchedValue[1]
+      orderBy = matchedValue[1]
       sort = matchedValue[2]
     }
 
-    setQuantityLog((data: any) => ({ ...data, orderByType, sort, ...rest, page: 1 }))
+    setQuantityLog((data: any) => ({ ...data, ...rest, orderBy, sort, page: 1 }))
   }
 
   const handleSubmit: FormProps['onFinish'] = () => {
@@ -54,9 +54,7 @@ export default function FilterArea() {
         onValuesChange={handleValuesChange}
         initialValues={{
           ...quantityLog,
-          orderByType: quantityLog.orderBy
-            ? `${quantityLog.orderBy}${quantityLog.sort}`
-            : undefined,
+          order: quantityLog.orderBy ? `${quantityLog.orderBy}${quantityLog.sort}` : undefined,
         }}
         onFinish={handleSubmit}
       >
@@ -68,9 +66,9 @@ export default function FilterArea() {
                 style={{ width: 120 }}
                 placeholder='구매/사용'
                 options={[
+                  { value: null, label: '전체 보기' },
                   { value: 'purchase', label: '구매' },
                   { value: 'consume', label: '사용' },
-                  { value: null, label: '전체 보기' },
                 ]}
               />
             </Form.Item>
@@ -79,6 +77,7 @@ export default function FilterArea() {
                 style={{ width: 120, marginLeft: 20 }}
                 placeholder='년도'
                 options={[
+                  { value: null, label: '전체 보기' },
                   { value: 2023, label: '2023' },
                   { value: 2022, label: '2022' },
                   { value: 2021, label: '2021' },
@@ -100,7 +99,6 @@ export default function FilterArea() {
                   { value: 2005, label: '2005' },
                   { value: 2004, label: '2004' },
                   { value: 2003, label: '2003' },
-                  { value: null, label: '전체 보기' },
                 ]}
               />
             </Form.Item>
@@ -109,32 +107,34 @@ export default function FilterArea() {
                 style={{ width: 120, marginLeft: 20 }}
                 placeholder='월'
                 options={[
-                  { value: 12, label: '12월' },
-                  { value: 11, label: '11월' },
-                  { value: 10, label: '10월' },
-                  { value: 9, label: '9월' },
-                  { value: 8, label: '8월' },
-                  { value: 7, label: '7월' },
-                  { value: 6, label: '6월' },
-                  { value: 5, label: '5월' },
-                  { value: 4, label: '4월' },
-                  { value: 3, label: '3월' },
-                  { value: 2, label: '2월' },
-                  { value: 1, label: '1월' },
                   { value: null, label: '전체 보기' },
+                  { value: 1, label: '1월' },
+                  { value: 2, label: '2월' },
+                  { value: 3, label: '3월' },
+                  { value: 4, label: '4월' },
+                  { value: 5, label: '5월' },
+                  { value: 6, label: '6월' },
+                  { value: 7, label: '7월' },
+                  { value: 8, label: '8월' },
+                  { value: 9, label: '9월' },
+                  { value: 10, label: '10월' },
+                  { value: 11, label: '11월' },
+                  { value: 12, label: '12월' },
                 ]}
               />
             </Form.Item>
             <Form.Item name='order'>
-              <Select placeholder='가격' className='w-[120px] ml-5'>
-                <Select.Option value='PRICE+'>낮은 가격 순</Select.Option>
+              <Select placeholder='정렬' className='w-[120px] ml-5' allowClear>
+                <Select.Option value='DATE-'>최신 날짜</Select.Option>
+                <Select.Option value='DATE+'>오래된 날짜</Select.Option>
+                <Select.Option value='COUNT-'>많은 수량 순</Select.Option>
+                <Select.Option value='COUNT+'>적은 수량 순</Select.Option>
                 <Select.Option value='PRICE-'>높은 가격 순</Select.Option>
-                <Select.Option value={null}>전체 보기</Select.Option>
+                <Select.Option value='PRICE+'>낮은 가격 순</Select.Option>
               </Select>
             </Form.Item>
           </div>
         </section>
-        <button type='submit' className='hidden'></button>
       </Form>
     </>
   )
