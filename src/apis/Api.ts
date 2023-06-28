@@ -374,7 +374,7 @@ export interface EquipmentItemRS {
 }
 
 export interface ResultListEquipmentItemRS {
-  page: Page
+  page: PageRS
   data?: EquipmentItemRS[]
 }
 
@@ -416,7 +416,7 @@ export interface ConsumableItemRS {
   labels?: LabelRS[]
 }
 
-export interface Page {
+export interface PageRS {
   /** @format int32 */
   totalDataCnt: number
   /** @format int32 */
@@ -428,7 +428,7 @@ export interface Page {
 }
 
 export interface ResultListConsumableItemRS {
-  page: Page
+  page: PageRS
   data?: ConsumableItemRS[]
 }
 
