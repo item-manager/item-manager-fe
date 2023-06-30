@@ -1,13 +1,23 @@
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
+import { useEffect, useState } from 'react'
 
 interface ChartDataProps {
   allPurchase: number[]
   allConsume: number[]
   initialYear: string | null
+  initialType: string | null
 }
 
-export default function LineChart({ allPurchase, allConsume, initialYear }: ChartDataProps) {
+export default function LineChart({
+  allPurchase,
+  allConsume,
+  initialYear,
+  initialType,
+}: ChartDataProps) {
+  const [isPurchase, setIsPurchase] = useState(false)
+  const [isConsume, setIsConsume] = useState(false)
+
   const allYears = [
     2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018,
     2019, 2020, 2021, 2022, 2023,
@@ -61,14 +71,30 @@ export default function LineChart({ allPurchase, allConsume, initialYear }: Char
     series: [
       {
         name: '구매',
-        data: allPurchase,
+        data: isConsume ? [] : allPurchase,
       },
       {
         name: '사용',
-        data: allConsume,
+        data: isPurchase ? [] : allConsume,
       },
     ],
   }
+
+  useEffect(() => {
+    if (JSON.parse(initialType || 'null') === 'purchase') {
+      setIsPurchase(true)
+    } else {
+      setIsPurchase(false)
+    }
+  }, [initialType])
+
+  useEffect(() => {
+    if (JSON.parse(initialType || 'null') === 'consume') {
+      setIsConsume(true)
+    } else {
+      setIsConsume(false)
+    }
+  }, [initialType])
 
   return (
     <>
