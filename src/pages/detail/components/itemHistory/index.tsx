@@ -191,7 +191,12 @@ const ItemHistory = () => {
       <FilterArea />
       <section className='h-full flex'>
         <div id='left-section' className='w-6/12 flex justify-center'>
-          <LineChart allPurchase={allPurchase} allConsume={allConsume} initialYear={initialYear} />
+          <LineChart
+            allPurchase={allPurchase}
+            allConsume={allConsume}
+            initialYear={initialYear}
+            initialType={initialType}
+          />
         </div>
         <div id='right-section' className='w-6/12'>
           <BasicTable<QuantityLogsRS>

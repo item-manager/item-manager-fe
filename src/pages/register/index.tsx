@@ -1,10 +1,11 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEyeSlash, faUser, faEye, faIdCard } from '@fortawesome/free-solid-svg-icons'
 import { ChangeEvent, useState } from 'react'
-import { NavigationUtil, Schema } from '@/utils'
+import { NavigationUtil } from '@/utils'
 import { useRecoilState } from 'recoil'
 import { showPassword, showPasswordConfirm } from '@/store/atom'
 import { useNavigate } from 'react-router'
+import { httpClient } from '@/apis'
 
 const Register = () => {
   const navigate = useNavigate()
@@ -32,10 +33,26 @@ const Register = () => {
     setIsShowPass((prev) => !prev)
   }
 
-  const onClickRegister = () => {
+  const onClickRegister = async () => {
     const { id, username, password, passwordConfirm } = inputs
 
-    Schema({ ...inputs })
+    if (!/^\w{2,10}$/.test(id)) {
+      return alert('아이디는 영문, 최소 2글자 이상, 10글자 이하여야 합니다.')
+    } else if (!/^[ㄱ-ㅎ가-힣a-zA-Z\d`~!@#$%^&*()-_=+]{2,10}$/.test(username)) {
+      return alert('닉네임은 최소 2글자 이상, 10글자 이하여야 합니다.')
+    } else if (
+      !/^(?=\w*\d)(?=\w*[a-z])(?=\w*[A-Z])[a-zA-Z\d`~!@#$%^&*()-_=+]{6,20}$/.test(password)
+    ) {
+      return alert('비밀번호는 최소6자 이상, 대/소문자1자, 숫자1자 입력이 필수입니다.')
+    } else if (password !== passwordConfirm) {
+      return alert('비밀번호가 동일 해야 합니다.')
+    }
+
+    try {
+      await httpClient.users.createUser({ id, username, password, passwordConfirm })
+    } catch (error) {
+      if (error instanceof Error) console.log('register error:', error.message)
+    }
 
     if (
       (id.length > 2 || id.length < 10) &&
