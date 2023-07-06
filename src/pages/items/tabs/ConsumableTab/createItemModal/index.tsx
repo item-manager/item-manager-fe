@@ -1,6 +1,18 @@
 import { httpClient } from '@/apis'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button, Form, Modal, Input, Select, Row, Col, message, Image } from 'antd'
+import {
+  Button,
+  Form,
+  Modal,
+  Input,
+  Select,
+  Radio,
+  Row,
+  Col,
+  message,
+  Image,
+  RadioChangeEvent,
+} from 'antd'
 import { ChangeEvent, useCallback, useRef, useState } from 'react'
 import { RoomsRS, PlacesRS } from '@/apis'
 import { Label, selectedValuesState } from '@/components/label/Label'
@@ -52,13 +64,23 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
     setInputValue(Number(newValue))
   }
 
-  const handleTypeChange = (value: string) => {
+  // const handleTypeChange = (value: string) => {
+  //   const { name, description } = inputs
+
+  //   setInputs({
+  //     name,
+  //     description,
+  //     type: value,
+  //   })
+  // }
+
+  const handleTypeChange = (e: RadioChangeEvent) => {
     const { name, description } = inputs
 
     setInputs({
       name,
       description,
-      type: value,
+      type: e.target.value,
     })
   }
 
@@ -213,14 +235,18 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
 
               <div className='ml-6'>
                 <Form.Item label='분류' name='type' colon={false} labelCol={{ span: 2 }}>
-                  <Select
+                  {/* <Select
                     onChange={handleTypeChange}
                     defaultValue={'소모품'}
                     options={[
                       { value: 'CONSUMABLE', label: '소모품' },
                       { value: 'EQUIPMENT', label: '비품' },
                     ]}
-                  />
+                  /> */}
+                  <Radio.Group onChange={handleTypeChange} defaultValue={'CONSUMABLE'}>
+                    <Radio value={'CONSUMABLE'}>소모품</Radio>
+                    <Radio value={'EQUIPMENT'}>비품</Radio>
+                  </Radio.Group>
                 </Form.Item>
               </div>
 
