@@ -29,11 +29,11 @@ export default function FilterArea() {
 
     const matchedValue = order?.match(/(.+)([+-])/) as [
       never,
-      'DATE' | 'COUNT' | 'PRICE' | 'NULL',
+      'date' | 'count' | 'price' | 'null',
       '+' | '-'
     ]
 
-    let orderBy: 'DATE' | 'COUNT' | 'PRICE' | 'NULL', sort: '+' | '-'
+    let orderBy: 'date' | 'count' | 'price' | 'null', sort: '+' | '-'
 
     if (matchedValue) {
       orderBy = matchedValue[1]
@@ -66,7 +66,7 @@ export default function FilterArea() {
                 style={{ width: 120 }}
                 placeholder='구매/사용'
                 options={[
-                  { value: null, label: '전체 보기' },
+                  { value: null, label: '구매/사용' },
                   { value: 'purchase', label: '구매' },
                   { value: 'consume', label: '사용' },
                 ]}
@@ -77,7 +77,7 @@ export default function FilterArea() {
                 style={{ width: 120, marginLeft: 20 }}
                 placeholder='년도'
                 options={[
-                  { value: null, label: '전체 보기' },
+                  { value: null, label: '전체 년도' },
                   { value: 2023, label: '2023' },
                   { value: 2022, label: '2022' },
                   { value: 2021, label: '2021' },
@@ -107,7 +107,7 @@ export default function FilterArea() {
                 style={{ width: 120, marginLeft: 20 }}
                 placeholder='월'
                 options={[
-                  { value: null, label: '전체 보기' },
+                  { value: null, label: '전체 월' },
                   { value: 1, label: '1월' },
                   { value: 2, label: '2월' },
                   { value: 3, label: '3월' },

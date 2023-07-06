@@ -138,7 +138,7 @@ const ItemHistory = () => {
       },
     },
     {
-      title: '단위금액',
+      title: '금액',
       dataIndex: 'amount',
       key: 'amount',
       align: 'center',
