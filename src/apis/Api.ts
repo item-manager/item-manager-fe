@@ -615,6 +615,9 @@ export class HttpClient<SecurityDataType = unknown> {
         url: path,
       })
       .then((response) => response.data)
+      .catch((error) => {
+        throw error
+      })
   }
 }
 
