@@ -446,7 +446,7 @@ export interface QuantityLogsRQ {
   type?: string
   year?: number | null
   month?: number
-  orderBy?: 'DATE' | 'COUNT' | 'PRICE' | 'NULL'
+  orderBy?: 'date' | 'count' | 'price' | 'null'
   /**
    * +(오름차순), -(내림차순)
    * @default "+"
