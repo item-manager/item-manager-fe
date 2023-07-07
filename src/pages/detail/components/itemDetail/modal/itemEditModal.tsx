@@ -36,7 +36,7 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
 
   const [newDetail, setNewDetail] = useState({
     editItemName: '',
-    editLocationMemo: '',
+    editMemo: '',
     editPhoto: '',
     editLabels: [],
   })
@@ -78,14 +78,14 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
   const onFinish: FormProps['onFinish'] = async (values) => {
     const { labels } = values
 
-    const { editItemName, editLocationMemo } = newDetail
+    const { editItemName, editMemo } = newDetail
 
     try {
       await httpClient.items.patchItem(Number(itemNo), {
         name: editItemName || itemDetail?.name,
         type,
         locationNo: editLocatioNo || itemDetail?.locationNo,
-        locationMemo: editLocationMemo || itemDetail?.locationMemo,
+        memo: editMemo || itemDetail?.memo,
         photoName: '',
         priority: inputValue || itemDetail?.priority,
         labels: labels.map((label: string) => +label),
@@ -198,20 +198,20 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
                 <input hidden />
               </Form.Item>
 
-              <Form.Item label='상세위치' name='locationMemo' colon={false}>
+              <Form.Item label='라벨' name='labels' colon={false}>
+                <Label />
+              </Form.Item>
+
+              <Form.Item label='메모' name='memo' colon={false}>
                 <TextArea
-                  placeholder='물품명으로 검색'
-                  rows={4}
+                  placeholder='메모'
+                  rows={2}
                   allowClear
-                  name='editLocationMemo'
-                  defaultValue={itemDetail?.locationMemo}
+                  name='editMemo'
+                  defaultValue={itemDetail?.memo}
                   className='h-12'
                   onChange={onChangeItemDetail}
                 />
-              </Form.Item>
-
-              <Form.Item label='라벨' name='labels' colon={false}>
-                <Label />
               </Form.Item>
             </div>
           </div>

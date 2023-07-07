@@ -229,7 +229,7 @@ export interface UpdateItemRQ {
   type?: string
   /** @format int64 */
   locationNo?: number | string
-  locationMemo?: string
+  memo?: string
   /** @format binary */
   photo?: File
   photoName?: string
@@ -303,7 +303,7 @@ export interface ItemRS {
   type?: 'CONSUMABLE' | 'EQUIPMENT'
   room?: string
   place?: string
-  locationMemo?: string
+  memo?: string
   photoUrl?: string
   /** @format int32 */
   quantity?: number

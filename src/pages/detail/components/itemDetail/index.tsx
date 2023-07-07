@@ -91,32 +91,33 @@ const ItemDetail = () => {
         <div id='right-section' className='w-full max-w-screen-lg '>
           <div className='flex items-center w-full h-18 border-b-1 border-lightGray'>
             <div className='flex justify-center w-full text-base'>
-              <span className='inline-block w-24 text-center'>분류:</span>
+              <span className='inline-block w-24 text-center font-bold'>분류:</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.type}</span>
             </div>
             <div className='flex justify-center w-full text-base '>
-              <span className='inline-block w-24 text-center'>남은 수량:</span>
+              <span className='inline-block w-24 text-center font-bold'>남은 수량:</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.quantity}</span>
             </div>
           </div>
           <div className='flex items-center w-full h-18 border-b-1 border-lightGray'>
             <div className='flex justify-center w-full text-base '>
-              <span className='inline-block w-24 text-center'>보관장소:</span>
+              <span className='inline-block w-24 text-center font-bold'>보관장소:</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.room}</span>
             </div>
             <div className='flex justify-center w-full text-base '>
-              <span className='inline-block w-24 text-center'>위치:</span>
+              <span className='inline-block w-24 text-center font-bold'>위치:</span>
               <span className='inline-block w-6/12 text-center'>{itemDetail?.data?.place}</span>
             </div>
           </div>
 
           <div className='flex items-center w-full h-18 border-b-1 border-lightGray'>
             <div className='flex justify-center w-1/2 text-base'>
-              <span className='inline-block w-24 text-center'>라벨</span>
+              <span className='inline-block w-24 text-center font-bold'>라벨</span>
               <div className='flex w-1/2 md:inline-block '>
                 {itemDetail?.data?.labels?.map((label: LabelRS) => (
                   <span key={uuidv4()} className=''>
-                    <Tag color='default' className='px-3 py-1 ml-2 rounded-lg border-1'>
+                    {/* <Tag color='default' className='px-3 py-1 ml-2 rounded-lg border-1'> */}
+                    <Tag color='default' className='ml-1 border-1'>
                       {label.name}
                     </Tag>
                   </span>
@@ -127,17 +128,17 @@ const ItemDetail = () => {
 
           <div className='flex items-center w-full h-18 border-b-1 border-lightGray'>
             <div className='flex items-center justify-center w-1/2 text-base'>
-              <span className='inline-block w-24 text-center'>메모 :</span>
+              <span className='inline-block w-24 text-center font-bold'>메모 :</span>
               <span className='inline-block w-6/12 text-center truncate text-ellipsis'>
-                {itemDetail?.data?.locationMemo}
+                {itemDetail?.data?.memo}
               </span>
             </div>
           </div>
           <div className='flex items-center justify-center w-full mt-6'>
-            <Button type='primary' className='h-10 text-base w-14 mr-9' onClick={showModal}>
+            <Button type='primary' className='h-10 text-base w-16 mr-9' onClick={showModal}>
               구매
             </Button>
-            <Button type='primary' className='h-10 text-base w-14' onClick={showItemUseModal}>
+            <Button type='primary' className='h-10 text-base w-16' onClick={showItemUseModal}>
               사용
             </Button>
           </div>
