@@ -1,6 +1,18 @@
 import { httpClient } from '@/apis'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button, Form, Modal, Input, Select, Row, Col, message, Image } from 'antd'
+import {
+  Button,
+  Form,
+  Modal,
+  Input,
+  Select,
+  Radio,
+  Row,
+  Col,
+  message,
+  Image,
+  RadioChangeEvent,
+} from 'antd'
 import { ChangeEvent, useCallback, useRef, useState } from 'react'
 import { RoomsRS, PlacesRS } from '@/apis'
 import { Label, selectedValuesState } from '@/components/label/Label'
@@ -52,13 +64,23 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
     setInputValue(Number(newValue))
   }
 
-  const handleTypeChange = (value: string) => {
+  // const handleTypeChange = (value: string) => {
+  //   const { name, description } = inputs
+
+  //   setInputs({
+  //     name,
+  //     description,
+  //     type: value,
+  //   })
+  // }
+
+  const handleTypeChange = (e: RadioChangeEvent) => {
     const { name, description } = inputs
 
     setInputs({
       name,
       description,
-      type: value,
+      type: e.target.value,
     })
   }
 
@@ -142,17 +164,17 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
         <Form
           form={form}
           name='basic'
-          className='mt-3'
+          className='w-full mt-3 '
           wrapperCol={{ span: 18 }}
           autoComplete='off'
         >
-          <div className='flex'>
-            <div className='flex items-center justify-center w-2/4 hover:cursor-pointer'>
+          <div className='flex flex-col'>
+            <div className='flex items-center justify-center hover:cursor-pointer'>
               {imageUrl ? (
                 <>
                   <img src={imageUrl} onClick={onClickImg} />
                   <input
-                    className='w-300 h-332 hidden'
+                    className='hidden w-300 h-332'
                     type='file'
                     name='file'
                     ref={imgRef}
@@ -162,7 +184,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
               ) : (
                 <>
                   <div
-                    className='w-300 h-332 flex items-center justify-center'
+                    className='flex items-center justify-center w-300 h-332'
                     onClick={onClickImg}
                   >
                     <Image
@@ -174,7 +196,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                     />
                   </div>
                   <input
-                    className='w-300 h-332 hidden'
+                    className='hidden w-300 h-332'
                     type='file'
                     name='file'
                     ref={imgRef}
@@ -183,20 +205,20 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                 </>
               )}
             </div>
-            <div className='w-2/4'>
-              <div className='mt-8 ml-6'>
+            <div className='flex flex-col w-full '>
+              <div className='flex justify-center w-full mt-8 '>
                 <Row className='items-center'>
                   <Col span={2}>
                     <Form.Item name='priority' labelCol={{ span: 0 }}>
                       <PriorityProgressBar
                         priority={inputValue}
                         strokeWidth={4}
-                        className='cursor-pointer select-none'
+                        className='w-8 cursor-pointer select-none'
                         onChange={onChangePriority}
                       />
                     </Form.Item>
                   </Col>
-                  <Col className='flex-1'>
+                  <Col className='flex-1 ml-6'>
                     <Form.Item label='' name='name'>
                       <Input
                         size='middle'
@@ -211,22 +233,36 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                 </Row>
               </div>
 
-              <div className='ml-6'>
-                <Form.Item label='분류' name='type' colon={false} labelCol={{ span: 2 }}>
-                  <Select
+              <div className='flex justify-center w-full'>
+                <Form.Item
+                  label='분류'
+                  name='type'
+                  colon={false}
+                  labelCol={{ span: 2 }}
+                  className='w-1/2 '
+                >
+                  {/* <Select
                     onChange={handleTypeChange}
                     defaultValue={'소모품'}
                     options={[
                       { value: 'CONSUMABLE', label: '소모품' },
                       { value: 'EQUIPMENT', label: '비품' },
                     ]}
-                  />
+                  /> */}
+                  <Radio.Group
+                    onChange={handleTypeChange}
+                    defaultValue={'CONSUMABLE'}
+                    className='w-56'
+                  >
+                    <Radio value={'CONSUMABLE'}>소모품</Radio>
+                    <Radio value={'EQUIPMENT'}>비품</Radio>
+                  </Radio.Group>
                 </Form.Item>
               </div>
 
-              <div className='flex'>
-                <Form.Item label='보관장소' name='roomNo' className='w-48' colon={false}>
-                  <Select onChange={onChangeRoomsList} className='w-28'>
+              <div className='flex flex-col items-center w-full'>
+                <Form.Item label='보관장소' name='roomNo' className='w-1/2' colon={false}>
+                  <Select onChange={onChangeRoomsList} className='w-full'>
                     {roomsList?.data?.map((el: RoomsRS) => (
                       <Select.Option key={el.roomNo} value={el.roomNo}>
                         <div>{el.name}</div>
@@ -235,8 +271,8 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   </Select>
                 </Form.Item>
 
-                <Form.Item label='위치' name='placesNo' className='w-48 ml-1' colon={false}>
-                  <Select className='w-28' onChange={onChangePlaceNo}>
+                <Form.Item label='위치ㅤㅤ' name='placesNo' className='w-1/2 ' colon={false}>
+                  <Select className='w-full' onChange={onChangePlaceNo}>
                     {roomValue?.data?.map((el: PlacesRS) => (
                       <Select.Option key={el.placeNo} value={el.placeNo}>
                         <div>{el.name}</div>
@@ -245,29 +281,35 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   </Select>
                 </Form.Item>
               </div>
+              <div className='flex justify-center w-full'>
+                <Form.Item label='상세위치' name='locationMemo' colon={false} className='w-1/2'>
+                  <TextArea
+                    placeholder='물품명으로 검색'
+                    rows={4}
+                    className='w-full'
+                    allowClear
+                    name='description'
+                    onChange={onChangeInputs}
+                  />
+                </Form.Item>
+              </div>
 
-              <Form.Item label='상세위치' name='locationMemo' colon={false}>
-                <TextArea
-                  placeholder='물품명으로 검색'
-                  rows={4}
-                  className='w-[285px] h-12'
-                  allowClear
-                  name='description'
-                  onChange={onChangeInputs}
-                />
-              </Form.Item>
-
-              <div className='ml-6'>
-                <Form.Item label='라벨' name='labels' colon={false} labelCol={{ span: 0 }}>
+              <div className='flex justify-center w-full'>
+                <Form.Item
+                  label='라벨ㅤㅤ'
+                  name='labels'
+                  colon={false}
+                  labelCol={{ span: 0 }}
+                  className='w-1/2'
+                >
                   <Label />
                 </Form.Item>
               </div>
 
               <div className='flex items-center justify-evenly'>
-                <Button className='w-32 text-white h-11 bg-main' onClick={onClickSave}>
+                <Button className='w-5/12 text-white h-11 bg-main' onClick={onClickSave}>
                   저장
                 </Button>
-                <Button className='text-white w-44 h-11 bg-main'>저장 후 구매</Button>
               </div>
             </div>
           </div>
