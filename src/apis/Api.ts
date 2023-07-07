@@ -93,7 +93,7 @@ export interface CreateItemRQ {
   type: string
   /** @format int64 */
   locationNo: number
-  locationMemo?: string
+  memo?: string
   /** @format binary */
   photoName?: string
   /** @format int32 */
