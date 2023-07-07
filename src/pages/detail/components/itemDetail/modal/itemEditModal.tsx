@@ -1,7 +1,7 @@
 import { httpClient, PlacesRS, UpdatePlaceRQ } from '@/apis'
 import { Label } from '@/components/label/Label'
 import { useQuery } from '@tanstack/react-query'
-import { Button, Form, FormProps, Input, Modal, Select } from 'antd'
+import { Button, Form, FormProps, Input, Modal, Select, Radio, RadioChangeEvent } from 'antd'
 import { ChangeEvent, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
@@ -48,8 +48,12 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
     })
   }
 
-  const onChangeType = (value: string) => {
-    setType(value)
+  // const onChangeType = (value: string) => {
+  //   setType(value)
+  // }
+
+  const onChangeType = (e: RadioChangeEvent) => {
+    setType(e.target.value)
   }
 
   const onChangeRoomValue = async (value: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -93,8 +97,6 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
     hideModal()
   }
 
-  console.log(window.innerHeight)
-
   return (
     <>
       <Modal
@@ -105,7 +107,8 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
         okText={'수정'}
         cancelText={'닫기'}
         closable={false}
-        bodyStyle={window.innerWidth > 768 ? { height: 730 } : { height: 960 }}
+        // bodyStyle={window.innerWidth > 768 ? { height: 730 } : { height: 960 }}
+        bodyStyle={{ height: 700, overflowY: 'auto' }}
         centered={true}
       >
         <Form
@@ -120,9 +123,9 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
             labels,
           }}
         >
-          <h3 className='mb-4 text-xl text-center'>물품 정보 수정</h3>
-          <div className='flex flex-col w-full '>
-            <div className='flex items-center justify-center '>
+          {/* <h3 className='mb-4 text-xl text-center'>물품 정보 수정</h3> */}
+          <div className='flex flex-col w-full mt-5'>
+            <div className='flex items-center justify-center'>
               <img className='h-64 aspect-square' src={itemDetail?.photoUrl} />
             </div>
             <div className='mx-auto mt-4 w-9'>
@@ -156,14 +159,21 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
               </div>
 
               <Form.Item label='분류' name='type' colon={false}>
-                <Select
+                {/* <Select
                   defaultValue={itemDetail?.type}
                   options={[
                     { value: 'CONSUMABLE', label: '소모품' },
                     { value: 'EQUIPMENT', label: '비품' },
                   ]}
                   onChange={onChangeType}
-                />
+                /> */}
+                <Radio.Group
+                  onChange={onChangeType}
+                  defaultValue={itemDetail?.type === '소모품' ? 'CONSUMABLE' : 'EQUIPMENT'}
+                >
+                  <Radio value={'CONSUMABLE'}>소모품</Radio>
+                  <Radio value={'EQUIPMENT'}>비품</Radio>
+                </Radio.Group>
               </Form.Item>
 
               <Form.Item label='보관장소' name='roomNo' colon={false}>
