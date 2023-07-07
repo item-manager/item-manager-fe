@@ -171,6 +171,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
           className='w-full mt-3 '
           wrapperCol={{ span: 18 }}
           autoComplete='off'
+          onFinish={onClickSave}
         >
           {/* <div className='flex flex-row'> */}
           <div className='grid xl:grid-cols-2'>
