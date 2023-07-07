@@ -157,9 +157,13 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
         open={true}
         onOk={handleOk}
         onCancel={hideModal}
+        okText={'저장'}
+        cancelText={'닫기'}
         width={858}
+        // width={1000}
         closable={false}
-        footer={null}
+        bodyStyle={{ height: 370, overflowY: 'auto' }}
+        centered={true}
       >
         <Form
           form={form}
@@ -168,8 +172,10 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
           wrapperCol={{ span: 18 }}
           autoComplete='off'
         >
-          <div className='flex flex-col'>
-            <div className='flex items-center justify-center hover:cursor-pointer'>
+          {/* <div className='flex flex-row'> */}
+          <div className='grid xl:grid-cols-2'>
+            <div className='flex items-center justify-center hover:cursor-pointer w-full'>
+              {/* <div className='w-full'> */}
               {imageUrl ? (
                 <>
                   <img src={imageUrl} onClick={onClickImg} />
@@ -205,10 +211,11 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                 </>
               )}
             </div>
-            <div className='flex flex-col w-full '>
-              <div className='flex justify-center w-full mt-8 '>
-                <Row className='items-center'>
-                  <Col span={2}>
+            <div className='flex flex-col w-full items-center'>
+              {/* <div className='w-full'> */}
+              <div className='flex justify-center w-full mt-8'>
+                <Row className='items-center w-full'>
+                  <Col span={3} className=''>
                     <Form.Item name='priority' labelCol={{ span: 0 }}>
                       <PriorityProgressBar
                         priority={inputValue}
@@ -218,12 +225,13 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                       />
                     </Form.Item>
                   </Col>
-                  <Col className='flex-1 ml-6'>
-                    <Form.Item label='' name='name'>
+                  {/* <Col className='flex-1 ml-6'> */}
+                  <Col span={21} className='w-full'>
+                    <Form.Item name='name' className='w-full'>
                       <Input
-                        size='middle'
+                        // size='middle'
                         placeholder='물품명 입력'
-                        className='w-[282px] h-12 border-none'
+                        className='w-full h-12 border-none'
                         allowClear
                         name='name'
                         onChange={onChangeInputs}
@@ -233,13 +241,14 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                 </Row>
               </div>
 
-              <div className='flex justify-center w-full'>
+              {/* <div className='flex justify-center w-full'> */}
+              <div className='w-full'>
                 <Form.Item
-                  label='분류'
+                  label='분류ㅤㅤ'
                   name='type'
                   colon={false}
-                  labelCol={{ span: 2 }}
-                  className='w-1/2 '
+                  // labelCol={{ span: 3 }}
+                  className='w-full'
                 >
                   {/* <Select
                     onChange={handleTypeChange}
@@ -252,7 +261,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   <Radio.Group
                     onChange={handleTypeChange}
                     defaultValue={'CONSUMABLE'}
-                    className='w-56'
+                    // className='w-56'
                   >
                     <Radio value={'CONSUMABLE'}>소모품</Radio>
                     <Radio value={'EQUIPMENT'}>비품</Radio>
@@ -260,9 +269,9 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                 </Form.Item>
               </div>
 
-              <div className='flex flex-col items-center w-full'>
+              <div className='flex flex-row items-center w-full'>
                 <Form.Item label='보관장소' name='roomNo' className='w-1/2' colon={false}>
-                  <Select onChange={onChangeRoomsList} className='w-full'>
+                  <Select onChange={onChangeRoomsList} className='w-5/6'>
                     {roomsList?.data?.map((el: RoomsRS) => (
                       <Select.Option key={el.roomNo} value={el.roomNo}>
                         <div>{el.name}</div>
@@ -271,8 +280,8 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   </Select>
                 </Form.Item>
 
-                <Form.Item label='위치ㅤㅤ' name='placesNo' className='w-1/2 ' colon={false}>
-                  <Select className='w-full' onChange={onChangePlaceNo}>
+                <Form.Item label='위치' name='placesNo' className='w-1/2 ' colon={false}>
+                  <Select onChange={onChangePlaceNo} className='w-5/6'>
                     {roomValue?.data?.map((el: PlacesRS) => (
                       <Select.Option key={el.placeNo} value={el.placeNo}>
                         <div>{el.name}</div>
@@ -281,11 +290,26 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   </Select>
                 </Form.Item>
               </div>
+
               <div className='flex justify-center w-full'>
-                <Form.Item label='상세위치' name='locationMemo' colon={false} className='w-1/2'>
+                <Form.Item
+                  label='라벨ㅤㅤ'
+                  // label='라벨'
+                  name='labels'
+                  colon={false}
+                  // labelCol={{ span: 3 }}
+                  className='w-full'
+                >
+                  <Label />
+                </Form.Item>
+              </div>
+
+              {/* <div className='flex justify-center w-full'> */}
+              <div className='w-full'>
+                <Form.Item label='상세위치' name='locationMemo' colon={false} className='w-full'>
                   <TextArea
-                    placeholder='물품명으로 검색'
-                    rows={4}
+                    placeholder='메모'
+                    rows={2}
                     className='w-full'
                     allowClear
                     name='description'
@@ -293,26 +317,9 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   />
                 </Form.Item>
               </div>
-
-              <div className='flex justify-center w-full'>
-                <Form.Item
-                  label='라벨ㅤㅤ'
-                  name='labels'
-                  colon={false}
-                  labelCol={{ span: 0 }}
-                  className='w-1/2'
-                >
-                  <Label />
-                </Form.Item>
-              </div>
-
-              <div className='flex items-center justify-evenly'>
-                <Button className='w-5/12 text-white h-11 bg-main' onClick={onClickSave}>
-                  저장
-                </Button>
-              </div>
             </div>
           </div>
+          <Button htmlType='submit' hidden />
         </Form>
       </Modal>
     </>
