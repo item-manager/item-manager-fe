@@ -1,7 +1,7 @@
 import { httpClient, PlacesRS, UpdatePlaceRQ } from '@/apis'
 import { Label } from '@/components/label/Label'
 import { useQuery } from '@tanstack/react-query'
-import { Button, Form, FormProps, Input, Modal, Select, Radio, RadioChangeEvent } from 'antd'
+import { Button, Form, FormProps, Input, Modal, Select } from 'antd'
 import { ChangeEvent, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
@@ -48,12 +48,8 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
     })
   }
 
-  // const onChangeType = (value: string) => {
-  //   setType(value)
-  // }
-
-  const onChangeType = (e: RadioChangeEvent) => {
-    setType(e.target.value)
+  const onChangeType = (value: string) => {
+    setType(value)
   }
 
   const onChangeRoomValue = async (value: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -97,6 +93,8 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
     hideModal()
   }
 
+  console.log(window.innerHeight)
+
   return (
     <>
       <Modal
@@ -107,13 +105,13 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
         okText={'수정'}
         cancelText={'닫기'}
         closable={false}
-        bodyStyle={{ height: 460 }}
+        bodyStyle={window.innerWidth > 768 ? { height: 730 } : { height: 960 }}
         centered={true}
       >
         <Form
           form={form}
           name='basic'
-          className='mt-3'
+          className='w-full mt-3 '
           autoComplete='off'
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 18 }}
@@ -122,28 +120,28 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
             labels,
           }}
         >
-          <div className='mb-4 text-xl text-center'>물품 정보 수정</div>
-          <div className='flex'>
-            <div className='flex items-center justify-center w-2/4'>
-              <img className='w-300 h-332' src={itemDetail?.photoUrl} />
+          <h3 className='mb-4 text-xl text-center'>물품 정보 수정</h3>
+          <div className='flex flex-col w-full '>
+            <div className='flex items-center justify-center '>
+              <img className='h-64 aspect-square' src={itemDetail?.photoUrl} />
             </div>
-            <div className='w-2/4'>
-              <div className='mt-4'>
+            <div className='mx-auto mt-4 w-9'>
+              <PriorityProgressBar
+                priority={inputValue}
+                strokeWidth={4}
+                className='cursor-pointer select-none'
+                onChange={onChangePriority}
+              />
+            </div>
+            <div className=''>
+              <div className='w-full mt-4 '>
                 <Form.Item
                   label='물품명'
                   name='name'
                   colon={false}
-                  className='flex-grow flex items-center'
+                  className='items-center justify-center w-full'
                 >
-                  <div className='flex items-center'>
-                    <div className='w-8 mr-2'>
-                      <PriorityProgressBar
-                        priority={inputValue}
-                        strokeWidth={4}
-                        className='cursor-pointer select-none'
-                        onChange={onChangePriority}
-                      />
-                    </div>
+                  <div className='flex items-center w-full'>
                     <Input
                       size='middle'
                       placeholder='물품명 입력'
@@ -151,28 +149,21 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
                       name='editItemName'
                       defaultValue={itemDetail?.name}
                       onChange={onChangeItemDetail}
-                      className='w-80'
+                      className=''
                     />
                   </div>
                 </Form.Item>
               </div>
 
               <Form.Item label='분류' name='type' colon={false}>
-                {/* <Select
+                <Select
                   defaultValue={itemDetail?.type}
                   options={[
                     { value: 'CONSUMABLE', label: '소모품' },
                     { value: 'EQUIPMENT', label: '비품' },
                   ]}
                   onChange={onChangeType}
-                /> */}
-                <Radio.Group
-                  onChange={onChangeType}
-                  defaultValue={itemDetail?.type === '소모품' ? 'CONSUMABLE' : 'EQUIPMENT'}
-                >
-                  <Radio value={'CONSUMABLE'}>소모품</Radio>
-                  <Radio value={'EQUIPMENT'}>비품</Radio>
-                </Radio.Group>
+                />
               </Form.Item>
 
               <Form.Item label='보관장소' name='roomNo' colon={false}>
