@@ -125,12 +125,12 @@ export default function FilterArea() {
             </Form.Item>
             <Form.Item name='order'>
               <Select placeholder='정렬' className='w-[120px] ml-5' allowClear>
-                <Select.Option value='DATE-'>최신 날짜</Select.Option>
-                <Select.Option value='DATE+'>오래된 날짜</Select.Option>
-                <Select.Option value='COUNT-'>많은 수량 순</Select.Option>
-                <Select.Option value='COUNT+'>적은 수량 순</Select.Option>
-                <Select.Option value='PRICE-'>높은 가격 순</Select.Option>
-                <Select.Option value='PRICE+'>낮은 가격 순</Select.Option>
+                <Select.Option value='date-'>최신 날짜</Select.Option>
+                <Select.Option value='date+'>오래된 날짜</Select.Option>
+                <Select.Option value='count-'>많은 수량 순</Select.Option>
+                <Select.Option value='count+'>적은 수량 순</Select.Option>
+                <Select.Option value='price-'>높은 가격 순</Select.Option>
+                <Select.Option value='price+'>낮은 가격 순</Select.Option>
               </Select>
             </Form.Item>
           </div>

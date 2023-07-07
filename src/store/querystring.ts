@@ -43,7 +43,7 @@ export const orderByType = atom({
   default: null,
   effects: [
     urlSyncEffect({
-      refine: nullable(union(literal('DATE'), literal('COUNT'), literal('PRICE'), literal('NULL'))),
+      refine: nullable(union(literal('date'), literal('count'), literal('price'), literal('null'))),
       history: 'push',
     }),
   ],
