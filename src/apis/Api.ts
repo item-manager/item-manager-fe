@@ -436,6 +436,7 @@ export interface QuantityLogsRS {
   date: string
   count: number
   price: number
+  unitPrice: number
   mall: string
   quantityLogNo: number
 }
