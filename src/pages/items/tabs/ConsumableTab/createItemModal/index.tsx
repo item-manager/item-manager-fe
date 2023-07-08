@@ -18,6 +18,7 @@ import { RoomsRS, PlacesRS } from '@/apis'
 import { Label, selectedValuesState } from '@/components/label/Label'
 import { useRecoilState } from 'recoil'
 import { PriorityProgressBar } from '@/components/progress'
+import { AxiosError } from 'axios'
 
 type createItemProps = {
   hideModal: () => void
@@ -128,25 +129,26 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
   const onClickSave = async () => {
     const { name, description, type } = inputs
 
-    if (!name || !type || !placeNo) {
-      return message.error('물품 추가를 실패하셨습니다.')
-    }
+    // if (!name || !type || !placeNo) {
+    //   return message.error('물품 추가를 실패하셨습니다.')
+    // }
 
     try {
-      await mutateAsync({
+      const res = await httpClient.items.createItem({
         name,
         type,
         locationNo: placeNo,
-        locationMemo: description,
+        // locationMemo: description,
         photoName: filename,
         priority: inputValue,
         labels: selectedValues,
+        memo: description,
       })
       message.success('물품을 추가 하셨습니다.')
       queryClient.invalidateQueries({ queryKey: ['items'] })
       hideModal()
     } catch (error) {
-      if (error instanceof Error) console.log('error createItem:', error.message)
+      if (error instanceof AxiosError) console.log('error createItem:', error.response?.data)
     }
   }
 
@@ -160,7 +162,6 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
         okText={'저장'}
         cancelText={'닫기'}
         width={858}
-        // width={1000}
         closable={false}
         bodyStyle={{ height: 370, overflowY: 'auto' }}
         centered={true}
@@ -172,11 +173,15 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
           wrapperCol={{ span: 18 }}
           autoComplete='off'
           onFinish={onClickSave}
+          initialValues={{
+            type: 'CONSUMABLE',
+          }}
+          validateMessages={{
+            required: '입력이 필요합니다',
+          }}
         >
-          {/* <div className='flex flex-row'> */}
           <div className='grid xl:grid-cols-2'>
             <div className='flex items-center justify-center hover:cursor-pointer w-full'>
-              {/* <div className='w-full'> */}
               {imageUrl ? (
                 <>
                   <img src={imageUrl} onClick={onClickImg} />
@@ -228,9 +233,9 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   </Col>
                   {/* <Col className='flex-1 ml-6'> */}
                   <Col span={21} className='w-full'>
-                    <Form.Item name='name' className='w-full'>
+                    <Form.Item name='name' rules={[{ required: true }]} className='w-full'>
                       <Input
-                        // size='middle'
+                        size='middle'
                         placeholder='물품명 입력'
                         className='w-full h-12 border-none'
                         allowClear
@@ -259,11 +264,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                       { value: 'EQUIPMENT', label: '비품' },
                     ]}
                   /> */}
-                  <Radio.Group
-                    onChange={handleTypeChange}
-                    defaultValue={'CONSUMABLE'}
-                    // className='w-56'
-                  >
+                  <Radio.Group onChange={handleTypeChange}>
                     <Radio value={'CONSUMABLE'}>소모품</Radio>
                     <Radio value={'EQUIPMENT'}>비품</Radio>
                   </Radio.Group>
@@ -281,8 +282,14 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   </Select>
                 </Form.Item>
 
-                <Form.Item label='위치' name='placesNo' className='w-1/2 ' colon={false}>
-                  <Select onChange={onChangePlaceNo} className='w-5/6'>
+                <Form.Item
+                  label='위치'
+                  name='placesNo'
+                  rules={[{ required: true }]}
+                  className='w-1/2 '
+                  colon={false}
+                >
+                  <Select onChange={onChangePlaceNo} className='w-5/6' disabled={!roomValue}>
                     {roomValue?.data?.map((el: PlacesRS) => (
                       <Select.Option key={el.placeNo} value={el.placeNo}>
                         <div>{el.name}</div>
@@ -307,7 +314,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
 
               {/* <div className='flex justify-center w-full'> */}
               <div className='w-full'>
-                <Form.Item label='상세위치' name='locationMemo' colon={false} className='w-full'>
+                <Form.Item label='상세위치' name='memo' colon={false} className='w-full'>
                   <TextArea
                     placeholder='메모'
                     rows={2}

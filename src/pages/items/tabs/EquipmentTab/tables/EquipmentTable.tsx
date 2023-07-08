@@ -110,13 +110,6 @@ const EquipmentTable = () => {
       width: 200,
     },
     {
-      title: '상세 위치',
-      dataIndex: 'locationMemo',
-      key: 'locationMemo',
-      align: 'center',
-      width: 300,
-    },
-    {
       title: <EllipsisOutlined />,
       key: '...',
       align: 'center',
