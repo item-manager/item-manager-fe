@@ -55,7 +55,7 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
       await httpClient.items.purchaseItem(itemNo, {
         mall: values.mall.trim(),
         date: values.date.toISOString(),
-        unitPrice: values.unitPrice,
+        price: values.price,
         count: values.count,
       })
 
@@ -157,8 +157,8 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
             <Row className='mb-2'>
               <Col span={16}>
                 <Form.Item
-                  label='단위금액'
-                  name='unitPrice'
+                  label='금액'
+                  name='price'
                   labelCol={{ span: 9 }}
                   className='mb-3'
                   rules={[{ required: true, message: '${label}을 입력해 주세요.' }]}

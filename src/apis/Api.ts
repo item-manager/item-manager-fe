@@ -121,7 +121,7 @@ export interface PurchaseItemRQ {
    * @format int32
    * @min 0
    */
-  unitPrice?: number
+  price?: number
   /**
    * @format int32
    * @min 0
