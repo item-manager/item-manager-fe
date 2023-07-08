@@ -121,7 +121,7 @@ export interface PurchaseItemRQ {
    * @format int32
    * @min 0
    */
-  unitPrice?: number
+  price?: number
   /**
    * @format int32
    * @min 0
@@ -436,6 +436,7 @@ export interface QuantityLogsRS {
   date: string
   count: number
   price: number
+  unitPrice: number
   mall: string
   quantityLogNo: number
 }
