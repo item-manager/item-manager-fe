@@ -369,7 +369,6 @@ export interface EquipmentItemRS {
   name?: string
   roomName?: string
   placeName?: string
-  locationMemo?: string
   labels?: LabelRS[]
 }
 
