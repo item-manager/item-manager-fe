@@ -2,6 +2,7 @@ import { httpClient, PurchaseItemRQ } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  App,
   Button,
   Col,
   DatePicker,
@@ -53,7 +54,7 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
     try {
       // 신규 추가
       await httpClient.items.purchaseItem(itemNo, {
-        mall: values.mall.trim(),
+        mall: values.mall?.trim(),
         date: values.date.toISOString(),
         price: values.price,
         count: values.count,
@@ -123,21 +124,21 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
               unitPrice: 0,
             }}
             colon={false}
-            requiredMark='optional'
+            // requiredMark='optional'
           >
             <Form.Item
               label='구매처'
               name='mall'
               className='mb-3'
-              rules={[
-                { required: true, message: '${label}를 입력해 주세요.' },
-                { type: 'string', whitespace: true, message: '구매처를 입력해 주세요.' },
-                {
-                  validator: async (_rule, value) => {
-                    value?.trim()
-                  },
-                },
-              ]}
+              // rules={[
+              //   { required: true, message: '${label}를 입력해 주세요.' },
+              //   { type: 'string', whitespace: true, message: '구매처를 입력해 주세요.' },
+              //   {
+              //     validator: async (_rule, value) => {
+              //       value?.trim()
+              //     },
+              //   },
+              // ]}
             >
               <Input ref={inputRef} className='w-32' />
             </Form.Item>
@@ -161,7 +162,10 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
                   name='price'
                   labelCol={{ span: 9 }}
                   className='mb-3'
-                  rules={[{ required: true, message: '${label}을 입력해 주세요.' }]}
+                  rules={[
+                    { required: true, message: '${label}을 입력해 주세요.' },
+                    { type: 'number', min: 0, message: '0보다 큰 값을 입력해주세요' },
+                  ]}
                 >
                   <InputNumber<number>
                     className='w-32'
@@ -171,7 +175,7 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
                     parser={(value) => (value ? parseInt(value.replace(/\$\s?|(,*)/g, '')) : 0)}
                     controls={false}
                     // addonAfter={<>원</>}
-                    min={0}
+                    // min={0}
                   />
                 </Form.Item>
               </Col>
