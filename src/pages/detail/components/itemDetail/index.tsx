@@ -112,11 +112,10 @@ const ItemDetail = () => {
 
           <div className='flex items-center w-full h-18 border-b-1 border-lightGray'>
             <div className='flex justify-center w-1/2 text-base'>
-              <span className='inline-block w-24 text-center font-bold'>라벨</span>
-              <div className='flex w-1/2 md:inline-block '>
+              <span className='inline-block w-24 text-center font-bold'>라벨:</span>
+              <div className='w-6/12 flex items-center justify-center'>
                 {itemDetail?.data?.labels?.map((label: LabelRS) => (
                   <span key={uuidv4()} className=''>
-                    {/* <Tag color='default' className='px-3 py-1 ml-2 rounded-lg border-1'> */}
                     <Tag color='default' className='ml-1 border-1'>
                       {label.name}
                     </Tag>
@@ -127,13 +126,10 @@ const ItemDetail = () => {
           </div>
 
           <div className='flex items-center w-full h-18 border-b-1 border-lightGray'>
-            <div className='flex items-center justify-center w-1/2 text-base'>
-              <span className='inline-block w-24 text-center font-bold'>메모 :</span>
-              <span className='inline-block w-6/12 text-center truncate text-ellipsis'>
-                {itemDetail?.data?.memo}
-              </span>
-            </div>
+            <span className='inline-block ml-[5.5rem] w-24 text-center font-bold'>메모:</span>
+            <span className='inline-block w-full text-ellipsis'>{itemDetail?.data?.memo}</span>
           </div>
+
           <div className='flex items-center justify-center w-full mt-6'>
             <Button type='primary' className='h-10 text-base w-16 mr-9' onClick={showModal}>
               구매

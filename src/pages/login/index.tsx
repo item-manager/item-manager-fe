@@ -7,7 +7,9 @@ import { NavigationUtil } from '@/utils'
 import { useRecoilState } from 'recoil'
 import { showPassword } from '@/store/atom'
 import { userState } from '@/store/user'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
+import { message } from 'antd'
 
 const LoginPage = () => {
   const focusRef = useRef() as MutableRefObject<HTMLInputElement>
@@ -20,8 +22,6 @@ const LoginPage = () => {
     id: '',
     password: '',
   })
-
-  const { mutate } = useMutation(httpClient.auth.login)
 
   const [_user, setUser] = useRecoilState(userState)
 
@@ -40,19 +40,18 @@ const LoginPage = () => {
     const { id, password } = inputs
     if (!id || !password) return alert('정보를 입력해 주세요')
 
-    mutate(
-      { ...inputs },
-      {
-        onSuccess: (response) => {
-          setUser(response.data)
-          queryClient.clear()
-          NavigationUtil.items
-        },
-        onError: (error) => {
-          if (error instanceof Error) console.log('error login:', error.message)
-        },
+    try {
+      const response = await httpClient.auth.login({
+        ...inputs,
+      })
+      setUser(response.data)
+      queryClient.clear()
+      NavigationUtil.items
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        message.error(error.response?.data.message)
       }
-    )
+    }
   }
 
   const onPressEnterLogin = async (event: KeyboardEvent<HTMLInputElement>) => {
