@@ -1,5 +1,5 @@
-import { CreateItemRQ, ResultSaveImageRS, httpClient } from '@/apis'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CreateItemRQ, httpClient } from '@/apis'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Button,
   Form,
@@ -16,8 +16,7 @@ import {
 } from 'antd'
 import { ChangeEvent, useCallback, useRef, useState } from 'react'
 import { RoomsRS, PlacesRS } from '@/apis'
-import { Label, selectedValuesState } from '@/components/label/Label'
-import { useRecoilState } from 'recoil'
+import { Label } from '@/components/label/Label'
 import { PriorityProgressBar } from '@/components/progress'
 import { AxiosError } from 'axios'
 
@@ -26,8 +25,6 @@ type createItemProps = {
 }
 
 const CreateItemModal = ({ hideModal }: createItemProps) => {
-  // const [selectedValues] = useRecoilState(selectedValuesState)
-
   const queryClient = useQueryClient()
 
   const [form] = Form.useForm()
@@ -86,16 +83,6 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
   }
 
   const onClickSave = async (values: CreateItemRQ) => {
-    const { name, description, type } = inputs
-
-    if (!name) {
-      return message.error('물품명을 입력해주세요')
-    } else if (roomValue?.data.length < 0) {
-      return message.error('보관장소를 입력해주세요.')
-    } else if (placeNo === 0) {
-      return message.error('위치를 추가해주세요.')
-    }
-
     try {
       await httpClient.items.createItem({
         name: values.name,
@@ -295,7 +282,6 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
 
               <div className='flex justify-center w-full'>
                 <Form.Item
-                  // label='라벨ㅤㅤ'
                   label='라벨'
                   name='labels'
                   colon={false}
