@@ -3,6 +3,7 @@ import { PriorityProgressBar } from '@/components/progress'
 import { historyTab } from '@/store/history'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  App,
   Button,
   Col,
   DatePicker,
@@ -61,9 +62,9 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
     try {
       // 신규 추가
       await httpClient.items.purchaseItem(itemNo, {
-        mall: values.mall.trim(),
+        mall: values.mall?.trim(),
         date: values.date.toISOString(),
-        unitPrice: values.unitPrice,
+        price: values.price,
         count: values.count,
       })
 
@@ -133,7 +134,7 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
               unitPrice: 0,
             }}
             colon={false}
-            requiredMark='optional'
+            // requiredMark='optional'
           >
             <Form.Item
               label='구매일'
@@ -151,11 +152,14 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
             <Row className='mb-2'>
               <Col span={16}>
                 <Form.Item
-                  label='단위금액'
-                  name='unitPrice'
+                  label='금액'
+                  name='price'
                   labelCol={{ span: 9 }}
                   className='mb-3'
-                  rules={[{ required: true, message: '${label}을 입력해 주세요.' }]}
+                  rules={[
+                    { required: true, message: '${label}을 입력해 주세요.' },
+                    { type: 'number', min: 0, message: '0보다 큰 값을 입력해주세요' },
+                  ]}
                 >
                   <InputNumber<number>
                     className='w-32'
@@ -165,7 +169,7 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
                     parser={(value) => (value ? parseInt(value.replace(/\$\s?|(,*)/g, '')) : 0)}
                     controls={false}
                     // addonAfter={<>원</>}
-                    min={0}
+                    // min={0}
                   />
                 </Form.Item>
               </Col>

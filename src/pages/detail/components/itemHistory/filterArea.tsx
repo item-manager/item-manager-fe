@@ -29,11 +29,11 @@ export default function FilterArea() {
 
     const matchedValue = order?.match(/(.+)([+-])/) as [
       never,
-      'DATE' | 'COUNT' | 'PRICE' | 'NULL',
+      'date' | 'count' | 'price' | 'null',
       '+' | '-'
     ]
 
-    let orderBy: 'DATE' | 'COUNT' | 'PRICE' | 'NULL', sort: '+' | '-'
+    let orderBy: 'date' | 'count' | 'price' | 'null', sort: '+' | '-'
 
     if (matchedValue) {
       orderBy = matchedValue[1]
@@ -54,7 +54,7 @@ export default function FilterArea() {
         onValuesChange={handleValuesChange}
         initialValues={{
           ...quantityLog,
-          order: quantityLog.orderBy ? `${quantityLog.orderBy}${quantityLog.sort}` : undefined,
+          order: quantityLog.orderBy ? `${quantityLog.orderBy}${quantityLog.sort}` : 'date-',
         }}
         onFinish={handleSubmit}
       >
@@ -66,7 +66,7 @@ export default function FilterArea() {
                 style={{ width: 120 }}
                 placeholder='구매/사용'
                 options={[
-                  { value: null, label: '전체 보기' },
+                  { value: null, label: '구매/사용' },
                   { value: 'purchase', label: '구매' },
                   { value: 'consume', label: '사용' },
                 ]}
@@ -77,7 +77,7 @@ export default function FilterArea() {
                 style={{ width: 120, marginLeft: 20 }}
                 placeholder='년도'
                 options={[
-                  { value: null, label: '전체 보기' },
+                  { value: null, label: '전체 년도' },
                   { value: 2023, label: '2023' },
                   { value: 2022, label: '2022' },
                   { value: 2021, label: '2021' },
@@ -107,7 +107,7 @@ export default function FilterArea() {
                 style={{ width: 120, marginLeft: 20 }}
                 placeholder='월'
                 options={[
-                  { value: null, label: '전체 보기' },
+                  { value: null, label: '전체 월' },
                   { value: 1, label: '1월' },
                   { value: 2, label: '2월' },
                   { value: 3, label: '3월' },
@@ -125,12 +125,12 @@ export default function FilterArea() {
             </Form.Item>
             <Form.Item name='order'>
               <Select placeholder='정렬' className='w-[120px] ml-5' allowClear>
-                <Select.Option value='DATE-'>최신 날짜</Select.Option>
-                <Select.Option value='DATE+'>오래된 날짜</Select.Option>
-                <Select.Option value='COUNT-'>많은 수량 순</Select.Option>
-                <Select.Option value='COUNT+'>적은 수량 순</Select.Option>
-                <Select.Option value='PRICE-'>높은 가격 순</Select.Option>
-                <Select.Option value='PRICE+'>낮은 가격 순</Select.Option>
+                <Select.Option value='date-'>최신 날짜</Select.Option>
+                <Select.Option value='date+'>오래된 날짜</Select.Option>
+                <Select.Option value='count-'>많은 수량 순</Select.Option>
+                <Select.Option value='count+'>적은 수량 순</Select.Option>
+                <Select.Option value='price-'>높은 가격 순</Select.Option>
+                <Select.Option value='price+'>낮은 가격 순</Select.Option>
               </Select>
             </Form.Item>
           </div>

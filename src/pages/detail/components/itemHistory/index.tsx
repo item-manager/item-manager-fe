@@ -35,8 +35,10 @@ const ItemHistory = () => {
     type: quantityLog.type || undefined,
     year: quantityLog.year || null,
     month: quantityLog.month || undefined,
-    orderBy: quantityLog.orderBy || undefined,
-    sort: quantityLog.sort || null,
+    // orderBy: quantityLog.orderBy || undefined,
+    // sort: quantityLog.sort || null,
+    orderBy: quantityLog.orderBy || 'date',
+    sort: quantityLog.sort || '-',
     page: quantityLog.page,
     size: quantityLog.size,
   }
@@ -108,11 +110,11 @@ const ItemHistory = () => {
 
   const columns: any = [
     {
-      title: '구매/사용',
+      title: '구분',
       dataIndex: 'status',
       key: 'status',
       align: 'center',
-      width: 200,
+      // width: 100,
       render(value: string, record: { type: string }) {
         return PurchaseStatus(record.type)
       },
@@ -122,7 +124,7 @@ const ItemHistory = () => {
       dataIndex: 'date',
       key: 'date',
       align: 'center',
-      width: 200,
+      width: 130,
       render(value: string) {
         return value.split('T')[0]
       },
@@ -139,10 +141,22 @@ const ItemHistory = () => {
     },
     {
       title: '단위금액',
+      dataIndex: 'unitPrice',
+      key: 'unitPrice',
+      align: 'center',
+      width: 100,
+      render(value: number, record: { unitPrice: number }) {
+        return record.unitPrice
+          ? record.unitPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+          : null
+      },
+    },
+    {
+      title: '금액',
       dataIndex: 'amount',
       key: 'amount',
       align: 'center',
-      width: 200,
+      width: 100,
       render(value: number, record: { price: number }) {
         return record.price ? record.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : null
       },
@@ -152,7 +166,7 @@ const ItemHistory = () => {
       dataIndex: 'buyer',
       key: 'buyer',
       align: 'center',
-      width: 200,
+      // width: 200,
       render(value: string, record: { mall: string }) {
         return record.mall
       },
@@ -177,7 +191,7 @@ const ItemHistory = () => {
           </Tooltip>
         )
       },
-      width: 70,
+      // width: 70,
     },
   ]
 

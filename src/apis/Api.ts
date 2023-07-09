@@ -93,9 +93,11 @@ export interface CreateItemRQ {
   type: string
   /** @format int64 */
   locationNo: number
-  locationMemo?: string
+  memo?: string
   /** @format binary */
   photoName?: string
+  /** @format int32 */
+  quantity?: number
   /** @format int32 */
   priority?: number
   labels: string[]
@@ -121,7 +123,7 @@ export interface PurchaseItemRQ {
    * @format int32
    * @min 0
    */
-  unitPrice?: number
+  price?: number
   /**
    * @format int32
    * @min 0
@@ -229,7 +231,7 @@ export interface UpdateItemRQ {
   type?: string
   /** @format int64 */
   locationNo?: number | string
-  locationMemo?: string
+  memo?: string
   /** @format binary */
   photo?: File
   photoName?: string
@@ -303,7 +305,7 @@ export interface ItemRS {
   type?: 'CONSUMABLE' | 'EQUIPMENT'
   room?: string
   place?: string
-  locationMemo?: string
+  memo?: string
   photoUrl?: string
   /** @format int32 */
   quantity?: number
@@ -369,12 +371,11 @@ export interface EquipmentItemRS {
   name?: string
   roomName?: string
   placeName?: string
-  locationMemo?: string
   labels?: LabelRS[]
 }
 
 export interface ResultListEquipmentItemRS {
-  page: Page
+  page: PageRS
   data?: EquipmentItemRS[]
 }
 
@@ -416,7 +417,7 @@ export interface ConsumableItemRS {
   labels?: LabelRS[]
 }
 
-export interface Page {
+export interface PageRS {
   /** @format int32 */
   totalDataCnt: number
   /** @format int32 */
@@ -428,7 +429,7 @@ export interface Page {
 }
 
 export interface ResultListConsumableItemRS {
-  page: Page
+  page: PageRS
   data?: ConsumableItemRS[]
 }
 
@@ -437,6 +438,7 @@ export interface QuantityLogsRS {
   date: string
   count: number
   price: number
+  unitPrice: number
   mall: string
   quantityLogNo: number
 }
@@ -446,7 +448,7 @@ export interface QuantityLogsRQ {
   type?: string
   year?: number | null
   month?: number
-  orderBy?: 'DATE' | 'COUNT' | 'PRICE' | 'NULL'
+  orderBy?: 'date' | 'count' | 'price' | 'null'
   /**
    * +(오름차순), -(내림차순)
    * @default "+"
@@ -615,6 +617,9 @@ export class HttpClient<SecurityDataType = unknown> {
         url: path,
       })
       .then((response) => response.data)
+      .catch((error) => {
+        throw error
+      })
   }
 }
 
