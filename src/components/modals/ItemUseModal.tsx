@@ -1,5 +1,6 @@
 import { httpClient, PurchaseItemRQ } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
+import { historyTab } from '@/store/history'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Button,
@@ -16,6 +17,7 @@ import {
 } from 'antd'
 import dayjs from 'dayjs'
 import { useEffect, useRef, useState } from 'react'
+import { useRecoilState } from 'recoil'
 
 type Props = {
   itemNo: number
@@ -27,6 +29,8 @@ const ItemUseModal = ({ itemNo, hideModal }: Props) => {
   const [count, setCount] = useState<number | null>(1)
   const queryClient = useQueryClient()
   const [form] = Form.useForm<PurchaseItemRQ>()
+
+  const [_, setIsHistory] = useRecoilState(historyTab)
 
   const breakpoint = Grid.useBreakpoint()
 
@@ -64,8 +68,10 @@ const ItemUseModal = ({ itemNo, hideModal }: Props) => {
       hideModal()
       message.success(`${count} 사용하셨습니다`)
       queryClient.invalidateQueries({ queryKey: ['items'] })
+      setIsHistory(true)
     } catch (e) {
       console.error(e)
+      setIsHistory(false)
     } finally {
       setConfirmLoading(false)
     }

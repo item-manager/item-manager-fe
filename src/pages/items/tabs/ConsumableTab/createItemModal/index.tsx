@@ -23,6 +23,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
   const { TextArea } = Input
 
   const [roomValue, setRoomValue] = useState<any>()
+
   const queryClient = useQueryClient()
 
   const [imageUrl, setImageUrl] = useState<any>('')
@@ -106,8 +107,12 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
   const onClickSave = async () => {
     const { name, description, type } = inputs
 
-    if (!name || !type || !placeNo) {
-      return message.error('물품 추가를 실패하셨습니다.')
+    if (!name) {
+      return message.error('물품명을 입력해주세요')
+    } else if (roomValue?.data.length < 0) {
+      return message.error('보관장소를 입력해주세요.')
+    } else if (placeNo === 0) {
+      return message.error('위치를 추가해주세요.')
     }
 
     try {

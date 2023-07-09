@@ -1,5 +1,6 @@
 import { httpClient, PurchaseItemRQ } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
+import { historyTab } from '@/store/history'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Button,
@@ -17,6 +18,7 @@ import {
 } from 'antd'
 import dayjs from 'dayjs'
 import { useEffect, useRef, useState } from 'react'
+import { useRecoilState } from 'recoil'
 
 type Props = {
   itemNo: number
@@ -27,6 +29,8 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
   const [confirmLoading, setConfirmLoading] = useState(false)
   const queryClient = useQueryClient()
   const [form] = Form.useForm<PurchaseItemRQ>()
+
+  const [_, setIsHistory] = useRecoilState(historyTab)
 
   const breakpoint = Grid.useBreakpoint()
 
@@ -50,6 +54,10 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
   const onFinish = async (values: any) => {
     setConfirmLoading(true)
 
+    if (values.unitPrice <= 0) {
+      return message.error('단위금액을 써주세요.')
+    }
+
     try {
       // 신규 추가
       await httpClient.items.purchaseItem(itemNo, {
@@ -62,8 +70,10 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
       hideModal()
       message.success('저장되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['items'] })
+      setIsHistory(true)
     } catch (e) {
       console.error(e)
+      setIsHistory(false)
     } finally {
       setConfirmLoading(false)
     }
@@ -126,22 +136,6 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
             requiredMark='optional'
           >
             <Form.Item
-              label='구매처'
-              name='mall'
-              className='mb-3'
-              rules={[
-                { required: true, message: '${label}를 입력해 주세요.' },
-                { type: 'string', whitespace: true, message: '구매처를 입력해 주세요.' },
-                {
-                  validator: async (_rule, value) => {
-                    value?.trim()
-                  },
-                },
-              ]}
-            >
-              <Input ref={inputRef} className='w-32' />
-            </Form.Item>
-            <Form.Item
               label='구매일'
               name='date'
               className='mb-3'
@@ -195,6 +189,22 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
                 </Form.Item>
               </Col>
             </Row>
+            <Form.Item
+              label='구매처'
+              name='mall'
+              className='mb-3'
+              rules={[
+                { required: true, message: '${label}를 입력해 주세요.' },
+                { type: 'string', whitespace: true, message: '구매처를 입력해 주세요.' },
+                {
+                  validator: async (_rule, value) => {
+                    value?.trim()
+                  },
+                },
+              ]}
+            >
+              <Input ref={inputRef} className='w-32' />
+            </Form.Item>
             <Button htmlType='submit' block type='primary'>
               구매하기
             </Button>
