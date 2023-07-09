@@ -51,7 +51,7 @@ body {
 } */
 
 #root #self .ant-upload-list.ant-upload-list-picture-circle {
-  position: relative
+  position: relative;
 }
 
 #root #self .ant-upload.ant-upload-select {
@@ -59,4 +59,8 @@ body {
   left: 0;
   top: 0;
   z-index: 555;
+}
+
+.ant-form-item .ant-form-item-label > label.ant-form-item-required::before {
+  display: none !important;
 }

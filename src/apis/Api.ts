@@ -97,6 +97,8 @@ export interface CreateItemRQ {
   /** @format binary */
   photoName?: string
   /** @format int32 */
+  quantity?: number
+  /** @format int32 */
   priority?: number
   labels: string[]
 }

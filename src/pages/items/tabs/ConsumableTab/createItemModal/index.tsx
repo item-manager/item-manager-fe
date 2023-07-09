@@ -1,4 +1,4 @@
-import { httpClient } from '@/apis'
+import { CreateItemRQ, ResultSaveImageRS, httpClient } from '@/apis'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Button,
@@ -10,8 +10,9 @@ import {
   Row,
   Col,
   message,
-  Image,
   RadioChangeEvent,
+  InputNumber,
+  Image,
 } from 'antd'
 import { ChangeEvent, useCallback, useRef, useState } from 'react'
 import { RoomsRS, PlacesRS } from '@/apis'
@@ -25,82 +26,40 @@ type createItemProps = {
 }
 
 const CreateItemModal = ({ hideModal }: createItemProps) => {
-  const [selectedValues] = useRecoilState(selectedValuesState)
+  // const [selectedValues] = useRecoilState(selectedValuesState)
 
-  const [form] = Form.useForm()
-
-  const [inputValue, setInputValue] = useState(0)
-
-  const [placeNo, setPlaceNo] = useState(0)
-
-  const { TextArea } = Input
-
-  const [roomValue, setRoomValue] = useState<any>()
   const queryClient = useQueryClient()
 
+  const [form] = Form.useForm()
+  const { TextArea } = Input
+  const handleOk = () => {
+    form.submit()
+  }
+
+  const [priorityValue, setPriority] = useState(0)
+  const [roomValue, setRoomValue] = useState<any>()
+
   const [imageUrl, setImageUrl] = useState<any>('')
-
   const imgRef = useRef<HTMLInputElement>(null)
-
   const [filename, setFilename] = useState('')
-
-  const [inputs, setInputs] = useState({
-    name: '',
-    description: '',
-    type: 'CONSUMABLE',
-  })
 
   const { data: roomsList } = useQuery({
     queryKey: ['roomsList'],
     queryFn: async () => await httpClient.locations.allRooms(),
   })
 
-  const { mutateAsync } = useMutation(httpClient.items.createItem)
-
-  const handleOk = () => {
-    form.submit()
-  }
-
   const onChangePriority = (newValue: number | null): void => {
-    setInputValue(Number(newValue))
+    setPriority(Number(newValue))
+    form.setFieldValue('priority', Number(newValue))
   }
-
-  // const handleTypeChange = (value: string) => {
-  //   const { name, description } = inputs
-
-  //   setInputs({
-  //     name,
-  //     description,
-  //     type: value,
-  //   })
-  // }
-
-  const handleTypeChange = (e: RadioChangeEvent) => {
-    const { name, description } = inputs
-
-    setInputs({
-      name,
-      description,
-      type: e.target.value,
-    })
+  const onChangeType = (e: RadioChangeEvent) => {
+    form.setFieldValue('type', e.target.value)
   }
-
   const onChangeRoomsList = async (value: number | undefined) => {
     if (value) {
       const result = await httpClient.locations.getPlacesByRoomNo({ roomNo: value })
       setRoomValue(result)
     }
-  }
-
-  const onChangeInputs = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setInputs({
-      ...inputs,
-      [event.target.name]: event.target.value,
-    })
-  }
-
-  const onChangePlaceNo = (placeNo: number) => {
-    setPlaceNo(placeNo)
   }
 
   const onChangeFile = useCallback(
@@ -126,24 +85,21 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
     imgRef.current?.click()
   }
 
-  const onClickSave = async () => {
-    const { name, description, type } = inputs
-
-    // if (!name || !type || !placeNo) {
-    //   return message.error('물품 추가를 실패하셨습니다.')
-    // }
+  const onClickSave = async (values: CreateItemRQ) => {
+    console.log(values)
 
     try {
-      const res = await httpClient.items.createItem({
-        name,
-        type,
-        locationNo: placeNo,
-        // locationMemo: description,
+      await httpClient.items.createItem({
+        name: values.name,
+        type: values.type,
+        locationNo: values.locationNo,
         photoName: filename,
-        priority: inputValue,
-        labels: selectedValues,
-        memo: description,
+        quantity: values.quantity,
+        priority: values.priority,
+        labels: values.labels,
+        memo: values.memo,
       })
+
       message.success('물품을 추가 하셨습니다.')
       queryClient.invalidateQueries({ queryKey: ['items'] })
       hideModal()
@@ -163,7 +119,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
         cancelText={'닫기'}
         width={858}
         closable={false}
-        bodyStyle={{ height: 370, overflowY: 'auto' }}
+        bodyStyle={{ height: 420, overflowY: 'auto' }}
         centered={true}
       >
         <Form
@@ -175,13 +131,15 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
           onFinish={onClickSave}
           initialValues={{
             type: 'CONSUMABLE',
+            quantity: 0,
           }}
           validateMessages={{
             required: '입력이 필요합니다',
           }}
         >
-          <div className='grid xl:grid-cols-2'>
-            <div className='flex items-center justify-center hover:cursor-pointer w-full'>
+          <div className='grid md:grid-cols-2'>
+            {/* <div className='flex items-center justify-center hover:cursor-pointer w-full'> */}
+            <div className='flex flex-col justify-center'>
               {imageUrl ? (
                 <>
                   <img src={imageUrl} onClick={onClickImg} />
@@ -219,12 +177,15 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
             </div>
             <div className='flex flex-col w-full items-center'>
               {/* <div className='w-full'> */}
+              <Form.Item hidden name='priority'>
+                <InputNumber />
+              </Form.Item>
               <div className='flex justify-center w-full mt-8'>
-                <Row className='items-center w-full'>
-                  <Col span={3} className=''>
-                    <Form.Item name='priority' labelCol={{ span: 0 }}>
+                <Row className='flex items-center w-full'>
+                  <Col className='w-1/6'>
+                    <Form.Item>
                       <PriorityProgressBar
-                        priority={inputValue}
+                        priority={priorityValue}
                         strokeWidth={4}
                         className='w-8 cursor-pointer select-none'
                         onChange={onChangePriority}
@@ -232,15 +193,14 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                     </Form.Item>
                   </Col>
                   {/* <Col className='flex-1 ml-6'> */}
-                  <Col span={21} className='w-full'>
+                  <Col className='flex w-5/6'>
                     <Form.Item name='name' rules={[{ required: true }]} className='w-full'>
                       <Input
-                        size='middle'
+                        // size='middle'
                         placeholder='물품명 입력'
                         className='w-full h-12 border-none'
                         allowClear
                         name='name'
-                        onChange={onChangeInputs}
                       />
                     </Form.Item>
                   </Col>
@@ -248,31 +208,56 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
               </div>
 
               {/* <div className='flex justify-center w-full'> */}
-              <div className='w-full'>
+              <div className='flex flex-row w-full'>
                 <Form.Item
-                  label='분류ㅤㅤ'
+                  // label='분류ㅤㅤ'
+                  label='분류'
                   name='type'
                   colon={false}
-                  // labelCol={{ span: 3 }}
                   className='w-full'
+                  labelCol={{ span: 4 }}
+                  labelAlign='left'
                 >
-                  {/* <Select
-                    onChange={handleTypeChange}
-                    defaultValue={'소모품'}
-                    options={[
-                      { value: 'CONSUMABLE', label: '소모품' },
-                      { value: 'EQUIPMENT', label: '비품' },
-                    ]}
-                  /> */}
-                  <Radio.Group onChange={handleTypeChange}>
+                  <Radio.Group onChange={onChangeType}>
                     <Radio value={'CONSUMABLE'}>소모품</Radio>
                     <Radio value={'EQUIPMENT'}>비품</Radio>
                   </Radio.Group>
                 </Form.Item>
               </div>
 
-              <div className='flex flex-row items-center w-full'>
-                <Form.Item label='보관장소' name='roomNo' className='w-1/2' colon={false}>
+              <div className='flex flex-row w-full'>
+                <Form.Item
+                  label='수량'
+                  name='quantity'
+                  colon={false}
+                  className='w-1/2'
+                  labelCol={{ span: 8 }}
+                  labelAlign='left'
+                  rules={[
+                    { required: true, message: '${label}을 입력해 주세요.' },
+                    { type: 'number', min: 0, message: '0보다 큰 값을 입력해주세요' },
+                  ]}
+                >
+                  <InputNumber<number>
+                    className='w-5/6'
+                    formatter={(value) =>
+                      value ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : ''
+                    }
+                    parser={(value) => (value ? parseInt(value.replace(/\$\s?|(,*)/g, '')) : 0)}
+                    max={999}
+                  />
+                </Form.Item>
+              </div>
+
+              <div className='flex flex-row grid-cols-2 items-center w-full'>
+                <Form.Item
+                  label='보관장소'
+                  name='roomNo'
+                  className='w-1/2'
+                  colon={false}
+                  labelCol={{ span: 8 }}
+                  labelAlign='left'
+                >
                   <Select onChange={onChangeRoomsList} className='w-5/6'>
                     {roomsList?.data?.map((el: RoomsRS) => (
                       <Select.Option key={el.roomNo} value={el.roomNo}>
@@ -284,12 +269,14 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
 
                 <Form.Item
                   label='위치'
-                  name='placesNo'
+                  name='locationNo'
                   rules={[{ required: true }]}
-                  className='w-1/2 '
+                  className='w-1/2'
                   colon={false}
+                  labelCol={{ span: 4 }}
+                  labelAlign='left'
                 >
-                  <Select onChange={onChangePlaceNo} className='w-5/6' disabled={!roomValue}>
+                  <Select className='w-5/6' disabled={!roomValue}>
                     {roomValue?.data?.map((el: PlacesRS) => (
                       <Select.Option key={el.placeNo} value={el.placeNo}>
                         <div>{el.name}</div>
@@ -301,28 +288,28 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
 
               <div className='flex justify-center w-full'>
                 <Form.Item
-                  label='라벨ㅤㅤ'
-                  // label='라벨'
+                  // label='라벨ㅤㅤ'
+                  label='라벨'
                   name='labels'
                   colon={false}
-                  // labelCol={{ span: 3 }}
                   className='w-full'
+                  labelCol={{ span: 4 }}
+                  labelAlign='left'
                 >
                   <Label />
                 </Form.Item>
               </div>
 
-              {/* <div className='flex justify-center w-full'> */}
               <div className='w-full'>
-                <Form.Item label='상세위치' name='memo' colon={false} className='w-full'>
-                  <TextArea
-                    placeholder='메모'
-                    rows={2}
-                    className='w-full'
-                    allowClear
-                    name='description'
-                    onChange={onChangeInputs}
-                  />
+                <Form.Item
+                  label='상세위치'
+                  name='memo'
+                  colon={false}
+                  className='w-full'
+                  labelCol={{ span: 4 }}
+                  labelAlign='left'
+                >
+                  <TextArea placeholder='메모' rows={2} className='w-full' allowClear />
                 </Form.Item>
               </div>
             </div>
