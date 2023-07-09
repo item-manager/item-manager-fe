@@ -138,8 +138,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
           }}
         >
           <div className='grid md:grid-cols-2'>
-            {/* <div className='flex items-center justify-center hover:cursor-pointer w-full'> */}
-            <div className='flex flex-col justify-center'>
+            <div className='flex items-center justify-center hover:cursor-pointer w-full'>
               {imageUrl ? (
                 <>
                   <img src={imageUrl} onClick={onClickImg} />
