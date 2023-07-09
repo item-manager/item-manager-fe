@@ -86,7 +86,15 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
   }
 
   const onClickSave = async (values: CreateItemRQ) => {
-    console.log(values)
+    const { name, description, type } = inputs
+
+    if (!name) {
+      return message.error('물품명을 입력해주세요')
+    } else if (roomValue?.data.length < 0) {
+      return message.error('보관장소를 입력해주세요.')
+    } else if (placeNo === 0) {
+      return message.error('위치를 추가해주세요.')
+    }
 
     try {
       await httpClient.items.createItem({
