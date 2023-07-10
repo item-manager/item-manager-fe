@@ -1,6 +1,6 @@
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface ChartDataProps {
   allPurchase: number[]
@@ -38,6 +38,19 @@ export default function LineChart({
     '12월',
   ]
 
+  const xAxis = useCallback(() => {
+    if (
+      initialYear === null ||
+      initialYear === 'null' ||
+      initialType === '"purchase"' ||
+      initialType === '"consume"'
+    ) {
+      return allYears
+    } else {
+      return allMonths
+    }
+  }, [initialYear, initialType])
+
   const options = {
     chart: {
       type: 'spline',
@@ -47,7 +60,7 @@ export default function LineChart({
       align: 'center',
     },
     xAxis: {
-      categories: initialYear === 'null' ? allYears : allMonths,
+      categories: xAxis(),
     },
     yAxis: {
       title: {
