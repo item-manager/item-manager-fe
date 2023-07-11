@@ -1108,6 +1108,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: 'GET',
         ...params,
       }),
+
+    deleteImage: (filename: string, params: RequestParams = {}) =>
+      this.request<ResultVoid, ErrorResult>({
+        path: `/images/${filename}`,
+        method: 'DELETE',
+        ...params,
+      }),
   }
   auth = {
     /**

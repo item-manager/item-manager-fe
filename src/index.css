@@ -61,6 +61,31 @@ body {
   z-index: 555;
 }
 
+#item-form .ant-upload-list.ant-upload-list-picture-card {
+  position: relative;
+}
+
+#item-form .ant-upload-list.ant-upload-list-picture-card > div {
+  width: 200px;
+  height: 200px;
+}
+
+#item-form .ant-upload.ant-upload-select {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+}
+
+#item-form .ant-upload-list.ant-upload-list-picture-card span.anticon-picture {
+  margin-top: 35%;
+  font-size: 60px;
+}
+#item-form .ant-upload-list.ant-upload-list-picture-card span.anticon-loading {
+  margin-top: 37%;
+  font-size: 40px;
+}
+
 .ant-form-item .ant-form-item-label > label.ant-form-item-required::before {
   display: none !important;
 }
