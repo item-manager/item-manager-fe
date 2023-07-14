@@ -1,99 +1,144 @@
-import { httpClient, PlacesRS, UpdatePlaceRQ } from '@/apis'
+import { httpClient, ItemRS, LabelRS, PlacesRS, RoomsRS, UpdateItemRQ } from '@/apis'
 import { Label } from '@/components/label/Label'
 import { useQuery } from '@tanstack/react-query'
-import { Button, Form, FormProps, Input, Modal, Select, Radio, RadioChangeEvent } from 'antd'
-import { ChangeEvent, useState } from 'react'
+import {
+  Button,
+  Form,
+  FormProps,
+  Input,
+  Modal,
+  Select,
+  Radio,
+  Upload,
+  UploadFile,
+  UploadProps,
+  InputNumber,
+  Row,
+  Col,
+} from 'antd'
+import { PictureOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { v4 as uuidv4 } from 'uuid'
 import { PriorityProgressBar } from '@/components/progress'
+import { RcFile, UploadListType } from 'antd/lib/upload/interface'
+import imageCompression from 'browser-image-compression'
 
 interface ItemEditProps {
   hideModal: () => void
-  itemDetail?: any
+  itemDetail?: ItemRS
 }
 
 const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
   const [form] = Form.useForm()
-
   const { TextArea } = Input
-
-  const { itemNo } = useParams()
-
-  const [roomValue, setRoomValue] = useState<any>()
-
-  const [type, setType] = useState('CONSUMABLE')
-
-  const [editLocatioNo, setEditLocationNo] = useState('')
-
-  const [inputValue, setInputValue] = useState(itemDetail?.priority)
-
-  const { data: roomsList } = useQuery({
-    queryKey: ['roomsList'],
-    queryFn: async () => await httpClient.locations.allRooms(),
-  })
-
-  const labels = itemDetail?.labels?.map((el: any) => el.labelNo.toString())
-
-  const [newDetail, setNewDetail] = useState({
-    editItemName: '',
-    editMemo: '',
-    editPhoto: '',
-    editLabels: [],
-  })
-
-  const onChangeItemDetail = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setNewDetail({
-      ...newDetail,
-      [event.target.name]: event.target.value,
-    })
-  }
-
-  // const onChangeType = (value: string) => {
-  //   setType(value)
-  // }
-
-  const onChangeType = (e: RadioChangeEvent) => {
-    setType(e.target.value)
-  }
-
-  const onChangeRoomValue = async (value: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (value) {
-      const result = await httpClient.locations.getPlacesByRoomNo({ roomNo: Number(value) })
-      setRoomValue(result)
-    }
-  }
-
-  const onChangeRoomLocation = (value: string) => {
-    setEditLocationNo(value)
-  }
-
-  const onChangePriority = (newValue: number | null): void => {
-    setInputValue(Number(newValue))
-  }
-
   const handleOk = () => {
     form.submit()
   }
 
-  const onFinish: FormProps['onFinish'] = async (values) => {
-    const { labels } = values
+  const { itemNo } = useParams()
+  const [roomNo, setRoomNo] = useState<number | undefined>(itemDetail?.roomNo)
+  const [priorityValue, setPriority] = useState(itemDetail?.priority)
 
-    const { editItemName, editMemo } = newDetail
+  const { data: roomList } = useQuery({
+    queryKey: ['roomList'],
+    queryFn: async () => await httpClient.locations.allRooms(),
+  })
+  const getPlaces = useQuery({
+    queryKey: ['rooms', roomNo],
+    queryFn: () => httpClient.locations.getPlacesByRoomNo({ roomNo: roomNo }),
+    enabled: roomNo !== undefined,
+  })
+
+  const onChangeRoomValue = async (value: number | undefined) => {
+    if (value) {
+      setRoomNo(value)
+      form.setFieldValue('locationNo', null)
+    }
+  }
+  const onChangePriority = (newValue: number | null): void => {
+    setPriority(Number(newValue))
+    form.setFieldValue('priority', Number(newValue))
+  }
+
+  // upload image
+  const [fileList, setFileList] = useState<UploadFile[]>(() => {
+    return [{ uid: '-1', name: '', fileName: itemDetail?.photoUrl, url: itemDetail?.photoUrl }]
+  })
+  const initFileList = (): void => {
+    setFileList([{ uid: '-1', name: '' }])
+  }
+  const [loading, setLoading] = useState(false)
+  const actionImgCompress = async (file: File) => {
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    }
+    try {
+      return await imageCompression(file, options)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const beforeImageUpload: UploadProps['beforeUpload'] = (file: RcFile, FileList: RcFile[]) => {
+    new Promise((resolve) => {
+      resolve(deleteImage())
+    }).then(() => {
+      setLoading(true)
+    })
+    return new Promise((resolve) => {
+      resolve(actionImgCompress(file as File))
+    })
+  }
+  const onImageChange: UploadProps['onChange'] = ({ file: file, fileList: newFileList }) => {
+    const filename = file.response?.data?.filename
+
+    form.setFieldValue('photoName', filename)
+
+    newFileList.forEach((file) => {
+      file.fileName = filename
+    })
+    setFileList(newFileList)
+    setLoading(false)
+  }
+  const deleteImage = (): void => {
+    new Promise((resolve) => {
+      resolve(
+        fileList.forEach((file) => {
+          if (file.fileName) {
+            httpClient.images.deleteImage(file.fileName)
+          }
+        })
+      )
+    }).then(() => {
+      initFileList()
+      form.setFieldValue('photoName', null)
+    })
+  }
+  // upload image
+
+  const onClickSave: FormProps['onFinish'] = async (values: UpdateItemRQ) => {
+    const data = {
+      name: values.name,
+      type: values.type,
+      locationNo: values.locationNo,
+      memo: values.memo,
+      photoName: values.photoName,
+      priority: values.priority,
+      labels: values.labels,
+    }
+    console.log(data)
 
     try {
-      await httpClient.items.patchItem(Number(itemNo), {
-        name: editItemName || itemDetail?.name,
-        type,
-        locationNo: editLocatioNo || itemDetail?.locationNo,
-        memo: editMemo || itemDetail?.memo,
-        photoName: '',
-        priority: inputValue || itemDetail?.priority,
-        labels: labels.map((label: string) => +label),
-      })
+      await httpClient.items.patchItem(Number(itemNo), data)
       window.location.reload()
     } catch (error) {
       if (error instanceof Error) console.log('edit item:', error.message)
     }
+    hideModal()
+  }
+  const cancle = (): void => {
+    deleteImage()
     hideModal()
   }
 
@@ -102,117 +147,190 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
       <Modal
         open={true}
         onOk={handleOk}
-        onCancel={hideModal}
+        onCancel={cancle}
         width={858}
         okText={'수정'}
         cancelText={'닫기'}
         closable={false}
-        // bodyStyle={window.innerWidth > 768 ? { height: 730 } : { height: 960 }}
-        bodyStyle={{ height: 700, overflowY: 'auto' }}
+        bodyStyle={{ height: 420, overflowY: 'auto' }}
         centered={true}
       >
         <Form
+          id='item-form'
           form={form}
           name='basic'
           className='w-full mt-3 '
           autoComplete='off'
-          labelCol={{ span: 4 }}
           wrapperCol={{ span: 18 }}
-          onFinish={onFinish}
+          onFinish={onClickSave}
           initialValues={{
-            labels,
+            photoName: itemDetail?.photoUrl?.replace(/^\/images\//, ''),
+            priority: itemDetail?.priority,
+            name: itemDetail?.name,
+            type: itemDetail?.type,
+            roomNo: itemDetail?.roomNo,
+            locationNo: itemDetail?.placeNo,
+            labels: itemDetail?.labels?.map((el: LabelRS) => el.labelNo.toString()),
+            memo: itemDetail?.memo,
+          }}
+          validateMessages={{
+            required: '입력이 필요합니다',
           }}
         >
-          {/* <h3 className='mb-4 text-xl text-center'>물품 정보 수정</h3> */}
-          <div className='flex flex-col w-full mt-5'>
-            <div className='flex items-center justify-center'>
-              <img className='h-64 aspect-square' src={itemDetail?.photoUrl} />
-            </div>
-            <div className='mx-auto mt-4 w-9'>
-              <PriorityProgressBar
-                priority={inputValue}
-                strokeWidth={4}
-                className='cursor-pointer select-none'
-                onChange={onChangePriority}
-              />
-            </div>
-            <div className=''>
-              <div className='w-full mt-4 '>
-                <Form.Item
-                  label='물품명'
-                  name='name'
-                  colon={false}
-                  className='items-center justify-center w-full'
+          <div className='grid md:grid-cols-2'>
+            <div className='flex flex-col justify-center w-full'>
+              <div className='ml-auto mr-auto'>
+                <Upload
+                  accept='image/*'
+                  action={'/images'}
+                  listType='picture-card'
+                  fileList={fileList}
+                  beforeUpload={beforeImageUpload}
+                  onChange={onImageChange}
+                  multiple={false}
+                  showUploadList={{
+                    showPreviewIcon: false,
+                    showRemoveIcon: false,
+                  }}
+                  iconRender={(file: UploadFile, listType?: UploadListType) => {
+                    if (loading) {
+                      return <LoadingOutlined />
+                    } else {
+                      return <PictureOutlined />
+                    }
+                  }}
+                  maxCount={1}
                 >
-                  <div className='flex items-center w-full'>
-                    <Input
-                      size='middle'
-                      placeholder='물품명 입력'
-                      allowClear
-                      name='editItemName'
-                      defaultValue={itemDetail?.name}
-                      onChange={onChangeItemDetail}
-                      className=''
-                    />
-                  </div>
+                  {' '}
+                </Upload>
+              </div>
+              <div className='flex justify-center'>
+                <Button
+                  // type='link'
+                  type='text'
+                  icon={<DeleteOutlined />}
+                  size='middle'
+                  className='flex justify-center items-center'
+                  onClick={deleteImage}
+                />
+              </div>
+
+              <Form.Item name='photoName' hidden>
+                <Input />
+              </Form.Item>
+            </div>
+
+            <div className='flex flex-col w-full items-center'>
+              <Form.Item hidden name='priority'>
+                <InputNumber />
+              </Form.Item>
+              <div className='flex justify-center w-full mt-8'>
+                <Row className='flex items-center w-full'>
+                  <Col className='w-1/6'>
+                    <Form.Item>
+                      <PriorityProgressBar
+                        priority={priorityValue}
+                        strokeWidth={4}
+                        className='w-8 cursor-pointer select-none'
+                        onChange={onChangePriority}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col className='flex w-5/6'>
+                    <Form.Item name='name' rules={[{ required: true }]} className='w-full'>
+                      <Input
+                        placeholder='물품명 입력'
+                        className='w-full h-12 border-none'
+                        allowClear
+                        name='name'
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </div>
+
+              <div className='flex flex-row w-full'>
+                <Form.Item
+                  // label='분류ㅤㅤ'
+                  label='분류'
+                  name='type'
+                  rules={[{ required: true }]}
+                  colon={false}
+                  className='w-full'
+                  labelCol={{ span: 4 }}
+                  labelAlign='left'
+                >
+                  <Radio.Group>
+                    <Radio value={'CONSUMABLE'}>소모품</Radio>
+                    <Radio value={'EQUIPMENT'}>비품</Radio>
+                  </Radio.Group>
                 </Form.Item>
               </div>
 
-              <Form.Item label='분류' name='type' colon={false}>
-                {/* <Select
-                  defaultValue={itemDetail?.type}
-                  options={[
-                    { value: 'CONSUMABLE', label: '소모품' },
-                    { value: 'EQUIPMENT', label: '비품' },
-                  ]}
-                  onChange={onChangeType}
-                /> */}
-                <Radio.Group
-                  onChange={onChangeType}
-                  defaultValue={itemDetail?.type === '소모품' ? 'CONSUMABLE' : 'EQUIPMENT'}
+              <div className='flex flex-row grid-cols-2 items-center w-full'>
+                <Form.Item
+                  label='장소'
+                  name='roomNo'
+                  className='w-1/2'
+                  colon={false}
+                  labelCol={{ span: 8 }}
+                  labelAlign='left'
                 >
-                  <Radio value={'CONSUMABLE'}>소모품</Radio>
-                  <Radio value={'EQUIPMENT'}>비품</Radio>
-                </Radio.Group>
-              </Form.Item>
+                  <Select
+                    onChange={onChangeRoomValue}
+                    className='w-5/6'
+                    options={roomList?.data?.map((el: RoomsRS) => ({
+                      value: el.roomNo,
+                      label: el.name,
+                    }))}
+                  />
+                </Form.Item>
 
-              <Form.Item label='보관장소' name='roomNo' colon={false}>
-                <Select defaultValue={itemDetail?.room} onChange={onChangeRoomValue}>
-                  {roomsList?.data?.map((el: UpdatePlaceRQ) => (
-                    <Select.Option key={uuidv4()} value={el.roomNo}>
-                      <div>{el.name}</div>
-                    </Select.Option>
-                  ))}
-                </Select>
-                <input hidden />
-              </Form.Item>
+                <Form.Item
+                  label='위치'
+                  name='locationNo'
+                  rules={[{ required: true, message: '필수: 장소를 선택하면 목록이 생성됩니다' }]}
+                  className='w-1/2'
+                  colon={false}
+                  labelCol={{ span: 4 }}
+                  labelAlign='left'
+                >
+                  <Select
+                    className='w-5/6'
+                    options={getPlaces?.data?.data?.map((el: PlacesRS) => ({
+                      value: el.placeNo,
+                      label: el.name,
+                    }))}
+                  />
+                </Form.Item>
+              </div>
 
-              <Form.Item label='위치' name='placesNo' colon={false}>
-                <Select defaultValue={itemDetail?.place} onChange={onChangeRoomLocation}>
-                  {roomValue?.data?.map((el: PlacesRS) => (
-                    <Select.Option key={uuidv4()} value={el.placeNo}>
-                      <div>{el.name}</div>
-                    </Select.Option>
-                  ))}
-                </Select>
-                <input hidden />
-              </Form.Item>
+              <div className='flex justify-center w-full'>
+                <Form.Item
+                  // label='라벨ㅤㅤ'
+                  label='라벨'
+                  name='labels'
+                  colon={false}
+                  className='w-full'
+                  labelCol={{ span: 4 }}
+                  labelAlign='left'
+                >
+                  <Label />
+                </Form.Item>
+              </div>
 
-              <Form.Item label='라벨' name='labels' colon={false}>
-                <Label />
-              </Form.Item>
-
-              <Form.Item label='메모' name='memo' colon={false}>
-                <TextArea
-                  placeholder='메모'
-                  rows={2}
-                  allowClear
-                  name='editMemo'
-                  defaultValue={itemDetail?.memo}
-                  className='h-12'
-                  onChange={onChangeItemDetail}
-                />
-              </Form.Item>
+              <div className='w-full'>
+                <Form.Item
+                  label='메모'
+                  name='memo'
+                  colon={false}
+                  className='w-full'
+                  labelCol={{ span: 4 }}
+                  labelAlign='left'
+                >
+                  <TextArea placeholder='메모' rows={4} className='w-full' allowClear />
+                </Form.Item>
+              </div>
             </div>
           </div>
           <Button htmlType='submit' hidden />
