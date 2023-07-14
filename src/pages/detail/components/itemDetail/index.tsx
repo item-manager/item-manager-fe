@@ -86,15 +86,20 @@ const ItemDetail = () => {
         <div className='flex flex-col lg:grid lg:grid-cols-2 w-full 2xl:w-3/5 justify-center'>
           <div id='left-section' className='flex justify-center items-center w-full'>
             {itemDetail?.data?.photoUrl ? (
-              <Image
-                // width={300}
-                // height={300}
-                width={250}
-                height={250}
-                preview={false}
-                src={itemDetail?.data?.photoUrl}
-                rootClassName='flex justify-center'
-              />
+              <div
+                className='flex justify-center items-center border rounded-md border-neutral-400'
+                style={{ width: '260px', height: '260px' }}
+              >
+                <Image
+                  // width={300}
+                  // height={300}
+                  width={250}
+                  height={250}
+                  preview={false}
+                  src={itemDetail?.data?.photoUrl}
+                  // rootClassName='flex justify-center'
+                />
+              </div>
             ) : (
               <div
                 className='flex justify-center rounded-lg bg-neutral-100'
