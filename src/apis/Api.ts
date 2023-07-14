@@ -303,7 +303,9 @@ export interface ItemRS {
   itemNo?: number
   name?: string
   type?: 'CONSUMABLE' | 'EQUIPMENT'
+  roomNo?: number
   room?: string
+  placeNo?: number
   place?: string
   memo?: string
   photoUrl?: string
