@@ -15,12 +15,14 @@ import {
   InputNumber,
   Row,
   Col,
+  Popover,
 } from 'antd'
 import { PictureOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { PriorityProgressBar } from '@/components/progress'
 import { RcFile, UploadListType } from 'antd/lib/upload/interface'
+import ImgCrop from 'antd-img-crop'
 import imageCompression from 'browser-image-compression'
 
 interface ItemEditProps {
@@ -62,7 +64,14 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
 
   // upload image
   const [fileList, setFileList] = useState<UploadFile[]>(() => {
-    return [{ uid: '-1', name: '', fileName: itemDetail?.photoUrl, url: itemDetail?.photoUrl }]
+    return [
+      {
+        uid: '-1',
+        name: '',
+        fileName: itemDetail?.photoUrl?.replace(/^\/images\//, ''),
+        url: itemDetail?.photoUrl,
+      },
+    ]
   })
   const initFileList = (): void => {
     setFileList([{ uid: '-1', name: '' }])
@@ -81,49 +90,45 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
     }
   }
   const beforeImageUpload: UploadProps['beforeUpload'] = (file: RcFile, FileList: RcFile[]) => {
+    setLoading(true)
+    initFileList()
     new Promise((resolve) => {
-      resolve(deleteImage())
-    }).then(() => {
-      setLoading(true)
+      if (file) resolve(actionImgCompress(file))
     })
-    return new Promise((resolve) => {
-      resolve(actionImgCompress(file as File))
-    })
-  }
-  const onImageChange: UploadProps['onChange'] = ({ file: file, fileList: newFileList }) => {
-    const filename = file.response?.data?.filename
+      .then((compressedFile) => {
+        const blob = compressedFile as Blob
+        setFileList([
+          {
+            uid: file.uid || '-1',
+            name: '',
+            originFileObj: new File([blob], file?.name || 'name', { type: blob.type }) as RcFile,
+          },
+        ])
+      })
+      .then(() => {
+        setLoading(false)
+      })
 
-    form.setFieldValue('photoName', filename)
-
-    newFileList.forEach((file) => {
-      file.fileName = filename
-    })
-    setFileList(newFileList)
-    setLoading(false)
-  }
-  const deleteImage = (): void => {
-    new Promise((resolve) => {
-      resolve(
-        fileList.forEach((file) => {
-          if (file.fileName) {
-            httpClient.images.deleteImage(file.fileName)
-          }
-        })
-      )
-    }).then(() => {
-      initFileList()
-      form.setFieldValue('photoName', null)
-    })
+    return false
   }
   // upload image
 
   const onClickSave: FormProps['onFinish'] = async (values: UpdateItemRQ) => {
+    const file = fileList[0].originFileObj
+    let imageRS = null
+    if (file) {
+      imageRS = await httpClient.images.saveImage({ file: file })
+    } else {
+      if (itemDetail?.photoUrl)
+        httpClient.images.deleteImage(itemDetail?.photoUrl?.replace(/^\/images\//, ''))
+    }
+
     const data = {
       name: values.name,
       type: values.type,
       locationNo: values.locationNo,
       memo: values.memo,
-      photoName: values.photoName,
+      photoName: imageRS?.data?.filename,
       priority: values.priority,
       labels: values.labels,
     }
@@ -138,7 +143,7 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
     hideModal()
   }
   const cancle = (): void => {
-    deleteImage()
+    initFileList()
     hideModal()
   }
 
@@ -180,44 +185,41 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
           <div className='grid md:grid-cols-2'>
             <div className='flex flex-col justify-center w-full'>
               <div className='ml-auto mr-auto'>
-                <Upload
-                  accept='image/*'
-                  action={'/images'}
-                  listType='picture-card'
-                  fileList={fileList}
-                  beforeUpload={beforeImageUpload}
-                  onChange={onImageChange}
-                  multiple={false}
-                  showUploadList={{
-                    showPreviewIcon: false,
-                    showRemoveIcon: false,
-                  }}
-                  iconRender={(file: UploadFile, listType?: UploadListType) => {
-                    if (loading) {
-                      return <LoadingOutlined />
-                    } else {
-                      return <PictureOutlined />
-                    }
-                  }}
-                  maxCount={1}
-                >
-                  {' '}
-                </Upload>
+                <ImgCrop rotationSlider>
+                  <Upload
+                    accept='image/*'
+                    listType='picture-card'
+                    fileList={fileList}
+                    beforeUpload={beforeImageUpload}
+                    multiple={false}
+                    showUploadList={{
+                      showPreviewIcon: false,
+                      showRemoveIcon: false,
+                    }}
+                    iconRender={(file: UploadFile, listType?: UploadListType) => {
+                      if (loading) {
+                        return <LoadingOutlined />
+                      } else {
+                        return <PictureOutlined />
+                      }
+                    }}
+                    maxCount={1}
+                  >
+                    {' '}
+                  </Upload>
+                </ImgCrop>
               </div>
               <div className='flex justify-center'>
-                <Button
-                  // type='link'
-                  type='text'
-                  icon={<DeleteOutlined />}
-                  size='middle'
-                  className='flex justify-center items-center'
-                  onClick={deleteImage}
-                />
+                <Popover content='사진 제거' placement='bottom'>
+                  <Button
+                    type='text'
+                    icon={<DeleteOutlined />}
+                    size='middle'
+                    className='flex justify-center items-center'
+                    onClick={initFileList}
+                  />
+                </Popover>
               </div>
-
-              <Form.Item name='photoName' hidden>
-                <Input />
-              </Form.Item>
             </div>
 
             <div className='flex flex-col w-full items-center'>
