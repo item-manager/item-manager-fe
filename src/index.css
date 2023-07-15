@@ -68,6 +68,7 @@ body {
 #item-form .ant-upload-list.ant-upload-list-picture-card > div {
   width: 200px;
   height: 200px;
+  margin: unset;
 }
 
 #item-form .ant-upload.ant-upload-select {
