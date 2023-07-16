@@ -16,6 +16,7 @@ import {
   Row,
   Col,
   Popover,
+  message,
 } from 'antd'
 import { PictureOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useState } from 'react'
@@ -24,6 +25,7 @@ import { PriorityProgressBar } from '@/components/progress'
 import { RcFile, UploadListType } from 'antd/lib/upload/interface'
 import ImgCrop from 'antd-img-crop'
 import imageCompression from 'browser-image-compression'
+import { AxiosError } from 'axios'
 
 interface ItemEditProps {
   hideModal: () => void
@@ -136,11 +138,15 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
 
     try {
       await httpClient.items.patchItem(Number(itemNo), data)
+
+      message.success('물품 정보가 수정되었습니다')
+      hideModal()
+
       window.location.reload()
     } catch (error) {
-      if (error instanceof Error) console.log('edit item:', error.message)
+      message.error('물품 정보 수정에 실패하였습니다')
+      if (error instanceof AxiosError) console.log('error patchItem:', error.response?.data)
     }
-    hideModal()
   }
   const cancle = (): void => {
     initFileList()
@@ -271,7 +277,7 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
 
               <div className='flex flex-row grid-cols-2 items-center w-full'>
                 <Form.Item
-                  label='장소'
+                  label='장소(방)'
                   name='roomNo'
                   className='w-1/2'
                   colon={false}
@@ -335,7 +341,6 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
               </div>
             </div>
           </div>
-          <Button htmlType='submit' hidden />
         </Form>
       </Modal>
     </>

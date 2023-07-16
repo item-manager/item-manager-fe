@@ -43,7 +43,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
   const [priorityValue, setPriority] = useState(0)
 
   const { data: roomList } = useQuery({
-    queryKey: ['roomsList'],
+    queryKey: ['roomList'],
     queryFn: async () => await httpClient.locations.allRooms(),
   })
   const getPlaces = useQuery({
@@ -129,10 +129,11 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
     try {
       await httpClient.items.createItem(data)
 
-      message.success('물품을 추가 하셨습니다.')
+      message.success('물품이 추가되었습니다')
       queryClient.invalidateQueries({ queryKey: ['items'] })
       hideModal()
     } catch (error) {
+      message.error('물품 추가에 실패하였습니다')
       if (error instanceof AxiosError) console.log('error createItem:', error.response?.data)
     }
   }
