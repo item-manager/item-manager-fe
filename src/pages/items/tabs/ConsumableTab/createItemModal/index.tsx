@@ -1,4 +1,4 @@
-import { CreateItemRQ, ResultSaveImageRS, httpClient } from '@/apis'
+import { CreateItemRQ, httpClient } from '@/apis'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Form,
@@ -9,7 +9,6 @@ import {
   Row,
   Col,
   message,
-  RadioChangeEvent,
   InputNumber,
   Upload,
   UploadProps,
