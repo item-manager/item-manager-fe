@@ -1,4 +1,4 @@
-import { CreateItemRQ, ResultSaveImageRS, httpClient } from '@/apis'
+import { CreateItemRQ, httpClient } from '@/apis'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Form,
@@ -9,19 +9,21 @@ import {
   Row,
   Col,
   message,
-  RadioChangeEvent,
   InputNumber,
   Upload,
   UploadProps,
   UploadFile,
+  Popover,
+  Button,
 } from 'antd'
-import { PictureOutlined, LoadingOutlined } from '@ant-design/icons'
+import { PictureOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import { RoomsRS, PlacesRS } from '@/apis'
 import { Label } from '@/components/label/Label'
 import { PriorityProgressBar } from '@/components/progress'
 import { AxiosError } from 'axios'
 import { RcFile, UploadListType } from 'antd/es/upload/interface'
+import ImgCrop from 'antd-img-crop'
 import imageCompression from 'browser-image-compression'
 
 type createItemProps = {
@@ -37,26 +39,28 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
     form.submit()
   }
 
+  const [roomNo, setRoomNo] = useState<number | undefined>(undefined)
   const [priorityValue, setPriority] = useState(0)
-  const [roomValue, setRoomValue] = useState<any>()
 
-  const { data: roomsList } = useQuery({
+  const { data: roomList } = useQuery({
     queryKey: ['roomsList'],
     queryFn: async () => await httpClient.locations.allRooms(),
   })
+  const getPlaces = useQuery({
+    queryKey: ['rooms', roomNo],
+    queryFn: async () => await httpClient.locations.getPlacesByRoomNo({ roomNo: roomNo }),
+    enabled: roomNo !== undefined,
+  })
 
+  const onChangeRoomValue = async (value: number | undefined) => {
+    if (value) {
+      setRoomNo(value)
+      form.setFieldValue('locationNo', null)
+    }
+  }
   const onChangePriority = (newValue: number | null): void => {
     setPriority(Number(newValue))
     form.setFieldValue('priority', Number(newValue))
-  }
-  const onChangeType = (e: RadioChangeEvent) => {
-    form.setFieldValue('type', e.target.value)
-  }
-  const onChangeRoomsList = async (value: number | undefined) => {
-    if (value) {
-      const result = await httpClient.locations.getPlacesByRoomNo({ roomNo: value })
-      setRoomValue(result)
-    }
   }
 
   // upload image
@@ -80,50 +84,50 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
     }
   }
   const beforeImageUpload: UploadProps['beforeUpload'] = (file: RcFile, FileList: RcFile[]) => {
+    setLoading(true)
+    initFileList()
     new Promise((resolve) => {
-      resolve(deleteImage())
-    }).then(() => {
-      initFileList()
-      setLoading(true)
+      if (file) resolve(actionImgCompress(file))
     })
-    return new Promise((resolve) => {
-      resolve(actionImgCompress(file as File))
-    })
-  }
-  const onImageChange: UploadProps['onChange'] = ({ file: file, fileList: newFileList }) => {
-    const filename = file.response?.data?.filename
+      .then((compressedFile) => {
+        const blob = compressedFile as Blob
+        setFileList([
+          {
+            uid: file.uid || '-1',
+            name: '',
+            originFileObj: new File([blob], file?.name || 'name', { type: blob.type }) as RcFile,
+          },
+        ])
+      })
+      .then(() => {
+        setLoading(false)
+      })
 
-    form.setFieldValue('photoName', filename)
-
-    newFileList.forEach((file) => {
-      file.fileName = filename
-    })
-    setFileList(newFileList)
-    setLoading(false)
-  }
-  const deleteImage = (): void => {
-    fileList.forEach((file) => {
-      if (file.fileName) {
-        httpClient.images.deleteImage(file.fileName)
-      }
-    })
+    return false
   }
   // upload image
 
   const onClickSave = async (values: CreateItemRQ) => {
-    console.log(values)
+    const file = fileList[0].originFileObj
+    let imageRS = null
+    if (file) {
+      imageRS = await httpClient.images.saveImage({ file: file })
+    }
+
+    const data = {
+      name: values.name,
+      type: values.type,
+      locationNo: values.locationNo,
+      photoName: imageRS?.data?.filename,
+      quantity: values.quantity,
+      priority: values.priority,
+      labels: values.labels,
+      memo: values.memo,
+    }
+    console.log(data)
 
     try {
-      await httpClient.items.createItem({
-        name: values.name,
-        type: values.type,
-        locationNo: values.locationNo,
-        photoName: values.photoName,
-        quantity: values.quantity,
-        priority: values.priority,
-        labels: values.labels,
-        memo: values.memo,
-      })
+      await httpClient.items.createItem(data)
 
       message.success('물품을 추가 하셨습니다.')
       queryClient.invalidateQueries({ queryKey: ['items'] })
@@ -133,7 +137,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
     }
   }
   const cancle = (): void => {
-    deleteImage()
+    initFileList()
     hideModal()
   }
 
@@ -170,35 +174,44 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
           <div className='grid md:grid-cols-2'>
             <div className='flex flex-col justify-center w-full'>
               <div className='ml-auto mr-auto'>
-                <Upload
-                  accept='image/*'
-                  action={'/images'}
-                  listType='picture-card'
-                  fileList={fileList}
-                  beforeUpload={beforeImageUpload}
-                  onChange={onImageChange}
-                  multiple={false}
-                  showUploadList={{
-                    showPreviewIcon: false,
-                    showRemoveIcon: false,
-                  }}
-                  iconRender={(file: UploadFile, listType?: UploadListType) => {
-                    if (loading) {
-                      return <LoadingOutlined />
-                    } else {
-                      return <PictureOutlined />
-                    }
-                  }}
-                  maxCount={1}
-                >
-                  {' '}
-                </Upload>
+                <ImgCrop rotationSlider>
+                  <Upload
+                    accept='image/*'
+                    listType='picture-card'
+                    fileList={fileList}
+                    beforeUpload={beforeImageUpload}
+                    multiple={false}
+                    showUploadList={{
+                      showPreviewIcon: false,
+                      showRemoveIcon: false,
+                    }}
+                    iconRender={(file: UploadFile, listType?: UploadListType) => {
+                      if (loading) {
+                        return <LoadingOutlined />
+                      } else {
+                        return <PictureOutlined />
+                      }
+                    }}
+                    maxCount={1}
+                  >
+                    {' '}
+                  </Upload>
+                </ImgCrop>
               </div>
 
-              <Form.Item name='photoName' hidden>
-                <Input />
-              </Form.Item>
+              <div className='flex justify-center'>
+                <Popover content='사진 제거' placement='bottom'>
+                  <Button
+                    type='text'
+                    icon={<DeleteOutlined />}
+                    size='middle'
+                    className='flex justify-center items-center'
+                    onClick={initFileList}
+                  />
+                </Popover>
+              </div>
             </div>
+
             <div className='flex flex-col w-full items-center'>
               <Form.Item hidden name='priority'>
                 <InputNumber />
@@ -233,12 +246,13 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   // label='분류ㅤㅤ'
                   label='분류'
                   name='type'
+                  rules={[{ required: true }]}
                   colon={false}
                   className='w-full'
                   labelCol={{ span: 4 }}
                   labelAlign='left'
                 >
-                  <Radio.Group onChange={onChangeType}>
+                  <Radio.Group>
                     <Radio value={'CONSUMABLE'}>소모품</Radio>
                     <Radio value={'EQUIPMENT'}>비품</Radio>
                   </Radio.Group>
@@ -274,38 +288,49 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
 
               <div className='flex flex-row grid-cols-2 items-center w-full'>
                 <Form.Item
-                  label='보관장소'
+                  label='장소(방)'
                   name='roomNo'
                   className='w-1/2'
                   colon={false}
                   labelCol={{ span: 8 }}
                   labelAlign='left'
                 >
-                  <Select onChange={onChangeRoomsList} className='w-5/6'>
-                    {roomsList?.data?.map((el: RoomsRS) => (
-                      <Select.Option key={el.roomNo} value={el.roomNo}>
-                        <div>{el.name}</div>
-                      </Select.Option>
-                    ))}
-                  </Select>
+                  <Select
+                    onChange={onChangeRoomValue}
+                    className='w-5/6'
+                    options={roomList?.data?.map((el: RoomsRS) => ({
+                      value: el.roomNo,
+                      label: el.name,
+                    }))}
+                  />
                 </Form.Item>
 
                 <Form.Item
                   label='위치'
                   name='locationNo'
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: '필수: 장소를 선택하면 목록이 생성됩니다' }]}
                   className='w-1/2'
                   colon={false}
                   labelCol={{ span: 4 }}
                   labelAlign='left'
                 >
-                  <Select className='w-5/6' disabled={!roomValue}>
-                    {roomValue?.data?.map((el: PlacesRS) => (
-                      <Select.Option key={el.placeNo} value={el.placeNo}>
-                        <div>{el.name}</div>
-                      </Select.Option>
-                    ))}
-                  </Select>
+                  <Select
+                    id='item-form-select-place'
+                    className='w-5/6'
+                    options={
+                      getPlaces?.data?.data?.map((el: PlacesRS) => ({
+                        value: el.placeNo,
+                        label: el.name,
+                        disabled: !roomNo,
+                      })) || [
+                        {
+                          value: 0,
+                          label: '장소을 선택하면 목록이 생성됩니다',
+                          disabled: roomNo === undefined,
+                        },
+                      ]
+                    }
+                  ></Select>
                 </Form.Item>
               </div>
 

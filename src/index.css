@@ -87,6 +87,11 @@ body {
   font-size: 40px;
 }
 
+#item-form-select-place_list + div .ant-select-item-option-content {
+  white-space: normal;
+  text-overflow: unset;
+}
+
 .ant-form-item .ant-form-item-label > label.ant-form-item-required::before {
   display: none !important;
 }
