@@ -103,6 +103,7 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
           {
             uid: file.uid || '-1',
             name: '',
+            fileName: file.name,
             originFileObj: new File([blob], file?.name || 'name', { type: blob.type }) as RcFile,
           },
         ])
@@ -116,13 +117,17 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
   // upload image
 
   const onClickSave: FormProps['onFinish'] = async (values: UpdateItemRQ) => {
-    const file = fileList[0].originFileObj
-    let imageRS = null
-    if (file) {
-      imageRS = await httpClient.images.saveImage({ file: file })
-    } else {
-      if (itemDetail?.photoUrl)
-        httpClient.images.deleteImage(itemDetail?.photoUrl?.replace(/^\/images\//, ''))
+    const originPhotoName = itemDetail?.photoUrl?.replace(/^\/images\//, '')
+
+    let photoName = originPhotoName
+    if (fileList[0].fileName !== originPhotoName) {
+      const file = fileList[0].originFileObj
+      if (file) {
+        const imageRS = await httpClient.images.saveImage({ file: file })
+        photoName = imageRS.data?.filename
+      } else {
+        photoName = undefined
+      }
     }
 
     const data = {
@@ -130,7 +135,7 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
       type: values.type,
       locationNo: values.locationNo,
       memo: values.memo,
-      photoName: imageRS?.data?.filename,
+      photoName: photoName,
       priority: values.priority,
       labels: values.labels,
     }
@@ -141,6 +146,12 @@ const ItemEditModal = ({ hideModal, itemDetail }: ItemEditProps) => {
 
       message.success('물품 정보가 수정되었습니다')
       hideModal()
+
+      if (originPhotoName !== data.photoName) {
+        if (originPhotoName) {
+          httpClient.images.deleteImage(originPhotoName)
+        }
+      }
 
       window.location.reload()
     } catch (error) {
