@@ -155,6 +155,9 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
         closable={false}
         bodyStyle={{ height: 420, overflowY: 'auto' }}
         centered={true}
+        wrapClassName='item-modal'
+        okButtonProps={{ className: 'max-md:w-[48%] md:w-1/4 md:h-9' }}
+        cancelButtonProps={{ className: 'max-md:w-[48%] md:w-1/4 md:h-9' }}
       >
         <Form
           form={form}

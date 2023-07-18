@@ -33,6 +33,7 @@ const DetailPage = () => {
   const [editHover, setEditHover] = useState(false)
 
   const onClickDeleteItem = () => {
+    // setDeleteHover(false)
     modal.confirm({
       title: '물품 삭제',
       content: (
@@ -49,7 +50,7 @@ const DetailPage = () => {
   }
 
   const Detail = () => (
-    <div className='grid grid-cols-2'>
+    <div className='grid sm:grid-cols-2'>
       <div className='block justify-self-start ml-2'>
         <Button type='link' className='flex' onClick={onClickMovePrev}>
           목록으로
@@ -62,7 +63,7 @@ const DetailPage = () => {
         </Typography.Title>
       </div>
       <div className='flex justify-self-end items-end'>
-        <div className='flex mr-8 grid grid-cols-2 gap-x-4'>
+        <div className='flex md:mr-8 grid grid-cols-2 gap-x-4'>
           <div className='w-10 h-10'>
             <FontAwesomeIcon
               icon={faPenToSquare}
@@ -89,12 +90,12 @@ const DetailPage = () => {
                 'text-emerald-900 hover:cursor-pointer hover:text-4xl' +
                 (deleteHover ? ' fa-shake' : '')
               }
-              onMouseEnter={() => {
-                setDeleteHover(true)
-              }}
-              onMouseLeave={() => {
-                setDeleteHover(false)
-              }}
+              // onMouseEnter={() => {
+              //   setDeleteHover(true)
+              // }}
+              // onMouseLeave={() => {
+              //   setDeleteHover(false)
+              // }}
               onClick={onClickDeleteItem}
             />
           </div>

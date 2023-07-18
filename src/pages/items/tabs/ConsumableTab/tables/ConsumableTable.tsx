@@ -294,10 +294,11 @@ const ConsumableTable = () => {
       title: '사용',
       key: '사용하기',
       align: 'center',
-      responsive: ['sm'],
+      // responsive: ['sm'],
       render(_value, record, _index) {
         return (
           <div
+            className='flex items-center justify-center'
             onClick={(e) => {
               e.stopPropagation()
             }}
@@ -305,10 +306,33 @@ const ConsumableTable = () => {
             <Button
               type='primary'
               disabled={!record.quantity}
+              className='max-md:hidden'
               onClick={() => consumeOneItem(record)}
             >
               1개 사용
             </Button>
+            <Popconfirm
+              title={
+                <>
+                  <b>{record.name}</b>을/를 1개 사용하겠습니까?
+                </>
+              }
+              onConfirm={() => consumeOneItem(record)}
+              disabled={!record.quantity}
+            >
+              <Button
+                type='text'
+                shape='circle'
+                icon={
+                  <FontAwesomeIcon
+                    icon={faSquareMinus}
+                    className={'text-2xl ' + (!record.quantity ? '' : 'text-emerald-900')}
+                  />
+                }
+                className='flex items-center justify-center md:hidden'
+                disabled={!record.quantity}
+              />
+            </Popconfirm>
           </div>
         )
       },
@@ -318,17 +342,29 @@ const ConsumableTable = () => {
       title: '구매',
       key: '구매',
       align: 'center',
-      responsive: ['sm'],
+      // responsive: ['sm'],
       render(_value, record, _index) {
         return (
           <div
+            className='flex items-center justify-center'
             onClick={(e) => {
               e.stopPropagation()
             }}
           >
-            <Button type='primary' onClick={() => openPurchaseModal(record)}>
+            <Button
+              type='primary'
+              className='max-md:hidden'
+              onClick={() => openPurchaseModal(record)}
+            >
               구매하기
             </Button>
+            <Button
+              type='text'
+              shape='circle'
+              icon={<FontAwesomeIcon icon={faSquarePlus} className='text-2xl text-emerald-900' />}
+              className='flex items-center justify-center md:hidden'
+              onClick={() => openPurchaseModal(record)}
+            />
           </div>
         )
       },
