@@ -108,7 +108,7 @@ const SearchArea = () => {
           </Form.Item>
           <Form.Item name='labels'>
             <Select<string[]>
-              className='min-w-[100px]'
+              className='min-w-[192px]'
               allowClear
               mode='multiple'
               placeholder='라벨 검색'
@@ -120,7 +120,8 @@ const SearchArea = () => {
           <Form.Item name='locationNo'>
             <TreeSelect
               treeDataSimpleMode
-              style={{ width: '100%' }}
+              // style={{ width: '100%' }}
+              className='w-48'
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               placeholder='보관 장소'
               // loadData={onLoadData}

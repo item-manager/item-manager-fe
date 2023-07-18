@@ -95,3 +95,7 @@ body {
 .ant-form-item .ant-form-item-label > label.ant-form-item-required::before {
   display: none !important;
 }
+
+#item-table tr.ant-table-expanded-row-level-1 td {
+  background-color: unset;
+}

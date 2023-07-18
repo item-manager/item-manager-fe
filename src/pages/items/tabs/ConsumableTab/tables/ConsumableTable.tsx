@@ -7,8 +7,20 @@ import { consumableSearchState } from '@/store'
 import dateUtil from '@/utils/dateUtil'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button, message, Modal, PaginationProps, Tag, Tooltip } from 'antd'
+import {
+  Button,
+  message,
+  Modal,
+  PaginationProps,
+  Tag,
+  Tooltip,
+  Descriptions,
+  Popconfirm,
+} from 'antd'
 import { ColumnsType } from 'antd/es/table'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSquareMinus, faSquarePlus } from '@fortawesome/free-regular-svg-icons'
+import { faAngleRight, faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -89,12 +101,130 @@ const ConsumableTable = () => {
     })
   }
 
+  // row 확장
+  const [expended, setExpended] = useState(0)
+  const expend = (itemNo: number) => {
+    if (expended === itemNo) setExpended(0)
+    else setExpended(itemNo)
+  }
+  const expandedRowRender = (record: ConsumableItemRS) => {
+    return (
+      <div className='lg:w-3/4 mx-auto'>
+        <div className='flex flex-wrap gap-x-2 mb-[18px]'>
+          <div className='flex items-center'>
+            <div className='w-5'>
+              <PriorityProgressBar priority={record.priority} />
+            </div>
+          </div>
+          <div className='flex items-center'>
+            <div className='font-medium text-lg'>{record.name}</div>
+          </div>
+        </div>
+        <Descriptions>
+          <Descriptions.Item label='남은 수량'>{record.quantity}</Descriptions.Item>
+          <Descriptions.Item label='최근 구매일'>
+            {record.latestPurchaseDate &&
+              dateUtil.formatUtc(record.latestPurchaseDate, 'YYYY년 M월 D일')}
+          </Descriptions.Item>
+          <Descriptions.Item label='최근 사용일'>
+            {record.latestConsumeDate &&
+              dateUtil.formatUtc(record.latestConsumeDate, 'YYYY년 M월 D일')}
+          </Descriptions.Item>
+          <Descriptions.Item label='라벨'>
+            <div className='inline-flex flex-wrap gap-y-2'>
+              {record.labels?.map((item) => (
+                <Tag key={item.labelNo} color='default'>
+                  {item.name}
+                </Tag>
+              ))}
+            </div>
+          </Descriptions.Item>
+        </Descriptions>
+        <div className='grid grid-cols-2 mt-2 lg:hidden'>
+          <div className='flex flex-wrap gap-x-3'>
+            <Popconfirm
+              title={
+                <>
+                  <b>{record.name}</b>을/를 1개 사용하겠습니까?
+                </>
+              }
+              onConfirm={() => consumeOneItem(record)}
+              disabled={!record.quantity}
+            >
+              <Button
+                type='text'
+                shape='circle'
+                icon={
+                  <FontAwesomeIcon
+                    icon={faSquareMinus}
+                    className={'text-2xl ' + (!record.quantity ? '' : 'text-emerald-900')}
+                  />
+                }
+                className='flex items-center justify-center lg:hidden'
+                disabled={!record.quantity}
+              />
+            </Popconfirm>
+            <Button
+              type='text'
+              shape='circle'
+              icon={<FontAwesomeIcon icon={faSquarePlus} className='text-2xl text-emerald-900' />}
+              className='flex items-center justify-center lg:hidden'
+              onClick={() => openPurchaseModal(record)}
+            />
+          </div>
+          <div className='grid justify-end'>
+            <Tooltip title='삭제'>
+              <Button
+                type='text'
+                shape='circle'
+                icon={<DeleteFilled className='text-stone-500' />}
+                className='flex items-center justify-center'
+                onClick={(e) => {
+                  deleteItem(record)
+                }}
+              />
+            </Tooltip>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  // row 확장
+
   const columns: ColumnsType<ConsumableItemRS> = [
     {
-      title: '중요도',
+      align: 'center',
+      render: (_value, record, _index) => {
+        return (
+          <Button
+            type='text'
+            shape='circle'
+            icon={
+              <FontAwesomeIcon
+                icon={expended === record.itemNo ? faAngleDown : faAngleRight}
+                className='text-lg text-emerald-900'
+              />
+            }
+            className='flex items-center justify-center'
+            onClick={(e) => {
+              e.stopPropagation()
+              expend(record.itemNo)
+            }}
+          />
+        )
+      },
+      onCell: (record, rowIndex) => {
+        return {
+          onClick: (e) => e.stopPropagation(),
+        }
+      },
+    },
+    {
+      // title: '중요도',
       dataIndex: 'priority',
       key: 'priority',
       align: 'center',
+      colSpan: 0,
       render: (priority) => {
         return (
           <div className='w-5 mx-auto'>
@@ -102,20 +232,22 @@ const ConsumableTable = () => {
           </div>
         )
       },
-      width: 80,
+      // width: 80,
     },
     {
       title: '물품명',
       dataIndex: 'name',
       key: 'name',
       align: 'center',
-      width: 200,
+      colSpan: 2,
+      // width: 200,
     },
     {
       title: '라벨',
       dataIndex: 'labels',
       key: 'labels',
       align: 'center',
+      responsive: ['lg'],
       render(_value, record, _index) {
         return (
           <div className='inline-flex flex-wrap gap-y-2'>
@@ -127,14 +259,15 @@ const ConsumableTable = () => {
           </div>
         )
       },
-      width: 200,
+      // width: 200,
     },
     {
       title: '최근 구매일',
       dataIndex: 'latestPurchaseDate',
       key: 'latestPurchaseDate',
       align: 'center',
-      width: 120,
+      // width: 120,
+      responsive: ['lg'],
       render: (value) => value && dateUtil.formatUtc(value, 'YYYY.MM.DD'),
     },
     {
@@ -142,24 +275,26 @@ const ConsumableTable = () => {
       dataIndex: 'latestConsumeDate',
       key: 'latestConsumeDate',
       align: 'center',
-      width: 120,
+      // width: 120,
+      responsive: ['lg'],
       render: (value) => value && dateUtil.formatUtc(value, 'YYYY.MM.DD'),
     },
     {
-      title: '남은 수량',
+      title: '수량',
       dataIndex: 'quantity',
       key: 'quantity',
       align: 'center',
-      width: 100,
+      // width: 100,
       render(_value, record) {
         return `${record.quantity?.toLocaleString() || 0}개`
       },
     },
 
     {
-      title: '사용하기',
+      title: '사용',
       key: '사용하기',
       align: 'center',
+      responsive: ['sm'],
       render(_value, record, _index) {
         return (
           <div
@@ -177,12 +312,13 @@ const ConsumableTable = () => {
           </div>
         )
       },
-      width: 100,
+      // width: 100,
     },
     {
       title: '구매',
       key: '구매',
       align: 'center',
+      responsive: ['sm'],
       render(_value, record, _index) {
         return (
           <div
@@ -191,17 +327,18 @@ const ConsumableTable = () => {
             }}
           >
             <Button type='primary' onClick={() => openPurchaseModal(record)}>
-              구매
+              구매하기
             </Button>
           </div>
         )
       },
-      width: 100,
+      // width: 100,
     },
     {
       title: <EllipsisOutlined />,
       key: '...',
       align: 'center',
+      responsive: ['lg'],
       render(_value, record, _index) {
         return (
           <Tooltip title='삭제'>
@@ -218,7 +355,7 @@ const ConsumableTable = () => {
           </Tooltip>
         )
       },
-      width: 70,
+      // width: 70,
     },
   ]
 
@@ -229,12 +366,14 @@ const ConsumableTable = () => {
   return (
     <>
       <BasicTable<ConsumableItemRS>
+        id='item-table'
         columns={columns}
         rowKey='itemNo'
         dataSource={query.data?.data}
         loading={query.isLoading || isLoading}
-        tableLayout='fixed'
-        scroll={{ x: 250 }}
+        tableLayout='auto'
+        // tableLayout='fixed'
+        // scroll={{ x: 250 }}
         size='large'
         pagination={{
           current: consumableSearch.page,
@@ -247,6 +386,11 @@ const ConsumableTable = () => {
           return {
             onClick: () => navigate(`/items/${data.itemNo}`),
           }
+        }}
+        expandable={{
+          expandedRowRender,
+          showExpandColumn: false,
+          expandedRowKeys: [expended],
         }}
       />
       {visible && <PurchaseModal itemNo={itemNo!} hideModal={hideModal} />}

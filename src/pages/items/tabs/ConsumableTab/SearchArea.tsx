@@ -88,7 +88,7 @@ const SearchArea = () => {
           </Form.Item>
           <Form.Item name='labels'>
             <Select<string[]>
-              className='min-w-[100px]'
+              className='min-w-[192px]'
               allowClear
               mode='multiple'
               placeholder='라벨 검색'
