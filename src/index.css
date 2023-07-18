@@ -61,6 +61,15 @@ body {
   z-index: 555;
 }
 
+@media not all and (min-width: 768px) {
+  .item-modal .ant-modal-content .ant-modal-footer {
+    text-align: center;
+  }
+  #item-table td.ant-table-cell {
+    padding: 10px;
+  }
+}
+
 #item-form .ant-upload-list.ant-upload-list-picture-card {
   position: relative;
 }

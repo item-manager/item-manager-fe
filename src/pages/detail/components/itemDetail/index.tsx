@@ -162,11 +162,11 @@ const ItemDetail = () => {
           </div>
         </div>
         <div className='flex w-full 2xl:w-3/5 justify-end'>
-          <div className='flex items-center justify-center w-full lg:w-1/2 mt-6'>
-            <Button type='primary' className='h-10 text-base w-16 mr-9' onClick={showModal}>
+          <div className='flex flex-wrap gap-x-8 items-center justify-center w-full lg:w-1/2 mt-6'>
+            <Button type='primary' className='h-9 text-base w-1/4' onClick={showModal}>
               구매
             </Button>
-            <Button type='primary' className='h-10 text-base w-16' onClick={showItemUseModal}>
+            <Button type='primary' className='h-9 text-base w-1/4' onClick={showItemUseModal}>
               사용
             </Button>
           </div>
