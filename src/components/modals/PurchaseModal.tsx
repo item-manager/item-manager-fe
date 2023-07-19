@@ -1,4 +1,4 @@
-import { httpClient, PurchaseItemRQ } from '@/apis'
+import { httpClient, PurchaseItemRQ, QuantityLogMallRS } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
 import { historyTab } from '@/store/history'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -16,6 +16,7 @@ import {
   message,
   Modal,
   Row,
+  Select,
 } from 'antd'
 import dayjs from 'dayjs'
 import { useEffect, useRef, useState } from 'react'
@@ -36,6 +37,28 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
   const breakpoint = Grid.useBreakpoint()
 
   const getItemQuery = useQuery(['items', itemNo], () => httpClient.items.getItem(itemNo))
+  const { data: mallList } = useQuery({
+    queryKey: ['mallList'],
+    queryFn: async () => {
+      const options = (await httpClient.quantity.getMalls()).data?.map((el: QuantityLogMallRS) => ({
+        value: el.mall,
+        label: el.mall,
+      }))
+      options?.unshift({ value: 'select-mall-self', label: '직접 입력' })
+      return options
+    },
+    // queryFn: async () => await httpClient.quantity.getMalls(),
+  })
+
+  const [onSelfInput, setOnSelfInput] = useState(false)
+  const changeOnSelfInput = async (value: string | undefined) => {
+    setOnSelfInput(value === 'select-mall-self')
+    if (value === 'select-mall-self') {
+      form.setFieldValue('mall', undefined)
+    } else {
+      form.setFieldValue('mall', value)
+    }
+  }
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -157,7 +180,7 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
                   labelCol={{ span: 9 }}
                   className='mb-3'
                   rules={[
-                    { required: true, message: '${label}을 입력해 주세요.' },
+                    // { required: true, message: '${label}을 입력해 주세요.' },
                     { type: 'number', min: 0, message: '0보다 큰 값을 입력해주세요' },
                   ]}
                 >
@@ -179,7 +202,10 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
                   name='count'
                   labelCol={{ span: 12 }}
                   className='mb-3'
-                  rules={[{ required: true, message: '${label}을 입력해 주세요.' }]}
+                  rules={[
+                    { required: true, message: '${label}을 입력해 주세요.' },
+                    { type: 'number', min: 0, message: '0보다 큰 값을 입력해주세요' },
+                  ]}
                 >
                   <InputNumber<number>
                     className='w-full'
@@ -187,28 +213,39 @@ const PurchaseModal = ({ itemNo, hideModal }: Props) => {
                       value ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : ''
                     }
                     parser={(value) => (value ? parseInt(value.replace(/\$\s?|(,*)/g, '')) : 0)}
-                    min={1}
+                    // min={1}
                     max={999}
+                    onClick={() => {
+                      form.setFieldValue('count', null)
+                    }}
                   />
                 </Form.Item>
               </Col>
             </Row>
-            <Form.Item
-              label='구매처'
-              name='mall'
-              className='mb-3'
-              rules={[
-                { required: true, message: '${label}를 입력해 주세요.' },
-                { type: 'string', whitespace: true, message: '구매처를 입력해 주세요.' },
-                {
-                  validator: async (_rule, value) => {
-                    value?.trim()
-                  },
-                },
-              ]}
-            >
-              <Input ref={inputRef} className='w-full' />
-            </Form.Item>
+            <div className='flex max-sm:flex-col sm:flex-row mb-3'>
+              <div className='inline-block sm:w-[25%] sm:text-end'>
+                <label className='sm:mr-2'>구매처</label>
+              </div>
+              <div className='max-sm:w-full sm:w-[75%]'>
+                <Select onChange={changeOnSelfInput} options={mallList} className='w-full'></Select>
+                <Form.Item
+                  // label='구매처'
+                  name='mall'
+                  className={'mb-0 ' + (onSelfInput ? 'block' : 'hidden')}
+                  rules={[
+                    // { required: true, message: '${label}를 입력해 주세요.' },
+                    // { type: 'string', whitespace: true, message: '구매처를 입력해 주세요.' },
+                    {
+                      validator: async (_rule, value) => {
+                        value?.trim()
+                      },
+                    },
+                  ]}
+                >
+                  <Input ref={inputRef} className='w-full mt-1' />
+                </Form.Item>
+              </div>
+            </div>
             <Button htmlType='submit' block type='primary'>
               구매하기
             </Button>

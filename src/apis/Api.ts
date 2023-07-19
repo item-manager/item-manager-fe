@@ -417,6 +417,8 @@ export interface ConsumableItemRS {
   /** @format int32 */
   quantity?: number
   labels?: LabelRS[]
+  roomName?: string
+  placeName?: string
 }
 
 export interface PageRS {
@@ -473,6 +475,16 @@ export interface QuantityLogSumsRQ {
   itemNo: number
   type: string | null
   year: number | null
+}
+export interface QuantityLogMallRS {
+  mall: string
+}
+
+export interface ResultListMallRS {
+  /** @format int32 */
+  code?: number
+  message?: string
+  data?: QuantityLogMallRS[]
 }
 
 import axios, { AxiosInstance, AxiosRequestConfig, HeadersDefaults, ResponseType } from 'axios'
@@ -1172,6 +1184,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/quantity-logs/sums`,
         method: 'GET',
         query: query,
+        ...params,
+      }),
+    getMalls: (params: RequestParams = {}) =>
+      this.request<ResultListMallRS, ErrorResult>({
+        path: `/quantity-logs/malls`,
+        method: 'GET',
         ...params,
       }),
     /**

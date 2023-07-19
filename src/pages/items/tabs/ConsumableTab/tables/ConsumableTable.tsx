@@ -122,6 +122,8 @@ const ConsumableTable = () => {
         </div>
         <Descriptions>
           <Descriptions.Item label='남은 수량'>{record.quantity}</Descriptions.Item>
+          <Descriptions.Item label='장소(방)'>{record.roomName}</Descriptions.Item>
+          <Descriptions.Item label='위치(가구)'>{record.placeName}</Descriptions.Item>
           <Descriptions.Item label='최근 구매일'>
             {record.latestPurchaseDate &&
               dateUtil.formatUtc(record.latestPurchaseDate, 'YYYY년 M월 D일')}

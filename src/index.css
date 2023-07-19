@@ -70,6 +70,12 @@ body {
   }
 }
 
+@media (min-width: 768px) {
+  #item-table .ant-popover-disabled-compatible-wrapper {
+    display: none !important;
+  }
+}
+
 #item-form .ant-upload-list.ant-upload-list-picture-card {
   position: relative;
 }
