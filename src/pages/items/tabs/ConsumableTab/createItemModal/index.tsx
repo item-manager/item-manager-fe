@@ -292,7 +292,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
 
               <div className='flex flex-row grid-cols-2 items-center w-full'>
                 <Form.Item
-                  label='장소(방)'
+                  label='장소'
                   name='roomNo'
                   className='w-1/2'
                   colon={false}

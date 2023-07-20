@@ -110,7 +110,7 @@ const PlaceTable = ({ roomNo }: PlacesRQ) => {
 
   const columns: ColumnsType<PlacesRS> = [
     {
-      title: '위치',
+      title: '위치(가구)',
       dataIndex: 'name',
       key: 'name',
       align: 'center',

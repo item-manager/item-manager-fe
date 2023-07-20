@@ -108,7 +108,7 @@ const RoomTable = ({ roomNo, setRoomNo }: Props) => {
 
   const columns: ColumnsType<RoomsRS> = [
     {
-      title: '방',
+      title: '장소(방)',
       dataIndex: 'name',
       key: 'name',
       align: 'center',
@@ -155,7 +155,7 @@ const RoomTable = ({ roomNo, setRoomNo }: Props) => {
   return (
     <div className='flex flex-col'>
       <Button onClick={() => showCreateModal()} type='primary' className='mb-4 ml-auto'>
-        방 추가
+        장소 추가
       </Button>
       <BasicTable<RoomsRS>
         columns={columns}

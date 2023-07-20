@@ -78,8 +78,8 @@ const EquipmentTable = () => {
           </div>
         </div>
         <Descriptions>
-          <Descriptions.Item label='장소(방)'>{record.roomName}</Descriptions.Item>
-          <Descriptions.Item label='위치(가구)'>{record.placeName}</Descriptions.Item>
+          <Descriptions.Item label='장소'>{record.roomName}</Descriptions.Item>
+          <Descriptions.Item label='위치'>{record.placeName}</Descriptions.Item>
           <Descriptions.Item label='라벨' className='md:min-w-[120px]'>
             <div className='inline-flex flex-wrap gap-y-2'>
               {record.labels?.map((item) => (
@@ -137,11 +137,11 @@ const EquipmentTable = () => {
       },
     },
     {
-      // title: '중요도',
+      title: '중요도',
       dataIndex: 'priority',
       key: 'priority',
       align: 'center',
-      colSpan: 0,
+      // colSpan: 0,
       render: (priority) => {
         return (
           <div className='w-5 mx-auto'>
@@ -156,7 +156,7 @@ const EquipmentTable = () => {
       dataIndex: 'name',
       key: 'name',
       align: 'center',
-      colSpan: 2,
+      // colSpan: 2,
       // width: 200,
     },
     {
