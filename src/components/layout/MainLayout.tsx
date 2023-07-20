@@ -15,7 +15,7 @@ const items = [
   { key: '1', icon: <HomeOutlined />, label: '물품 관리', path: NavigationUtil.items },
   { key: '2', icon: <ApartmentOutlined />, label: '보관장소 관리', path: NavigationUtil.locations },
   { key: '3', icon: <UserOutlined />, label: '회원 정보', path: NavigationUtil.profileEdit },
-  { key: '4', icon: <SmileOutlined />, label: '테스트 페이지', path: NavigationUtil.test },
+  // { key: '4', icon: <SmileOutlined />, label: '테스트 페이지', path: NavigationUtil.test },
 ]
 
 const findKey = () => items.find((_item) => location.pathname.startsWith(_item.path))?.key
