@@ -65,7 +65,7 @@ export const pageState = atom({
 
 export const sizeState = atom({
   key: 'size',
-  default: 7,
+  default: 20,
   effects: [urlSyncEffect({ refine: number(), history: 'push' })],
 })
 

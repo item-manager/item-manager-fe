@@ -122,8 +122,8 @@ const ConsumableTable = () => {
         </div>
         <Descriptions>
           <Descriptions.Item label='남은 수량'>{record.quantity}</Descriptions.Item>
-          <Descriptions.Item label='장소(방)'>{record.roomName}</Descriptions.Item>
-          <Descriptions.Item label='위치(가구)'>{record.placeName}</Descriptions.Item>
+          <Descriptions.Item label='장소'>{record.roomName}</Descriptions.Item>
+          <Descriptions.Item label='위치'>{record.placeName}</Descriptions.Item>
           <Descriptions.Item label='최근 구매일'>
             {record.latestPurchaseDate &&
               dateUtil.formatUtc(record.latestPurchaseDate, 'YYYY년 M월 D일')}
@@ -222,11 +222,11 @@ const ConsumableTable = () => {
       },
     },
     {
-      // title: '중요도',
+      title: '중요도',
       dataIndex: 'priority',
       key: 'priority',
       align: 'center',
-      colSpan: 0,
+      // colSpan: 0,
       render: (priority) => {
         return (
           <div className='w-5 mx-auto'>
@@ -241,7 +241,7 @@ const ConsumableTable = () => {
       dataIndex: 'name',
       key: 'name',
       align: 'center',
-      colSpan: 2,
+      // colSpan: 2,
       // width: 200,
     },
     {
@@ -412,6 +412,7 @@ const ConsumableTable = () => {
         tableLayout='auto'
         // tableLayout='fixed'
         // scroll={{ x: 250 }}
+        scroll={{ y: window.innerHeight * 0.5 }}
         size='large'
         pagination={{
           current: consumableSearch.page,
