@@ -412,6 +412,7 @@ const ConsumableTable = () => {
         tableLayout='auto'
         // tableLayout='fixed'
         // scroll={{ x: 250 }}
+        scroll={{ y: window.innerHeight * 0.5 }}
         size='large'
         pagination={{
           current: consumableSearch.page,

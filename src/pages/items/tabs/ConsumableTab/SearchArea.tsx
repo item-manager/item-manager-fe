@@ -109,6 +109,14 @@ const SearchArea = () => {
               <Select.Option value='latest_consume_date-'>사용일 내림차순</Select.Option>
             </Select>
           </Form.Item>
+          <Form.Item name='size'>
+            <Select placeholder='20개씩 보기' className='w-28' allowClear>
+              <Select.Option value={10}>10개씩 보기</Select.Option>
+              <Select.Option value={20}>20개씩 보기</Select.Option>
+              <Select.Option value={50}>50개씩 보기</Select.Option>
+              <Select.Option value={100}>100개씩 보기</Select.Option>
+            </Select>
+          </Form.Item>
         </div>
         <button type='submit' className='hidden'></button>
       </Form>

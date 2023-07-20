@@ -233,10 +233,11 @@ const EquipmentTable = () => {
         tableLayout='auto'
         // tableLayout='fixed'
         // scroll={{ x: 250 }}
+        scroll={{ y: window.innerHeight * 0.5 }}
         size='large'
         pagination={{
-          current: equipmentSearch.page || 1,
-          pageSize: equipmentSearch.size || 7,
+          current: equipmentSearch.page,
+          pageSize: equipmentSearch.size,
           total: query.data?.page?.totalDataCnt,
           onChange: handlePageChange,
           // showSizeChanger: true,
