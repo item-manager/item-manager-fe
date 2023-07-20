@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEyeSlash, faUser, faEye } from '@fortawesome/free-solid-svg-icons'
 import { ChangeEvent, KeyboardEvent, MutableRefObject, useEffect, useRef, useState } from 'react'
-import { httpClient } from '@/apis'
+import { LoginUserRQ, httpClient } from '@/apis'
 import { useNavigate } from 'react-router'
 import { NavigationUtil } from '@/utils'
 import { useRecoilState } from 'recoil'
@@ -18,7 +18,7 @@ const LoginPage = () => {
 
   const [isShow, setIsShow] = useRecoilState(showPassword)
 
-  const [inputs, setInputs] = useState({
+  const [inputs, setInputs] = useState<LoginUserRQ>({
     id: '',
     password: '',
   })
@@ -36,14 +36,9 @@ const LoginPage = () => {
     setIsShow((prev) => !prev)
   }
 
-  const onClickLogin = async () => {
-    const { id, password } = inputs
-    if (!id || !password) return alert('정보를 입력해 주세요')
-
+  const doLogin = async (user: LoginUserRQ): Promise<void> => {
     try {
-      const response = await httpClient.auth.login({
-        ...inputs,
-      })
+      const response = await httpClient.auth.login(user)
       setUser(response.data)
       queryClient.clear()
       NavigationUtil.items
@@ -54,6 +49,13 @@ const LoginPage = () => {
     }
   }
 
+  const onClickLogin = async () => {
+    const { id, password } = inputs
+    if (!id || !password) return alert('정보를 입력해 주세요')
+
+    doLogin(inputs)
+  }
+
   const onPressEnterLogin = async (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       onClickLogin()
@@ -62,6 +64,14 @@ const LoginPage = () => {
 
   const onClickMoveToRegister = (): void => {
     navigate(NavigationUtil.register)
+  }
+
+  const insertSampleUser = (): void => {
+    const idInput = document.getElementsByName('id').item(0) as HTMLInputElement
+    const pwInput = document.getElementsByName('password').item(0) as HTMLInputElement
+    idInput.value = 'sample'
+    pwInput.value = 'sample'
+    doLogin({ id: 'sample', password: 'sample' })
   }
 
   useEffect(() => {
@@ -83,6 +93,7 @@ const LoginPage = () => {
             className='h-10 pl-3 bg-white border-b-2 outline-none w-72'
             name='id'
             onChange={onChangeInputs}
+            onKeyDown={onPressEnterLogin}
             ref={focusRef}
           />
           <FontAwesomeIcon icon={faUser} className='relative right-6' />
@@ -123,6 +134,10 @@ const LoginPage = () => {
             onClick={onClickMoveToRegister}
           >
             회원가입
+          </span>
+          {' / '}
+          <span className='cursor-pointer text-main hover:opacity-95' onClick={insertSampleUser}>
+            테스트 계정으로 로그인하기
           </span>
         </div>
       </div>
