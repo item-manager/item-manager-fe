@@ -13,6 +13,8 @@ import { faLeftLong } from '@fortawesome/free-solid-svg-icons'
 import LineChart from './lineChart'
 import { useEffect } from 'react'
 import useModal from '@/hooks/useModal'
+import PurchaseModal from '@/components/modals/PurchaseModal'
+import ItemUseModal from '@/components/modals/ItemUseModal'
 
 const ItemHistory = () => {
   const { itemNo } = useParams()
@@ -235,6 +237,8 @@ const ItemHistory = () => {
             }}
           />
         </div>
+        {visible && <PurchaseModal itemNo={Number(itemNo)!} hideModal={hideModal} />}
+        {isItemUse && <ItemUseModal itemNo={Number(itemNo)!} hideModal={hideItemUseModal} />}
         {contextHolder}
       </section>
     </>
