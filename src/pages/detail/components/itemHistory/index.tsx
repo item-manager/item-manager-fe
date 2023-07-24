@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLeftLong } from '@fortawesome/free-solid-svg-icons'
 import LineChart from './lineChart'
 import { useEffect } from 'react'
+import useModal from '@/hooks/useModal'
 
 const ItemHistory = () => {
   const { itemNo } = useParams()
@@ -20,6 +21,8 @@ const ItemHistory = () => {
 
   const [quantityLog, setQuantityLog] = useRecoilState(quantityLogState)
 
+  const { visible, showModal, hideModal, isItemUse, showItemUseModal, hideItemUseModal } =
+    useModal()
   const [modal, contextHolder] = Modal.useModal()
 
   const queryClient = useQueryClient()
@@ -96,10 +99,10 @@ const ItemHistory = () => {
     }
   }
 
-  const deleteItem = async (record: QuantityLogsRS) => {
+  const deleteLog = async (record: QuantityLogsRS) => {
     modal.confirm({
-      title: `물품 삭제`,
-      content: <>해당 물품을 삭제하시겠습니까?</>,
+      title: `기록 삭제`,
+      content: <>해당 기록을 삭제하시겠습니까?</>,
       onOk: async () => {
         await httpClient.quantity.deleteLog(record.quantityLogNo)
         queryClient.invalidateQueries({ queryKey: ['itemDetail', criteria] })
@@ -185,7 +188,7 @@ const ItemHistory = () => {
               className='flex items-center justify-center py-0 mx-auto'
               onClick={(e) => {
                 e.stopPropagation()
-                deleteItem(record)
+                deleteLog(record)
               }}
             />
           </Tooltip>
@@ -197,11 +200,19 @@ const ItemHistory = () => {
 
   return (
     <>
-      <FontAwesomeIcon
+      {/* <FontAwesomeIcon
         icon={faLeftLong}
         className='absolute ml-10 text-4xl hover:cursor-pointer'
         onClick={onClickMovePrev}
-      />
+      /> */}
+      <div className='flex flex-wrap gap-x-4 items-end justify-end w-full pr-8'>
+        <Button type='primary' className='h-9 text-base' onClick={showModal}>
+          구매
+        </Button>
+        <Button type='primary' className='h-9 text-base' onClick={showItemUseModal}>
+          사용
+        </Button>
+      </div>
       <FilterArea />
       <section className='h-full flex'>
         <div id='left-section' className='w-6/12 flex justify-center'>

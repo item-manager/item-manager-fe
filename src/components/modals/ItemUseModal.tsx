@@ -26,7 +26,7 @@ type Props = {
 const ItemUseModal = ({ itemNo, hideModal }: Props) => {
   const inputRef = useRef<InputRef | null>(null)
   const [confirmLoading, setConfirmLoading] = useState(false)
-  const [count, setCount] = useState<number | null>(1)
+  // const [count, setCount] = useState<number | null>(1)
   const queryClient = useQueryClient()
   const [form] = Form.useForm<PurchaseItemRQ>()
 
@@ -51,22 +51,22 @@ const ItemUseModal = ({ itemNo, hideModal }: Props) => {
     form.submit()
   }
 
-  const onChangeItemUse = (value: number | null) => {
-    setCount(value)
-  }
+  // const onChangeItemUse = (value: number | null) => {
+  //   setCount(value)
+  // }
 
-  const onFinish = async () => {
+  const onFinish = async (values: any) => {
     setConfirmLoading(true)
 
     try {
       // 물품 사용
       await httpClient.items.consumeItem(itemNo, {
-        count,
-        date: dayjs().toISOString(),
+        count: values.count,
+        date: values.date.toISOString(),
       })
 
       hideModal()
-      message.success(`${count} 사용하셨습니다`)
+      message.success(`${values.count} 사용하셨습니다`)
       queryClient.invalidateQueries({ queryKey: ['items'] })
       setIsHistory(true)
     } catch (e) {
@@ -130,10 +130,10 @@ const ItemUseModal = ({ itemNo, hideModal }: Props) => {
               count: 1,
             }}
             colon={false}
-            requiredMark='optional'
+            // requiredMark='optional'
           >
             <Form.Item
-              label='구매일'
+              label='사용일'
               name='date'
               className='mb-3'
               rules={[{ required: true, message: '${label}을 입력해 주세요.' }]}
@@ -152,7 +152,10 @@ const ItemUseModal = ({ itemNo, hideModal }: Props) => {
                   name='count'
                   labelCol={{ span: 12 }}
                   className='mb-3'
-                  rules={[{ required: true, message: '${label}을 입력해 주세요.' }]}
+                  rules={[
+                    { required: true, message: '${label}을 입력해 주세요.' },
+                    { type: 'number', min: 0, message: '0보다 큰 값을 입력해주세요' },
+                  ]}
                 >
                   <InputNumber<number>
                     className='w-full'
@@ -160,8 +163,8 @@ const ItemUseModal = ({ itemNo, hideModal }: Props) => {
                       value ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : ''
                     }
                     parser={(value) => (value ? parseInt(value.replace(/\$\s?|(,*)/g, '')) : 0)}
-                    onChange={onChangeItemUse}
-                    min={1}
+                    // onChange={onChangeItemUse}
+                    // min={1}
                     max={999}
                   />
                 </Form.Item>

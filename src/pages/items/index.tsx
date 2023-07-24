@@ -14,7 +14,7 @@ const Intro = () => {
         src={<img src={user.photoUrl || DEFAULT_PROFILE_IMAGE_URL} className='object-contain' />}
       />
       <Typography.Title level={2} className='m-0'>
-        {user.username}님 좋은 아침 입니다.
+        {user.username}님 좋은 하루되세요.
       </Typography.Title>
     </Space>
   )
