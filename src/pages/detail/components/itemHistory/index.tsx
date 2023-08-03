@@ -3,13 +3,10 @@ import BasicTable from '@/components/tables/BasicTable'
 import { useRecoilState } from 'recoil'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { httpClient, QuantityLogsRQ, QuantityLogsRS } from '@/apis'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { quantityLogState } from '@/store'
 import FilterArea from './filterArea'
 import { DeleteFilled, EllipsisOutlined } from '@ant-design/icons'
-import { NavigationUtil } from '@/utils'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLeftLong } from '@fortawesome/free-solid-svg-icons'
 import LineChart from './lineChart'
 import { useEffect } from 'react'
 import useModal from '@/hooks/useModal'
@@ -29,8 +26,6 @@ const ItemHistory = () => {
 
   const queryClient = useQueryClient()
 
-  const navigate = useNavigate()
-
   const searchParams = new URLSearchParams(window.location.search)
   const initialType = searchParams.get('type')
   const initialYear = searchParams.get('year')
@@ -46,10 +41,6 @@ const ItemHistory = () => {
     sort: quantityLog.sort || '-',
     page: quantityLog.page,
     size: quantityLog.size,
-  }
-
-  const onClickMovePrev = () => {
-    navigate(NavigationUtil.items)
   }
 
   const query = useQuery({
@@ -109,6 +100,7 @@ const ItemHistory = () => {
         await httpClient.quantity.deleteLog(record.quantityLogNo)
         queryClient.invalidateQueries({ queryKey: ['itemDetail', criteria] })
         message.success('삭제되었습니다.')
+        refetch()
       },
     })
   }
@@ -202,11 +194,6 @@ const ItemHistory = () => {
 
   return (
     <>
-      {/* <FontAwesomeIcon
-        icon={faLeftLong}
-        className='absolute ml-10 text-4xl hover:cursor-pointer'
-        onClick={onClickMovePrev}
-      /> */}
       <div className='flex flex-wrap gap-x-4 items-end justify-end w-full pr-8'>
         <Button type='primary' className='h-9 text-base' onClick={showModal}>
           구매
@@ -237,8 +224,22 @@ const ItemHistory = () => {
             }}
           />
         </div>
-        {visible && <PurchaseModal itemNo={Number(itemNo)!} hideModal={hideModal} />}
-        {isItemUse && <ItemUseModal itemNo={Number(itemNo)!} hideModal={hideItemUseModal} />}
+        {visible && (
+          <PurchaseModal
+            itemNo={Number(itemNo)!}
+            refetch={refetch}
+            hideModal={hideModal}
+            criteria={criteria}
+          />
+        )}
+        {isItemUse && (
+          <ItemUseModal
+            itemNo={Number(itemNo)!}
+            refetch={refetch}
+            hideModal={hideItemUseModal}
+            criteria={criteria}
+          />
+        )}
         {contextHolder}
       </section>
     </>

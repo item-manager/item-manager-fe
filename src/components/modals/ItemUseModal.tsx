@@ -1,4 +1,4 @@
-import { httpClient, PurchaseItemRQ } from '@/apis'
+import { httpClient, PurchaseItemRQ, QuantityLogsRQ } from '@/apis'
 import { PriorityProgressBar } from '@/components/progress'
 import { historyTab } from '@/store/history'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -22,8 +22,10 @@ import { useRecoilState } from 'recoil'
 type Props = {
   itemNo: number
   hideModal: () => void
+  refetch?: () => void
+  criteria?: QuantityLogsRQ
 }
-const ItemUseModal = ({ itemNo, hideModal }: Props) => {
+const ItemUseModal = ({ itemNo, hideModal, refetch, criteria }: Props) => {
   const inputRef = useRef<InputRef | null>(null)
   const [confirmLoading, setConfirmLoading] = useState(false)
   // const [count, setCount] = useState<number | null>(1)
@@ -65,9 +67,12 @@ const ItemUseModal = ({ itemNo, hideModal }: Props) => {
         date: values.date.toISOString(),
       })
 
+      refetch && refetch()
+
       hideModal()
       message.success(`${values.count} 사용하셨습니다`)
       queryClient.invalidateQueries({ queryKey: ['items'] })
+      queryClient.invalidateQueries({ queryKey: ['itemDetail', criteria] })
       setIsHistory(true)
     } catch (e) {
       console.error(e)
