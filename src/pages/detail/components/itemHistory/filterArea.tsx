@@ -1,10 +1,14 @@
 import { quantityLogState } from '@/store'
 import { useForm } from 'antd/lib/form/Form'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { Form, Select, FormProps } from 'antd'
+import { httpClient } from '@/apis'
+import { useParams } from 'react-router'
 
 export default function FilterArea() {
+  const { itemNo } = useParams()
+
   const [form] = useForm<{
     type: string
     year: number | null
@@ -13,6 +17,7 @@ export default function FilterArea() {
   }>()
 
   const [quantityLog, setQuantityLog] = useRecoilState(quantityLogState)
+  const [year, setYears] = useState<Date[]>([])
 
   useEffect(() => {
     form.resetFields()
@@ -47,6 +52,58 @@ export default function FilterArea() {
     setFilterArea()
   }
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await httpClient.quantity.quantityLog({
+          itemNo: Number(itemNo),
+          type: quantityLog.type!,
+          year: quantityLog.year!,
+          month: quantityLog.month!,
+          orderBy: quantityLog.orderBy!,
+          sort: quantityLog.sort!,
+          page: 1,
+          size: 10,
+        })
+        if (Array.isArray(result.data)) {
+          const dates = result.data.map((item) => new Date(item.date))
+          setYears(dates)
+        } else {
+          console.error('Data is not an array or is empty.')
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchData()
+  }, [quantityLog])
+
+  const newList = year.map((el) => el.getFullYear())
+
+  const largestYear = Math.max(...newList)
+  const smallestYear = Math.min(...newList)
+
+  const numbersInBetween: number[] = []
+  for (let i = smallestYear + 1; i < largestYear; i++) {
+    if (!newList.includes(i)) {
+      numbersInBetween.push(i)
+    }
+  }
+
+  const yearOptions = [
+    { value: null, label: '전체 년도' },
+    { value: largestYear, label: String(largestYear) },
+    ...numbersInBetween.map((year) => ({ value: year, label: String(year) })),
+    { value: smallestYear, label: String(smallestYear) },
+  ].reduce<{ value: number | null; label: string }[]>((accumulator, currentValue) => {
+    const existingValue = accumulator.find((el) => el.value === currentValue.value)
+    if (!existingValue) {
+      accumulator.push(currentValue)
+    }
+    return accumulator
+  }, [])
+
   return (
     <>
       <Form
@@ -76,30 +133,7 @@ export default function FilterArea() {
               <Select
                 style={{ width: 120, marginLeft: 20 }}
                 placeholder='년도'
-                options={[
-                  { value: null, label: '전체 년도' },
-                  { value: 2023, label: '2023' },
-                  { value: 2022, label: '2022' },
-                  { value: 2021, label: '2021' },
-                  { value: 2020, label: '2020' },
-                  { value: 2019, label: '2019' },
-                  { value: 2018, label: '2018' },
-                  { value: 2017, label: '2017' },
-                  { value: 2016, label: '2016' },
-                  { value: 2015, label: '2015' },
-                  { value: 2014, label: '2014' },
-                  { value: 2013, label: '2013' },
-                  { value: 2012, label: '2012' },
-                  { value: 2011, label: '2011' },
-                  { value: 2010, label: '2010' },
-                  { value: 2009, label: '2009' },
-                  { value: 2008, label: '2008' },
-                  { value: 2007, label: '2007' },
-                  { value: 2006, label: '2006' },
-                  { value: 2005, label: '2005' },
-                  { value: 2004, label: '2004' },
-                  { value: 2003, label: '2003' },
-                ]}
+                options={yearOptions}
               />
             </Form.Item>
             <Form.Item name='month'>
