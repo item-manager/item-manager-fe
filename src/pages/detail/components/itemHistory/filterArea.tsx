@@ -111,7 +111,10 @@ export default function FilterArea() {
         onValuesChange={handleValuesChange}
         initialValues={{
           ...quantityLog,
-          order: quantityLog.orderBy ? `${quantityLog.orderBy}${quantityLog.sort}` : 'date-',
+          order:
+            quantityLog.orderBy && quantityLog.sort
+              ? `${quantityLog.orderBy}${quantityLog.sort}`
+              : 'date-',
         }}
         onFinish={handleSubmit}
       >
