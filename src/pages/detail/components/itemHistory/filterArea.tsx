@@ -77,32 +77,14 @@ export default function FilterArea() {
     }
 
     fetchData()
-  }, [quantityLog])
+  }, [])
 
   const newList = year.map((el) => el.getFullYear())
-
-  const largestYear = Math.max(...newList)
-  const smallestYear = Math.min(...newList)
-
-  const numbersInBetween: number[] = []
-  for (let i = smallestYear + 1; i < largestYear; i++) {
-    if (!newList.includes(i)) {
-      numbersInBetween.push(i)
-    }
-  }
-
+  const yearList = [...new Set(newList)]
   const yearOptions = [
     { value: null, label: '전체 년도' },
-    { value: largestYear, label: String(largestYear) },
-    ...numbersInBetween.map((year) => ({ value: year, label: String(year) })),
-    { value: smallestYear, label: String(smallestYear) },
-  ].reduce<{ value: number | null; label: string }[]>((accumulator, currentValue) => {
-    const existingValue = accumulator.find((el) => el.value === currentValue.value)
-    if (!existingValue) {
-      accumulator.push(currentValue)
-    }
-    return accumulator
-  }, [])
+    ...yearList.map((year) => ({ value: year, label: String(year) })),
+  ]
 
   return (
     <>

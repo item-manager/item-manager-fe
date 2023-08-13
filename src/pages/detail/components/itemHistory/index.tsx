@@ -69,6 +69,14 @@ const ItemHistory = () => {
 
   const allConsume = chartData?.data?.logSumByType.CONSUME?.map((el: { sum: number }) => el.sum)
 
+  const allPurchaseYears = chartData?.data?.logSumByType.PURCHASE?.map(
+    (el: { date: number[] }) => el.date
+  )
+
+  const allConsumeYears = chartData?.data?.logSumByType.CONSUME?.map(
+    (el: { date: number[] }) => el.date
+  )
+
   useEffect(() => {
     refetch()
   }, [initialType, initialYear, refetch])
@@ -210,6 +218,8 @@ const ItemHistory = () => {
             allConsume={allConsume}
             initialYear={initialYear}
             initialType={initialType}
+            allPurchaseYears={allPurchaseYears}
+            allConsumeYears={allConsumeYears}
           />
         </div>
         <div id='right-section' className='w-6/12'>

@@ -1,12 +1,14 @@
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface ChartDataProps {
   allPurchase: number[]
   allConsume: number[]
   initialYear: string | null
   initialType: string | null
+  allPurchaseYears?: number[]
+  allConsumeYears?: number[]
 }
 
 export default function LineChart({
@@ -14,14 +16,11 @@ export default function LineChart({
   allConsume,
   initialYear,
   initialType,
+  allPurchaseYears,
+  allConsumeYears,
 }: ChartDataProps) {
   const [isPurchase, setIsPurchase] = useState(false)
   const [isConsume, setIsConsume] = useState(false)
-
-  const allYears = [
-    2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018,
-    2019, 2020, 2021, 2022, 2023,
-  ]
 
   const allMonths = [
     '1월',
@@ -38,18 +37,19 @@ export default function LineChart({
     '12월',
   ]
 
-  const xAxis = useCallback(() => {
+  const xAxis = () => {
     if (
       initialYear === null ||
       initialYear === 'null' ||
+      initialType === null ||
       initialType === '"purchase"' ||
       initialType === '"consume"'
     ) {
-      return allYears
+      return initialType === '"purchase"' ? allPurchaseYears : allConsumeYears
     } else {
       return allMonths
     }
-  }, [initialYear, initialType])
+  }
 
   const options = {
     chart: {
