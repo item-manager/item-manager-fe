@@ -100,12 +100,11 @@ export default function FilterArea() {
         }}
         onFinish={handleSubmit}
       >
-        <section className='flex mt-14 mb-2'>
-          <div className='w-6/12' />
-          <div className='flex w-6/12 h-8'>
-            <Form.Item name='type'>
+        <section className='flex mb-2'>
+          <div className='flex flex-row flex-wrap gap-x-3'>
+            <Form.Item name='type' className='flex'>
               <Select
-                style={{ width: 120 }}
+                className='w-[120px]'
                 placeholder='구매/사용'
                 options={[
                   { value: null, label: '구매/사용' },
@@ -114,16 +113,12 @@ export default function FilterArea() {
                 ]}
               />
             </Form.Item>
-            <Form.Item name='year'>
-              <Select
-                style={{ width: 120, marginLeft: 20 }}
-                placeholder='년도'
-                options={yearOptions}
-              />
+            <Form.Item name='year' className='flex'>
+              <Select className='w-[120px]' placeholder='년도' options={yearOptions} />
             </Form.Item>
-            <Form.Item name='month'>
+            <Form.Item name='month' className='flex'>
               <Select
-                style={{ width: 120, marginLeft: 20 }}
+                className='w-[120px]'
                 placeholder='월'
                 options={[
                   { value: null, label: '전체 월' },
@@ -142,8 +137,8 @@ export default function FilterArea() {
                 ]}
               />
             </Form.Item>
-            <Form.Item name='order'>
-              <Select placeholder='정렬' className='w-[120px] ml-5' allowClear>
+            <Form.Item name='order' className='flex'>
+              <Select placeholder='정렬' allowClear className='w-[120px]'>
                 <Select.Option value='date-'>최신 날짜</Select.Option>
                 <Select.Option value='date+'>오래된 날짜</Select.Option>
                 <Select.Option value='count-'>많은 수량 순</Select.Option>

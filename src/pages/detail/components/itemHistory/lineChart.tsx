@@ -111,8 +111,12 @@ export default function LineChart({
 
   return (
     <>
-      <div>
-        <HighchartsReact highcharts={Highcharts} options={options} />
+      <div className='w-full lg:w-5/6'>
+        <HighchartsReact
+          containerProps={{ className: 'w-full' }}
+          highcharts={Highcharts}
+          options={options}
+        />
       </div>
     </>
   )
