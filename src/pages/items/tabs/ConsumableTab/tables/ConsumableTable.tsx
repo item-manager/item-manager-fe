@@ -41,6 +41,7 @@ const ConsumableTable = () => {
   const criteria: ConsumableItemsRQ = {
     name: consumableSearch.name || undefined,
     labelNos: consumableSearch.labels?.map((item) => +item),
+    checkThreshold: consumableSearch.checkThreshold || false,
     orderBy: consumableSearch.orderBy || undefined,
     sort: consumableSearch.sort || null,
     page: consumableSearch.page,
@@ -120,8 +121,9 @@ const ConsumableTable = () => {
             <div className='font-medium text-lg'>{record.name}</div>
           </div>
         </div>
-        <Descriptions>
+        <Descriptions column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label='남은 수량'>{record.quantity}</Descriptions.Item>
+          <Descriptions.Item label='기준 수량'>{record.threshold}</Descriptions.Item>
           <Descriptions.Item label='장소'>{record.roomName}</Descriptions.Item>
           <Descriptions.Item label='위치'>{record.placeName}</Descriptions.Item>
           <Descriptions.Item label='최근 구매일'>
@@ -132,7 +134,7 @@ const ConsumableTable = () => {
             {record.latestConsumeDate &&
               dateUtil.formatUtc(record.latestConsumeDate, 'YYYY년 M월 D일')}
           </Descriptions.Item>
-          <Descriptions.Item label='라벨'>
+          <Descriptions.Item label='라벨' span={2}>
             <div className='inline-flex flex-wrap gap-y-2'>
               {record.labels?.map((item) => (
                 <Tag key={item.labelNo} color='default'>
@@ -288,7 +290,19 @@ const ConsumableTable = () => {
       align: 'center',
       // width: 100,
       render(_value, record) {
-        return `${record.quantity?.toLocaleString() || 0}개`
+        return (
+          <div
+            className={
+              record.quantity !== undefined &&
+              record.threshold !== undefined &&
+              record.quantity > record.threshold
+                ? ''
+                : 'font-bold text-orange-500'
+            }
+          >
+            {record.quantity?.toLocaleString() || 0}개
+          </div>
+        )
       },
     },
 

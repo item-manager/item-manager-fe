@@ -2,7 +2,7 @@ import { httpClient } from '@/apis'
 import { consumableSearchState } from '@/store'
 import { SearchOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
-import { Button, Form, FormProps, Input, Select } from 'antd'
+import { Button, Checkbox, Form, FormProps, Input, Select } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
 import { useEffect } from 'react'
 import { useRecoilState } from 'recoil'
@@ -14,6 +14,7 @@ const SearchArea = () => {
     labels: string[]
     name: string
     order: string
+    checkThreshold: boolean
   }>()
 
   const [consumableSearch, setConsumableSearch] = useRecoilState(consumableSearchState)
@@ -45,6 +46,7 @@ const SearchArea = () => {
 
   const setSearchValue = () => {
     const { order, ...rest } = form.getFieldsValue()
+    // console.log(rest)
 
     const matchedValue = order?.match(/(.+)([+-])/) as [
       never,
@@ -61,6 +63,7 @@ const SearchArea = () => {
     }
 
     setConsumableSearch((data) => ({ ...data, ...rest, orderBy, sort, page: 1 }))
+    console.log(consumableSearch)
   }
 
   return (
@@ -116,6 +119,9 @@ const SearchArea = () => {
               <Select.Option value={50}>50개씩 보기</Select.Option>
               <Select.Option value={100}>100개씩 보기</Select.Option>
             </Select>
+          </Form.Item>
+          <Form.Item name='checkThreshold' valuePropName='checked'>
+            <Checkbox>구매 임박 상품만 보기</Checkbox>
           </Form.Item>
         </div>
         <button type='submit' className='hidden'></button>
