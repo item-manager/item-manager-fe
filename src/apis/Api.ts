@@ -98,6 +98,7 @@ export interface CreateItemRQ {
   photoName?: string
   /** @format int32 */
   quantity?: number
+  threshold?: number
   /** @format int32 */
   priority?: number
   labels: string[]
@@ -237,6 +238,7 @@ export interface UpdateItemRQ {
   photoName?: string
   /** @format int32 */
   priority?: number
+  threshold?: number
   labels?: string[]
 }
 
@@ -311,6 +313,7 @@ export interface ItemRS {
   photoUrl?: string
   /** @format int32 */
   quantity?: number
+  threshold?: number
   /** @format int32 */
   priority?: number
   labels?: LabelRS[]
@@ -384,6 +387,7 @@ export interface ResultListEquipmentItemRS {
 export interface ConsumableItemsRQ {
   name?: string
   labelNos?: number[]
+  checkThreshold?: boolean
   /** priority(중요도), quantity(수량), latest_purchase_date(최근 구매일), latest_consume_date(최근 사용일), null(생성순) */
   orderBy?: 'priority' | 'quantity' | 'latest_purchase_date' | 'latest_consume_date'
   /**
@@ -416,6 +420,7 @@ export interface ConsumableItemRS {
   latestPurchaseDate?: string
   /** @format int32 */
   quantity?: number
+  threshold?: number
   labels?: LabelRS[]
   roomName?: string
   placeName?: string

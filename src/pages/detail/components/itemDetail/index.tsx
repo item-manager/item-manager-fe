@@ -110,16 +110,23 @@ const ItemDetail = () => {
             )}
           </div>
           <div id='right-section' className='w-full'>
-            <div className='flex items-center grid grid-cols-2 w-full h-18 border-b-1 border-lightGray'>
+            <div className='grid grid-cols-2 items-center w-full h-18 border-b-1 border-lightGray'>
               <div className='grid grid-cols-2 text-base'>
                 <span className='inline-block text-center font-bold'>분류</span>
                 <span className='inline-block text-center'>
                   {convertItemType(itemDetail?.data?.type)}
                 </span>
               </div>
+            </div>
+
+            <div className='flex items-center grid grid-cols-2 w-full h-18 border-b-1 border-lightGray'>
               <div className='grid grid-cols-2 text-base'>
                 <span className='inline-block text-center font-bold'>남은 수량</span>
                 <span className='inline-block text-center'>{itemDetail?.data?.quantity}</span>
+              </div>
+              <div className='grid grid-cols-2 text-base'>
+                <span className='inline-block text-center font-bold'>기준 수량</span>
+                <span className='inline-block text-center'>{itemDetail?.data?.threshold}</span>
               </div>
             </div>
 

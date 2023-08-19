@@ -16,7 +16,7 @@ export const PriorityProgressBar = ({
   priority = 0,
   strokeWidth = 10,
   gap = 20,
-  color = '#F98600',
+  color = 'rgb(249 115 22)',
   className = '',
   onChange,
 }: PriorityProgressBarType) => {

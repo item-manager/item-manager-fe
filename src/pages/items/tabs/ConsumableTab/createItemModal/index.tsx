@@ -15,6 +15,7 @@ import {
   UploadFile,
   Popover,
   Button,
+  Tooltip,
 } from 'antd'
 import { PictureOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useState } from 'react'
@@ -120,6 +121,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
       locationNo: values.locationNo,
       photoName: imageRS?.data?.filename,
       quantity: values.quantity,
+      threshold: values.threshold,
       priority: values.priority,
       labels: values.labels,
       memo: values.memo,
@@ -170,6 +172,7 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
           initialValues={{
             type: 'CONSUMABLE',
             quantity: 0,
+            threshold: 0,
           }}
           validateMessages={{
             required: '입력이 필요합니다',
@@ -263,10 +266,10 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                 </Form.Item>
               </div>
 
-              <div className='flex flex-row w-full'>
+              <div className='flex flex-row grid-cols-2 items-center w-full'>
                 <Form.Item
-                  label='수량'
-                  name='quantity'
+                  label='기준 수량'
+                  name='threshold'
                   colon={false}
                   className='w-1/2'
                   labelCol={{ span: 8 }}
@@ -275,6 +278,39 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                     { required: true, message: '${label}을 입력해 주세요.' },
                     { type: 'number', min: 0, message: '0보다 큰 값을 입력해주세요' },
                   ]}
+                  tooltip={{
+                    title: '구매 임박 표시 기준이 되는 수량',
+                    className: 'text-xs ml-px',
+                  }}
+                >
+                  <InputNumber<number>
+                    className='w-5/6'
+                    formatter={(value) =>
+                      value ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : ''
+                    }
+                    parser={(value) => (value ? parseInt(value.replace(/\$\s?|(,*)/g, '')) : 0)}
+                    max={999}
+                    onClick={() => {
+                      form.setFieldValue('threshold', null)
+                    }}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label='수량'
+                  name='quantity'
+                  colon={false}
+                  className='w-1/2'
+                  labelCol={{ span: 5 }}
+                  labelAlign='left'
+                  rules={[
+                    { required: true, message: '${label}을 입력해 주세요.' },
+                    { type: 'number', min: 0, message: '0보다 큰 값을 입력해주세요' },
+                  ]}
+                  tooltip={{
+                    title: '물품의 현재 보유 수량',
+                    className: 'text-xs ml-px',
+                  }}
                 >
                   <InputNumber<number>
                     className='w-5/6'
@@ -298,6 +334,10 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   colon={false}
                   labelCol={{ span: 8 }}
                   labelAlign='left'
+                  tooltip={{
+                    title: '[보관장소 관리]의 장소(방)',
+                    className: 'text-xs ml-px',
+                  }}
                 >
                   <Select
                     onChange={onChangeRoomValue}
@@ -315,8 +355,13 @@ const CreateItemModal = ({ hideModal }: createItemProps) => {
                   rules={[{ required: true, message: '필수: 장소를 선택하면 목록이 생성됩니다' }]}
                   className='w-1/2'
                   colon={false}
-                  labelCol={{ span: 4 }}
+                  labelCol={{ span: 5 }}
                   labelAlign='left'
+                  tooltip={{
+                    title:
+                      '[보관장소 관리]의 위치(가구)이다. [장소]를 선택하면 해당 장소에 속하는 위치 목록이 생성된다',
+                    className: 'text-xs ml-px',
+                  }}
                 >
                   <Select
                     id='item-form-select-place'

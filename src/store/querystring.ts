@@ -1,4 +1,4 @@
-import { array, literal, nullable, number, string, union } from '@recoiljs/refine'
+import { array, literal, nullable, number, string, union, bool } from '@recoiljs/refine'
 import { atom, DefaultValue, selector } from 'recoil'
 import { urlSyncEffect } from 'recoil-sync'
 
@@ -18,6 +18,12 @@ export const nameState = atom({
   key: 'name',
   default: null,
   effects: [urlSyncEffect({ refine: nullable(string()), history: 'push' })],
+})
+
+export const checkThresholdState = atom({
+  key: 'checkThreshold',
+  default: false,
+  effects: [urlSyncEffect({ refine: nullable(bool()), history: 'push' })],
 })
 
 export const orderByState = atom({
@@ -165,6 +171,7 @@ export const consumableSearchState = selector({
   get: ({ get }) => {
     const labels = get(labelsState)
     const name = get(nameState)
+    const checkThreshold = get(checkThresholdState)
     const orderBy = get(orderByState)
     const sort = get(sortState)
     const page = get(pageState)
@@ -173,6 +180,7 @@ export const consumableSearchState = selector({
     return {
       labels,
       name,
+      checkThreshold,
       orderBy,
       sort,
       page,
@@ -183,6 +191,7 @@ export const consumableSearchState = selector({
     if (newValue instanceof DefaultValue) {
       reset(labelsState)
       reset(nameState)
+      reset(checkThresholdState)
       reset(orderByState)
       reset(sortState)
       reset(pageState)
@@ -190,6 +199,7 @@ export const consumableSearchState = selector({
     } else {
       set(labelsState, newValue.labels || [])
       set(nameState, newValue.name || null)
+      set(checkThresholdState, newValue.checkThreshold)
       set(orderByState, newValue.orderBy || null)
       set(sortState, newValue.sort || null)
       set(pageState, newValue.page)
