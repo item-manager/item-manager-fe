@@ -384,7 +384,7 @@ export interface ResultListEquipmentItemRS {
 export interface ConsumableItemsRQ {
   name?: string
   labelNos?: number[]
-  /** priority(중요도), quantity(수량), latest_purchase_date(최근 구매일), latest_consume_date(최근 사용일), null(생성순) */
+  /** priority(중요도), quantity(수량), latest_purchase_date(최근 구매일), latest_consume_date(최근 사용일), null(중요도) */
   orderBy?: 'priority' | 'quantity' | 'latest_purchase_date' | 'latest_consume_date'
   /**
    * +(오름차순), -(내림차순)
